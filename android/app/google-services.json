@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "785067393451",
+    "firebase_url": "https://chatooapp.firebaseio.com",
+    "project_id": "chatooapp",
+    "storage_bucket": "chatooapp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:785067393451:android:f7e61b014a7f7900d552ee",
+        "android_client_info": {
+          "package_name": "singhsduos.ChatApp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "785067393451-sdsk0n0hkfj6pf5fmp35mc7ma47ofphq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJYA8iOO2-ENMJ6IA0gCE4Hshuq28atzE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "785067393451-sdsk0n0hkfj6pf5fmp35mc7ma47ofphq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

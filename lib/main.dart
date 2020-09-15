@@ -1,9 +1,14 @@
-import 'dart:core';
+import 'package:ChatApp/Views/chatRoomsScreen.dart';
+import 'package:ChatApp/Views/signIn.dart';
+import 'package:ChatApp/Views/signUp.dart';
+import 'package:ChatApp/helper/authenticate.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'Views/signIn.dart';
 
 // ignore: avoid_void_async
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(MyApp());
 }
 
@@ -12,12 +17,14 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Chatoo',
+      title: 'ChatooApp',
       theme: ThemeData(
-        primarySwatch: Colors.lime,
+        scaffoldBackgroundColor:  Color(0xfffeaf0f1),
+        primarySwatch: Colors.cyan,
+       
       ),
 
-      home: SignIn(),
+      home: Authenticate(),
       // home: MLHome(),
     );
   }
