@@ -1,5 +1,6 @@
 import 'package:ChatApp/Views/signIn.dart';
 import 'package:ChatApp/Views/signUp.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:flutter/material.dart';
 
 class Authenticate extends StatefulWidget {
@@ -11,6 +12,8 @@ class Authenticate extends StatefulWidget {
 
 class _AuthenticateState extends State<Authenticate> {
   bool showSignIn = true;
+  bool isSwitched = false;
+
 
   void toggleView() {
     setState(() {
@@ -25,5 +28,7 @@ class _AuthenticateState extends State<Authenticate> {
     } else {
       return SignUp(toggleView);
     }
+    
   }
+    
 }

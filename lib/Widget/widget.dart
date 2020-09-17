@@ -12,6 +12,7 @@ PreferredSizeWidget appBarMain(BuildContext context) {
       ),
     ),
     backgroundColor: Colors.cyan,
+    
     iconTheme: IconThemeData(color: Colors.white)
   );
 }

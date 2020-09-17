@@ -1,17 +1,24 @@
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
+import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
+import 'chatRoomsScreen.dart';
+import 'package:ChatApp/helper/authenticate.dart';
+import 'package:ChatApp/main.dart';
 
 import '../Widget/widget.dart';
 
 class SignUp extends StatefulWidget {
   final Function toggle;
   SignUp(this.toggle);
+
   @override
   _SignUpState createState() => _SignUpState();
 }
@@ -20,7 +27,7 @@ class _SignUpState extends State<SignUp> {
   bool isLoading = false;
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
-  QuerySnapshot currentUser;
+  
 
   final formKey = GlobalKey<FormState>();
   TextEditingController userNameTextEditingController = TextEditingController();
@@ -32,6 +39,9 @@ class _SignUpState extends State<SignUp> {
         'name': userNameTextEditingController.text,
         'email': emailTextEditingController.text.trim()
       };
+   
+      HelperFunctions.saveUserEmailSharedPreference( emailTextEditingController.text.trim());
+      HelperFunctions.saveUserEmailSharedPreference( userNameTextEditingController.text );
       setState(() {
         isLoading = true;
       });
@@ -42,7 +52,8 @@ class _SignUpState extends State<SignUp> {
         // print('${val.uid}');
 
         // ignore: always_specify_types
-
+        // databaseMethods.uploadUserInfo(userInfoMap);
+        HelperFunctions.saveUserLoggedInSharedPreference(true);
         Navigator.pushReplacement(
             context,
             MaterialPageRoute<MaterialPageRoute>(
@@ -71,7 +82,7 @@ class _SignUpState extends State<SignUp> {
                               : null;
                         },
                         controller: userNameTextEditingController,
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(color: Colors.cyan),
                         decoration: InputDecoration(
                           focusedBorder: OutlineInputBorder(
                               borderRadius:
@@ -102,7 +113,7 @@ class _SignUpState extends State<SignUp> {
                               : 'Enter correct email';
                         },
                         controller: emailTextEditingController,
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(color: Colors.cyan),
                         decoration: InputDecoration(
                           focusedBorder: OutlineInputBorder(
                               borderRadius:
@@ -126,13 +137,13 @@ class _SignUpState extends State<SignUp> {
                       ),
                       TextFormField(
                         validator: (val) {
-                          return val.length > 6
+                          return val.length > 5
                               ? null
                               : "Enter Username 6+ characters";
                         },
                         controller: passwordTextEditingController,
                         obscureText: true,
-                        style: TextStyle(color: Colors.blue),
+                        style: TextStyle(color: Colors.cyan),
                         decoration: InputDecoration(
                           focusedBorder: OutlineInputBorder(
                               borderRadius:

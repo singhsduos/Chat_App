@@ -17,10 +17,15 @@ class _SearchScreenState extends State<SearchScreen> {
   dynamic initiateSearch() {
     databaseMethods
         .getByUserName(searchTextEditingController.text)
-        .then((value) => setState(() {
-              searchSnapshot = value as QuerySnapshot;
+        .then((val) => setState(() {
+              searchSnapshot = val as QuerySnapshot;
             }));
   }
+
+//  dynamic createChatroomAndStartConversation(String userName){
+//     List<String> users = [userName, ];
+//     databaseMethods.createChatRoom();
+//   }
 
   Widget searchList() {
     return searchSnapshot != null
@@ -69,7 +74,7 @@ class _SearchScreenState extends State<SearchScreen> {
                               color: Colors.white,
                               letterSpacing: 1.0,
                               fontSize: 16),
-                          cursorColor: Colors.black,
+                          cursorColor: Colors.black54,
                           decoration: InputDecoration(
                             suffixIcon: Container(
                               child: Icon(
