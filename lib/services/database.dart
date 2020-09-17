@@ -42,26 +42,62 @@ class DatabaseMethods {
     return user;
   }
 
-  Future<String> retrieveData(String username) async {
-    final DocumentSnapshot snap = await users.document(username).get();
-    Map<String, String> map = snap.data.toString() as Map<String, String>;
-    final String email = map['name'];
-    return username;
+  // Future<String> retrieveData(String username) async {
+  //   final DocumentSnapshot snap = await users.document(username).get();
+  //   Map<String, String> map = snap.data.toString() as Map<String, String>;
+  //   final String email = map['name'];
+  //   return username;
+  // }
+
+  dynamic uploadUserInfo(dynamic userMap) {
+    Firestore.instance
+        .collection('users')
+        .add({userMap})
+        .then((value) => print('User Added'))
+        .catchError((dynamic e) {
+          print(e.toString());
+        });
   }
-//
 
   // user data from snapshot
   Stream<QuerySnapshot> get userInfo {
     return users.snapshots();
   }
 
-  // dynamic createChatRoom(String chatroomid, dynamic chatRoomMap) {
-  //   Firestore.instance
-  //       .collection('ChatRoom')
-  //       .document(chatroomid)
-  //       .setData(chatRoomMap)
-  //       .catchError((dynamic e) {
-  //     print(e.toString());
-  //   });
-  // }
+  dynamic createChatRoom(String chatroomid, dynamic chatRoomMap) {
+    Firestore.instance
+        .collection('ChatRoom')
+        .document(chatroomid)
+        .setData({chatRoomMap})
+        .then((value) => print('User Added'))
+        .catchError((dynamic e) {
+          print(e.toString());
+        });
+  }
+
+  dynamic addConversationMessages(String chatRoomid, dynamic messageMap) {
+    Firestore.instance
+        .collection('ChatRoom')
+        .document(chatRoomid)
+        .collection('chats')
+        .add(messageMap)
+        .then((value) => print('User Added'))
+        .catchError((dynamic error) => print("Failed to add user: $error"));
+  }
+
+  dynamic getConversationMessages(String chatRoomid) async {
+    return await Firestore.instance
+        .collection('ChatRoom')
+        .document(chatRoomid)
+        .collection('chats')
+        .orderBy('time', descending: false)
+        .snapshots();
+  }
+
+  dynamic getChatRooms(String userName) async{
+    return await Firestore.instance
+        .collection('ChatRoom')
+        .where('users', arrayContains: userName)
+        .snapshots();
+  }
 }

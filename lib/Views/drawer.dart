@@ -22,7 +22,7 @@ class _SideDrawerState extends State<SideDrawer> {
           children: [
             SwitchListTile(
               title: Text(
-                'Switch Theme',
+                'Switch DarkMode',
                 style: TextStyle(
                   fontSize: 17.0,
                   letterSpacing: 1.0,
