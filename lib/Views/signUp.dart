@@ -7,7 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
 import 'chatRoomsScreen.dart';
-import 'package:ChatApp/helper/authenticate.dart';
+
 
 import '../Widget/widget.dart';
 
@@ -80,7 +80,10 @@ class _SignUpState extends State<SignUp> {
             MaterialPageRoute<MaterialPageRoute>(
                 builder: (BuildContext context) => ChatRoom()));
       } else {
-        print("There was an error");
+         setState(() {
+            isLoading = false;
+             print("There was an error");
+          });
       }
     });
   }
@@ -162,7 +165,7 @@ class _SignUpState extends State<SignUp> {
                         validator: (val) {
                           return val.length > 5
                               ? null
-                              : "Enter Username 6+ characters";
+                              : "Enter Password 6+ characters";
                         },
                         controller: passwordTextEditingController,
                         obscureText: true,

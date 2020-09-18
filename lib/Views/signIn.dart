@@ -78,7 +78,11 @@ class _SignInState extends State<SignIn> {
             MaterialPageRoute<MaterialPageRoute>(
                 builder: (BuildContext context) => ChatRoom()));
       } else {
-        print("There was an error");
+         setState(() {
+            isLoading = false;
+             print("There was an error");
+          });
+       
       }
     });
   }
@@ -134,7 +138,7 @@ class _SignInState extends State<SignIn> {
                             validator: (val) {
                               return val.length > 5
                                   ? null
-                                  : "Enter valid password";
+                                  : "Enter correct password";
                             },
                             controller: passwordTextEditingController,
                             obscureText: true,
@@ -205,6 +209,7 @@ class _SignInState extends State<SignIn> {
                           ),
                           GestureDetector(
                             onTap: () {
+                              Constants.prefs.setBool('userIsLoggedIn', true);
                               performLogin();
                             },
                             child: Container(
