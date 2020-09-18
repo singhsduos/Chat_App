@@ -1,5 +1,3 @@
-import 'dart:html';
-
 import 'package:ChatApp/Widget/widget.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/services/auth.dart';
@@ -23,12 +21,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
   Stream<QuerySnapshot> chatMessagesStream;
 
   Widget ChatMessageList() {
-    return StreamBuilder<dynamic>(
+    return StreamBuilder(
       stream: chatMessagesStream,
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-                // itemCount: snapshot.data,
+                // ignore: prefer_const_literals_to_create_immutables
+                itemCount: (int.parse('${snapshot.data.documents.length}')),
                 itemBuilder: (context, index) {
                 return MessageTile(
                   '${snapshot.data.documents[index].data["message"]}',
@@ -43,11 +42,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   dynamic sendMessage() {
     if (messageController.text.isNotEmpty) {
-      Map<String, dynamic> messageMap = {
+      // ignore: always_specify_types
+      final Map<String, dynamic> messageMap = <String, dynamic>{
         'message': messageController.text,
         'sendBy': Constants.myName,
         'time': DateTime.now().millisecondsSinceEpoch,
-        
       };
       databaseMethods.addConversationMessages(widget.chatRoomid, messageMap);
       setState(() {

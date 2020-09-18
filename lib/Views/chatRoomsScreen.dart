@@ -29,7 +29,7 @@ class _ChatRoomState extends State<ChatRoom> {
       builder: (BuildContext context, AsyncSnapshot snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-                // itemCount: snapshot.data.documents.length,
+                itemCount: (int.parse('${snapshot.data.documents.length}')),
                 itemBuilder: (context, index) {
                 return ChatRoomTile(
                     '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}',
