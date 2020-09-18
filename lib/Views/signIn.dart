@@ -1,4 +1,5 @@
 import 'package:ChatApp/Views/forgetPassword.dart';
+import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
@@ -86,168 +87,173 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBarMain(context),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(24),
-          child: Column(
-            children: <Widget>[
-              Form(
-                key: formKey,
+      body: isLoading
+          ? Container(child: Center(child: CircularProgressIndicator()))
+          : SingleChildScrollView(
+              child: Container(
+                padding: EdgeInsets.all(24),
                 child: Column(
                   children: <Widget>[
-                    isLoading
-                        ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : Container(),
-                    TextFormField(
-                      validator: (val) {
-                        return RegExp(
-                                    r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                                .hasMatch(val)
-                            ? null
-                            : 'Enter correct email';
-                      },
-                      controller: emailTextEditingController,
-                      style: TextStyle(color: Colors.cyan),
-                      decoration: InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(22.0)),
-                          borderSide: BorderSide(color: Colors.cyan, width: 2),
-                        ),
-                        enabledBorder: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                          borderSide: BorderSide(color: Colors.cyan),
-                        ),
-                        hintText: 'Enter E-mail',
-                        labelText: 'E-mail',
-                        filled: true,
-                        labelStyle:
-                            new TextStyle(color: Colors.cyan, fontSize: 16.0),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    TextFormField(
-                      validator: (val) {
-                        return val.length > 5
-                            ? null
-                            : "Enter Username 6+ characters";
-                      },
-                      controller: passwordTextEditingController,
-                      obscureText: true,
-                      style: TextStyle(color: Colors.cyan),
-                      decoration: InputDecoration(
-                        focusedBorder: OutlineInputBorder(
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(22.0)),
-                            borderSide:
-                                BorderSide(color: Colors.cyan, width: 2)),
-                        enabledBorder: const OutlineInputBorder(
-                          borderRadius: BorderRadius.all(Radius.circular(20.0)),
-                          borderSide: BorderSide(color: Colors.cyan),
-                        ),
-                        hintText: 'Enter Password',
-                        labelText: 'Password',
-                        filled: true,
-                        labelStyle:
-                            new TextStyle(color: Colors.cyan, fontSize: 16.0),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute<MaterialPageRoute>(
-                                builder: (BuildContext context) =>
-                                    ForgotPassword()));
-                      },
-                      child: Container(
-                        alignment: Alignment.centerRight,
-                        child: Container(
-                          padding: EdgeInsets.all(16),
-                          child: Text('Forgot Password?',
-                              style:
-                                  TextStyle(color: Colors.blue, fontSize: 16)),
-                        ),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        signIn();
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xfff4BCFFA),
-                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                        ),
-                        child: Text('Sign In',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 17)),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        performLogin();
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        width: MediaQuery.of(context).size.width,
-                        padding: EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: Color(0xfff99AAAB),
-                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
-                        ),
-                        child: Text('Sign In with Google',
-                            style:
-                                TextStyle(color: Colors.white, fontSize: 17)),
-                      ),
-                    ),
-                    SizedBox(
-                      height: 20,
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        Text("Don't have account? ",
-                            style: TextStyle(color: Colors.blue, fontSize: 16)),
-                        GestureDetector(
-                          onTap: () {
-                            widget.toggle();
-                          },
-                          child: Container(
-                            padding: EdgeInsets.symmetric(vertical: 8),
-                            child: Text(
-                              'Register now',
-                              style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 16,
-                                  decoration: TextDecoration.underline),
+                    Form(
+                      key: formKey,
+                      child: Column(
+                        children: <Widget>[
+                          TextFormField(
+                            validator: (val) {
+                              return RegExp(
+                                          r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                                      .hasMatch(val)
+                                  ? null
+                                  : 'Enter correct email';
+                            },
+                            controller: emailTextEditingController,
+                            style: TextStyle(color: Colors.cyan),
+                            decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(22.0)),
+                                borderSide:
+                                    BorderSide(color: Colors.cyan, width: 2),
+                              ),
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                                borderSide: BorderSide(color: Colors.cyan),
+                              ),
+                              hintText: 'Enter E-mail',
+                              labelText: 'E-mail',
+                              filled: true,
+                              labelStyle: new TextStyle(
+                                  color: Colors.cyan, fontSize: 16.0),
                             ),
                           ),
-                        )
-                      ],
-                    ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          TextFormField(
+                            validator: (val) {
+                              return val.length > 5
+                                  ? null
+                                  : "Enter valid password";
+                            },
+                            controller: passwordTextEditingController,
+                            obscureText: true,
+                            style: TextStyle(color: Colors.cyan),
+                            decoration: InputDecoration(
+                              focusedBorder: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(22.0)),
+                                  borderSide:
+                                      BorderSide(color: Colors.cyan, width: 2)),
+                              enabledBorder: const OutlineInputBorder(
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(20.0)),
+                                borderSide: BorderSide(color: Colors.cyan),
+                              ),
+                              hintText: 'Enter Password',
+                              labelText: 'Password',
+                              filled: true,
+                              labelStyle: new TextStyle(
+                                  color: Colors.cyan, fontSize: 16.0),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                  context,
+                                  MaterialPageRoute<MaterialPageRoute>(
+                                      builder: (BuildContext context) =>
+                                          ForgotPassword()));
+                            },
+                            child: Container(
+                              alignment: Alignment.centerRight,
+                              child: Container(
+                                padding: EdgeInsets.all(16),
+                                child: Text('Forgot Password?',
+                                    style: TextStyle(
+                                        color: Colors.blue, fontSize: 16)),
+                              ),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              Constants.prefs.setBool('userIsLoggedIn', true);
+                              signIn();
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              width: MediaQuery.of(context).size.width,
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: const Color(0xfff4BCFFA),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30.0)),
+                              ),
+                              child: Text('Sign In',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 17)),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          GestureDetector(
+                            onTap: () {
+                              performLogin();
+                            },
+                            child: Container(
+                              alignment: Alignment.center,
+                              width: MediaQuery.of(context).size.width,
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Color(0xfff99AAAB),
+                                borderRadius:
+                                    BorderRadius.all(Radius.circular(30.0)),
+                              ),
+                              child: Text('Sign In with Google',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 17)),
+                            ),
+                          ),
+                          SizedBox(
+                            height: 20,
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: <Widget>[
+                              Text("Don't have account? ",
+                                  style: TextStyle(
+                                      color: Colors.blue, fontSize: 16)),
+                              GestureDetector(
+                                onTap: () {
+                                  widget.toggle();
+                                },
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(vertical: 8),
+                                  child: Text(
+                                    'Register now',
+                                    style: TextStyle(
+                                        color: Colors.blue,
+                                        fontSize: 16,
+                                        decoration: TextDecoration.underline),
+                                  ),
+                                ),
+                              )
+                            ],
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
-              )
-            ],
-          ),
-        ),
-      ),
+              ),
+            ),
     );
   }
 }

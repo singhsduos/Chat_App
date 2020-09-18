@@ -79,7 +79,8 @@ class _ChatRoomState extends State<ChatRoom> {
         actions: <Widget>[
           GestureDetector(
             onTap: () {
-              authMethods.signOut();
+              Constants.prefs.setBool('userIsLoggedIn', false);
+               authMethods.signOut();
               Navigator.pushReplacement(
                   context,
                   MaterialPageRoute<MaterialPageRoute>(

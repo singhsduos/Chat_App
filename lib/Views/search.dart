@@ -1,7 +1,6 @@
 import 'package:ChatApp/Views/conversationScreen.dart';
 import 'package:ChatApp/Widget/widget.dart';
 import 'package:ChatApp/helper/constants.dart';
-import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
@@ -18,12 +17,32 @@ class _SearchScreenState extends State<SearchScreen> {
   TextEditingController searchTextEditingController = TextEditingController();
 
   QuerySnapshot searchSnapshot;
+  bool isLoading = false;
+  bool haveUserSearched = false;
+
+  dynamic initiateSearch() async {
+    if (searchTextEditingController.text.isNotEmpty) {
+      setState(() {
+        isLoading = true;
+      });
+      await databaseMethods
+          .getByUserName(searchTextEditingController.text)
+          .then((val) {
+        searchSnapshot = val as QuerySnapshot;
+        print('$searchSnapshot');
+        setState(() {
+          isLoading = false;
+          haveUserSearched = true;
+        });
+      });
+    }
+  }
 
   Widget searchList() {
-    return searchSnapshot != null
+    return haveUserSearched
         ? ListView.builder(
-            itemCount: searchSnapshot.documents.length,
             shrinkWrap: true,
+            itemCount: searchSnapshot.documents.length,
             itemBuilder: (context, index) {
               return SearchTile(
                 userName: ('${searchSnapshot.documents[index].data()['name']}'),
@@ -32,14 +51,6 @@ class _SearchScreenState extends State<SearchScreen> {
               );
             })
         : Container();
-  }
-
-  dynamic initiateSearch() {
-    databaseMethods
-        .getByUserName(searchTextEditingController.text)
-        .then((val) => setState(() {
-              searchSnapshot = val as QuerySnapshot;
-            }));
   }
 
   dynamic createChatroomAndStartConversation({String userName}) {
@@ -52,11 +63,12 @@ class _SearchScreenState extends State<SearchScreen> {
         'users': users,
         'chatroomid': chatRoomid,
       }.cast<String, dynamic>();
-      DatabaseMethods().createChatRoom(chatRoomMap,  chatRoomid);
+      databaseMethods.createChatRoom(chatRoomMap, chatRoomid);
       Navigator.push(
           context,
           MaterialPageRoute<MaterialPageRoute>(
-              builder: (BuildContext context) => ConversationScreen(chatRoomid)));
+              builder: (BuildContext context) =>
+                  ConversationScreen(chatRoomid)));
     } else {
       print('you cannot send message to yourself');
     }
@@ -105,7 +117,11 @@ class _SearchScreenState extends State<SearchScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: appBarMain(context),
-      body: Container(
+      body: isLoading ? Container(
+        child: Center(
+          child: CircularProgressIndicator(),
+        ),
+      ) : Container(
         child: Column(
           children: <Widget>[
             Container(

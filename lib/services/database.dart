@@ -26,7 +26,7 @@ class DatabaseMethods {
     String user = '';
     await Firestore.instance
         .collection('users')
-        .where('name', isEqualTo: username)
+        .where('userName', isEqualTo: username)
         .getDocuments();
 
     return user;

@@ -1,4 +1,5 @@
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
+import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
@@ -29,6 +30,10 @@ class _SignUpState extends State<SignUp> {
   TextEditingController passwordTextEditingController = TextEditingController();
   dynamic signMeUp() {
     if (formKey.currentState.validate()) {
+      Map<String, dynamic> userInfoMap = {
+        'name': userNameTextEditingController.text,
+        'email': emailTextEditingController.text.trim()
+      }.cast<String, dynamic>();
       HelperFunctions.saveUserEmailSharedPreference(
           emailTextEditingController.text.trim());
       HelperFunctions.saveUserNameSharedPreference(
@@ -42,12 +47,9 @@ class _SignUpState extends State<SignUp> {
           .then((dynamic val) {
         if (val != null) {
           // ignore: always_specify_types
-           Map<String, dynamic> userInfoMap = {
-            'name': userNameTextEditingController.text,
-            'email': emailTextEditingController.text.trim()
-          }.cast<String, dynamic>();
+
           // ignore: unnecessary_parenthesis
-          DatabaseMethods().uploadUserInfo((userInfoMap));
+          databaseMethods.uploadUserInfo((userInfoMap));
           HelperFunctions.saveUserLoggedInSharedPreference(true);
           Navigator.pushReplacement(
               context,
@@ -65,13 +67,13 @@ class _SignUpState extends State<SignUp> {
 
     authMethods.handleSignIn().then((User user) {
       if (user != null) {
-         final Map<String, dynamic> userInfoMap = {
-            'name': userNameTextEditingController.text,
-            'email': emailTextEditingController.text.trim()
-          }.cast<String, dynamic>();
-          // ignore: unnecessary_parenthesis
-          DatabaseMethods().uploadUserInfo((userInfoMap));
-          HelperFunctions.saveUserLoggedInSharedPreference(true);
+        final Map<String, dynamic> userInfoMap = {
+          'name': userNameTextEditingController.text,
+          'email': emailTextEditingController.text.trim()
+        }.cast<String, dynamic>();
+        // ignore: unnecessary_parenthesis
+        databaseMethods.uploadUserInfo(userInfoMap);
+        HelperFunctions.saveUserLoggedInSharedPreference(true);
         HelperFunctions.saveUserLoggedInSharedPreference(true);
         Navigator.pushReplacement(
             context,
@@ -96,15 +98,10 @@ class _SignUpState extends State<SignUp> {
                   key: formKey,
                   child: Column(
                     children: <Widget>[
-                      isLoading
-                          ? Center(
-                              child: CircularProgressIndicator(),
-                            )
-                          : Container(),
                       TextFormField(
                         validator: (val) {
                           return val.isEmpty || val.length < 3
-                              ? "Enter Username 3+ characters"
+                              ? 'Enter Username 3+ characters'
                               : null;
                         },
                         controller: userNameTextEditingController,
@@ -191,21 +188,9 @@ class _SignUpState extends State<SignUp> {
                       SizedBox(
                         height: 20,
                       ),
-                      // Container(
-                      //   alignment: Alignment.centerRight,
-                      //   child: Container(
-                      //     padding: EdgeInsets.all(16),
-                      //     child: Text('Forgot Password?',
-                      //         style:
-                      //             TextStyle(color: Colors.blue, fontSize: 16)),
-                      //   ),
-                      // ),
-                      // SizedBox(
-                      //   height: 20,
-                      // ),
                       GestureDetector(
                         onTap: () {
-                          //To Do
+                          Constants.prefs.setBool('userIsLoggedIn', true);
                           signMeUp();
                         },
                         child: Container(
