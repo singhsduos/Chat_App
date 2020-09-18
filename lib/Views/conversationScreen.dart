@@ -2,7 +2,9 @@ import 'dart:html';
 
 import 'package:ChatApp/Widget/widget.dart';
 import 'package:ChatApp/helper/constants.dart';
+import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 class ConversationScreen extends StatefulWidget {
@@ -15,21 +17,25 @@ class ConversationScreen extends StatefulWidget {
 
 class _ConversationScreenState extends State<ConversationScreen> {
   DatabaseMethods databaseMethods = DatabaseMethods();
+  AuthMethods authMethods = AuthMethods();
   TextEditingController messageController = TextEditingController();
 
-  Stream<dynamic> chatMessagesStream;
+  Stream<QuerySnapshot> chatMessagesStream;
 
   Widget ChatMessageList() {
     return StreamBuilder<dynamic>(
       stream: chatMessagesStream,
-      builder: (BuildContext context, snapshot) {
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-                itemCount: snapshot.data,
+                // itemCount: snapshot.data,
                 itemBuilder: (context, index) {
-                  return MessageTile(
-                      '${snapshot.data.documents()[index].data['message']}', '${snapshot.data.documents()[index].data['SendBy'] ==Constants.myName}');
-                })
+                return MessageTile(
+                  '${snapshot.data.documents[index].data["message"]}',
+                  Constants.myName ==
+                      snapshot.data.documents[index].data["sendBy"],
+                );
+              })
             : Container();
       },
     );
@@ -37,13 +43,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   dynamic sendMessage() {
     if (messageController.text.isNotEmpty) {
-      final Map<String, dynamic> messageMap = {
+      Map<String, dynamic> messageMap = {
         'message': messageController.text,
         'sendBy': Constants.myName,
         'time': DateTime.now().millisecondsSinceEpoch,
+        
       };
       databaseMethods.addConversationMessages(widget.chatRoomid, messageMap);
-      messageController.text = "";
+      setState(() {
+        messageController.text = "";
+      });
     }
   }
 
@@ -53,7 +62,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         .getConversationMessages(widget.chatRoomid)
         .then((dynamic value) {
       setState(() {
-        chatMessagesStream = value as Stream<int>;
+        chatMessagesStream = value as Stream<QuerySnapshot>;
       });
     });
     super.initState();

@@ -25,15 +25,16 @@ class _ChatRoomState extends State<ChatRoom> {
 
   Widget chatRoomList() {
     return StreamBuilder<dynamic>(
-      stream:chatRoomsStream,
-      builder: (BuildContext context, snapshot) {
+      stream: chatRoomsStream,
+      builder: (BuildContext context, AsyncSnapshot snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-                itemCount: snapshot.data,
+                // itemCount: snapshot.data.documents.length,
                 itemBuilder: (context, index) {
-                  return ChatRoomTile(
-                      '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}', '${snapshot.data.documents[index].data['chatroomid']}');
-                })
+                return ChatRoomTile(
+                    '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}',
+                    '${snapshot.data.documents[index].data['chatroomid']}');
+              })
             : Container();
       },
     );
@@ -124,15 +125,15 @@ class ChatRoomTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: (){
+      onTap: () {
         Navigator.push(
-                  context,
-                  MaterialPageRoute<MaterialPageRoute>(
-                      builder: (BuildContext context) => ConversationScreen(chatRoomid)));
-            
+            context,
+            MaterialPageRoute<MaterialPageRoute>(
+                builder: (BuildContext context) =>
+                    ConversationScreen(chatRoomid)));
       },
-          child: Container(
-            color: Color(0xfff99AAAB),
+      child: Container(
+        color: Color(0xfff99AAAB),
         padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Row(
           children: <Widget>[
