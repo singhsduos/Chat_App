@@ -1,9 +1,12 @@
 import 'package:ChatApp/modal/user.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthMethods {
+  static final FirebaseFirestore _firestore = Firestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
+   final GoogleSignIn googleSignIn = GoogleSignIn();
   Users _userFromFirebaseUser(User user) {
     return user != null ? Users(userId: user.uid) : null;
   }
@@ -46,8 +49,8 @@ class AuthMethods {
     }
   }
 
-  final GoogleSignIn googleSignIn = GoogleSignIn();
-  Future<User> _handleSignIn() async {
+ 
+  Future<User> handleSignIn() async {
   final GoogleSignInAccount googleUser = await googleSignIn.signIn();
   GoogleSignInAuthentication googleAuth = await googleUser.authentication;
   final AuthCredential credential = GoogleAuthProvider.getCredential(

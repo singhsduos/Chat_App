@@ -21,7 +21,7 @@ class _ChatRoomState extends State<ChatRoom> {
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
 
-  Stream chatRoomsStream;
+  Stream <dynamic>chatRoomsStream;
 
   Widget chatRoomList() {
     return StreamBuilder<dynamic>(
@@ -29,10 +29,10 @@ class _ChatRoomState extends State<ChatRoom> {
       builder: (context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
-                itemCount: snapshot.data.documents.length,
+                itemCount: snapshot.data,
                 itemBuilder: (context, index) {
                   return ChatRoomTile(
-                      '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}, ${snapshot.data.documents[index].data['chatroomid']}');
+                      '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}', '${snapshot.data.documents[index].data['chatroomid']}');
                 })
             : Container();
       },

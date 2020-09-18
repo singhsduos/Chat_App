@@ -17,7 +17,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   DatabaseMethods databaseMethods = DatabaseMethods();
   TextEditingController messageController = TextEditingController();
 
-  Stream chatMessagesStream;
+  Stream<dynamic> chatMessagesStream;
 
   Widget ChatMessageList() {
     return StreamBuilder<dynamic>(
@@ -28,7 +28,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 itemCount: snapshot.data,
                 itemBuilder: (context, index) {
                   return MessageTile(
-                      '${snapshot.data.documents()[index].data['message']}, ${snapshot.data.documents()[index].data['SendBy'] == Constants.myName}');
+                      '${snapshot.data.documents()[index].data['message']}', '${snapshot.data.documents()[index].data['SendBy'] ==Constants.myName}');
                 })
             : Container();
       },

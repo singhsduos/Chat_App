@@ -42,21 +42,18 @@ class DatabaseMethods {
     return user;
   }
 
-  // Future<String> retrieveData(String username) async {
+  // Future<String> uploadUserInfo(String username) async {
   //   final DocumentSnapshot snap = await users.document(username).get();
   //   Map<String, String> map = snap.data.toString() as Map<String, String>;
   //   final String email = map['name'];
   //   return username;
   // }
 
-  dynamic uploadUserInfo(dynamic userMap) {
-    Firestore.instance
+  dynamic uploadUserInfo(String userMap) async {
+    return await Firestore.instance
         .collection('users')
-        .add({userMap})
-        .then((value) => print('User Added'))
-        .catchError((dynamic e) {
-          print(e.toString());
-        });
+        .where('users', arrayContains: userMap)
+        .snapshots();
   }
 
   // user data from snapshot

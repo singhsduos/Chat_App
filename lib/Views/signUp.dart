@@ -62,6 +62,24 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
+  void performLogin() {
+    setState(() {
+      isLoading = true;
+    });
+
+    authMethods.handleSignIn().then((User user) {
+      if (user != null) {
+        HelperFunctions.saveUserLoggedInSharedPreference(true);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<MaterialPageRoute>(
+                builder: (BuildContext context) => ChatRoom()));
+      } else {
+        print("There was an error");
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -75,6 +93,11 @@ class _SignUpState extends State<SignUp> {
                   key: formKey,
                   child: Column(
                     children: <Widget>[
+                       isLoading
+                          ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : Container(),
                       TextFormField(
                         validator: (val) {
                           return val.isEmpty || val.length < 3
@@ -199,18 +222,23 @@ class _SignUpState extends State<SignUp> {
                       SizedBox(
                         height: 20,
                       ),
-                      Container(
-                          alignment: Alignment.center,
-                          width: MediaQuery.of(context).size.width,
-                          padding: EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            color: Color(0xfff99AAAB),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(30.0)),
-                          ),
-                          child: Text('Sign Up with Google',
-                              style: TextStyle(
-                                  color: Colors.white, fontSize: 17))),
+                      GestureDetector(
+                        onTap: (){
+                          performLogin();
+                        },
+                                              child: Container(
+                            alignment: Alignment.center,
+                            width: MediaQuery.of(context).size.width,
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              color: Color(0xfff99AAAB),
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(30.0)),
+                            ),
+                            child: Text('Sign Up with Google',
+                                style: TextStyle(
+                                    color: Colors.white, fontSize: 17))),
+                      ),
                       SizedBox(
                         height: 20,
                       ),

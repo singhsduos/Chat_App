@@ -2,6 +2,7 @@ import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
 
@@ -58,6 +59,24 @@ class _SignInState extends State<SignIn> {
     }
   }
 
+  void performLogin() {
+    setState(() {
+      isLoading = true;
+    });
+
+    authMethods.handleSignIn().then((User user) {
+      if (user != null) {
+        HelperFunctions.saveUserLoggedInSharedPreference(true);
+        Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<MaterialPageRoute>(
+                builder: (BuildContext context) => ChatRoom()));
+      } else {
+        print("There was an error");
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,6 +90,11 @@ class _SignInState extends State<SignIn> {
                 key: formKey,
                 child: Column(
                   children: <Widget>[
+                    isLoading
+                          ? Center(
+                            child: CircularProgressIndicator(),
+                          )
+                        : Container(),
                     TextFormField(
                       validator: (val) {
                         return RegExp(
@@ -160,16 +184,22 @@ class _SignInState extends State<SignIn> {
                     SizedBox(
                       height: 20,
                     ),
-                    Container(
-                      alignment: Alignment.center,
-                      width: MediaQuery.of(context).size.width,
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Color(0xfff99AAAB),
-                        borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                    GestureDetector(
+                      onTap: () {
+                        performLogin();
+                      },
+                      child: Container(
+                        alignment: Alignment.center,
+                        width: MediaQuery.of(context).size.width,
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Color(0xfff99AAAB),
+                          borderRadius: BorderRadius.all(Radius.circular(30.0)),
+                        ),
+                        child: Text('Sign In with Google',
+                            style:
+                                TextStyle(color: Colors.white, fontSize: 17)),
                       ),
-                      child: Text('Sign In with Google',
-                          style: TextStyle(color: Colors.white, fontSize: 17)),
                     ),
                     SizedBox(
                       height: 20,
