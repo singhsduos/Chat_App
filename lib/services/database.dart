@@ -61,25 +61,36 @@ class DatabaseMethods {
     return users.snapshots();
   }
 
-  dynamic createChatRoom(String chatroomid, dynamic chatRoomMap) {
-    Firestore.instance
-        .collection('ChatRoom')
-        .document(chatroomid)
-        .setData({chatRoomMap})
-        .then((value) => print('User Added'))
+  //  Future<bool>  createChatRoom(String chatroomid, dynamic chatRoomMap){
+  //   //  Set<Map<String, dynamic>>chatRoomMap;
+  //    Firestore.instance
+  //       .collection('ChatRoom')
+  //       .document(chatroomid)
+  //       .setData({chatRoomMap})
+  //       .then((value) => print('User Added'))
+  //       .catchError((dynamic e) {
+  //         print(e.toString());
+  //       });
+  // }
+  Future<void> createChatRoom(dynamic chatRoomMap, String chatRoomId) async {
+    Map<String, dynamic> chatRoomMap;
+    return await Firestore.instance
+        .collection("chatRoom")
+        .document(chatRoomId)
+        .setData(chatRoomMap)
         .catchError((dynamic e) {
-          print(e.toString());
-        });
+      print(e);
+    });
   }
 
-  dynamic addConversationMessages(String chatRoomid, dynamic messageMap) {
-    Firestore.instance
+  Future<void> addConversationMessages(
+      String chatRoomid, dynamic messageMap) async {
+    Map<String, dynamic> messageMap;
+    return await Firestore.instance
         .collection('ChatRoom')
         .document(chatRoomid)
         .collection('chats')
-        .add(messageMap)
-        .then((value) => print('User Added'))
-        .catchError((dynamic error) => print("Failed to add user: $error"));
+        .add(messageMap);
   }
 
   dynamic getConversationMessages(String chatRoomid) async {
@@ -91,7 +102,7 @@ class DatabaseMethods {
         .snapshots();
   }
 
-  dynamic getChatRooms(String userName) async{
+  dynamic getChatRooms(String userName) async {
     return await Firestore.instance
         .collection('ChatRoom')
         .where('users', arrayContains: userName)

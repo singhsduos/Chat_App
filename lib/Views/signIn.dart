@@ -1,3 +1,4 @@
+import 'package:ChatApp/Views/forgetPassword.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
@@ -54,6 +55,10 @@ class _SignInState extends State<SignIn> {
               context,
               MaterialPageRoute<MaterialPageRoute>(
                   builder: (BuildContext context) => ChatRoom()));
+        } else {
+          setState(() {
+            isLoading = false;
+          });
         }
       });
     }
@@ -91,7 +96,7 @@ class _SignInState extends State<SignIn> {
                 child: Column(
                   children: <Widget>[
                     isLoading
-                          ? Center(
+                        ? Center(
                             child: CircularProgressIndicator(),
                           )
                         : Container(),
@@ -153,12 +158,22 @@ class _SignInState extends State<SignIn> {
                     SizedBox(
                       height: 20,
                     ),
-                    Container(
-                      alignment: Alignment.centerRight,
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute<MaterialPageRoute>(
+                                builder: (BuildContext context) =>
+                                    ForgotPassword()));
+                      },
                       child: Container(
-                        padding: EdgeInsets.all(16),
-                        child: Text('Forgot Password?',
-                            style: TextStyle(color: Colors.blue, fontSize: 16)),
+                        alignment: Alignment.centerRight,
+                        child: Container(
+                          padding: EdgeInsets.all(16),
+                          child: Text('Forgot Password?',
+                              style:
+                                  TextStyle(color: Colors.blue, fontSize: 16)),
+                        ),
                       ),
                     ),
                     SizedBox(

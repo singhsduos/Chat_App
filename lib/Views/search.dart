@@ -52,7 +52,7 @@ class _SearchScreenState extends State<SearchScreen> {
         'users': users,
         'chatroomid': chatRoomid,
       }.cast<String, dynamic>();
-      DatabaseMethods().createChatRoom(chatRoomid, chatRoomMap);
+      DatabaseMethods().createChatRoom(chatRoomMap,  chatRoomid);
       Navigator.push(
           context,
           MaterialPageRoute<MaterialPageRoute>(

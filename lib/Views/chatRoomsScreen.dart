@@ -21,12 +21,12 @@ class _ChatRoomState extends State<ChatRoom> {
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
 
-  Stream <dynamic>chatRoomsStream;
+  Stream chatRoomsStream;
 
   Widget chatRoomList() {
     return StreamBuilder<dynamic>(
-      stream: chatRoomsStream,
-      builder: (context, snapshot) {
+      stream:chatRoomsStream,
+      builder: (BuildContext context, snapshot) {
         return snapshot.hasData
             ? ListView.builder(
                 itemCount: snapshot.data,
