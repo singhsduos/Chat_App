@@ -21,7 +21,8 @@ class HelperFunctions {
     return await prefs.setString(sharedPreferenceUserEmailKey, userEmail);
   }
 
-  //getting data from shared
+  
+  /// fetching data from sharedpreference
 
   static Future<bool> getUserLoggedInSharedPreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();

@@ -1,17 +1,12 @@
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
-import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:dynamic_theme/dynamic_theme.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
 import 'chatRoomsScreen.dart';
 import 'package:ChatApp/helper/authenticate.dart';
-import 'package:ChatApp/main.dart';
 
 import '../Widget/widget.dart';
 
@@ -27,21 +22,17 @@ class _SignUpState extends State<SignUp> {
   bool isLoading = false;
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
-  
 
   final formKey = GlobalKey<FormState>();
   TextEditingController userNameTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
-  void signMeUp() {
+  dynamic signMeUp() {
     if (formKey.currentState.validate()) {
-      final Map<String, String> userInfoMap = {
-        'name': userNameTextEditingController.text,
-        'email': emailTextEditingController.text.trim()
-      };
-   
-      HelperFunctions.saveUserEmailSharedPreference( emailTextEditingController.text.trim());
-      HelperFunctions.saveUserNameSharedPreference( userNameTextEditingController.text );
+      HelperFunctions.saveUserEmailSharedPreference(
+          emailTextEditingController.text.trim());
+      HelperFunctions.saveUserNameSharedPreference(
+          userNameTextEditingController.text);
       setState(() {
         isLoading = true;
       });
@@ -49,15 +40,20 @@ class _SignUpState extends State<SignUp> {
           .signUpWithEmailAndPassword(emailTextEditingController.text.trim(),
               passwordTextEditingController.text)
           .then((dynamic val) {
-        // print('${val.uid}');
-
-        // ignore: always_specify_types
-        // databaseMethods.uploadUserInfo(userInfoMap);
-        HelperFunctions.saveUserLoggedInSharedPreference(true);
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute<MaterialPageRoute>(
-                builder: (BuildContext context) => ChatRoom()));
+        if (val != null) {
+          // ignore: always_specify_types
+           Map<String, dynamic> userInfoMap = {
+            'name': userNameTextEditingController.text,
+            'email': emailTextEditingController.text.trim()
+          }.cast<String, dynamic>();
+          // ignore: unnecessary_parenthesis
+          DatabaseMethods().uploadUserInfo((userInfoMap));
+          HelperFunctions.saveUserLoggedInSharedPreference(true);
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute<MaterialPageRoute>(
+                  builder: (BuildContext context) => ChatRoom()));
+        }
       });
     }
   }
@@ -69,6 +65,13 @@ class _SignUpState extends State<SignUp> {
 
     authMethods.handleSignIn().then((User user) {
       if (user != null) {
+         final Map<String, dynamic> userInfoMap = {
+            'name': userNameTextEditingController.text,
+            'email': emailTextEditingController.text.trim()
+          }.cast<String, dynamic>();
+          // ignore: unnecessary_parenthesis
+          DatabaseMethods().uploadUserInfo((userInfoMap));
+          HelperFunctions.saveUserLoggedInSharedPreference(true);
         HelperFunctions.saveUserLoggedInSharedPreference(true);
         Navigator.pushReplacement(
             context,
@@ -93,11 +96,11 @@ class _SignUpState extends State<SignUp> {
                   key: formKey,
                   child: Column(
                     children: <Widget>[
-                       isLoading
+                      isLoading
                           ? Center(
-                            child: CircularProgressIndicator(),
-                          )
-                        : Container(),
+                              child: CircularProgressIndicator(),
+                            )
+                          : Container(),
                       TextFormField(
                         validator: (val) {
                           return val.isEmpty || val.length < 3
@@ -223,10 +226,10 @@ class _SignUpState extends State<SignUp> {
                         height: 20,
                       ),
                       GestureDetector(
-                        onTap: (){
+                        onTap: () {
                           performLogin();
                         },
-                                              child: Container(
+                        child: Container(
                             alignment: Alignment.center,
                             width: MediaQuery.of(context).size.width,
                             padding: EdgeInsets.all(16),

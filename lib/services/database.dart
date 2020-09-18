@@ -49,11 +49,20 @@ class DatabaseMethods {
   //   return username;
   // }
 
-  dynamic uploadUserInfo(String userMap) async {
+  // dynamic uploadUserInfo(String userMap) async {
+  //   return await Firestore.instance
+  //       .collection('users')
+  //       .where('users', arrayContains: userMap)
+  //       .snapshots();
+  // }
+  Future<void> uploadUserInfo(dynamic userMap) async {
+    Map<String, dynamic> userMap;
     return await Firestore.instance
-        .collection('users')
-        .where('users', arrayContains: userMap)
-        .snapshots();
+        .collection("users")
+        .add(userMap)
+        .catchError((dynamic e) {
+      print(e.toString());
+    });
   }
 
   // user data from snapshot
@@ -61,17 +70,7 @@ class DatabaseMethods {
     return users.snapshots();
   }
 
-  //  Future<bool>  createChatRoom(String chatroomid, dynamic chatRoomMap){
-  //   //  Set<Map<String, dynamic>>chatRoomMap;
-  //    Firestore.instance
-  //       .collection('ChatRoom')
-  //       .document(chatroomid)
-  //       .setData({chatRoomMap})
-  //       .then((value) => print('User Added'))
-  //       .catchError((dynamic e) {
-  //         print(e.toString());
-  //       });
-  // }
+
   Future<void> createChatRoom(dynamic chatRoomMap, String chatRoomId) async {
     Map<String, dynamic> chatRoomMap;
     return await Firestore.instance
