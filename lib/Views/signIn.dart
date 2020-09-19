@@ -1,4 +1,6 @@
 import 'package:ChatApp/Views/forgetPassword.dart';
+import 'package:ChatApp/Widget/customtheme.dart';
+import 'package:ChatApp/Widget/theme.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/auth.dart';
@@ -89,6 +91,10 @@ class _SignInState extends State<SignIn> {
   bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
+    void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
+      CustomTheme.instanceOf(buildContext).changeTheme(key);
+    }
+
     return Scaffold(
       appBar: appBarMain(context),
       body: isLoading
@@ -210,9 +216,11 @@ class _SignInState extends State<SignIn> {
                               alignment: Alignment.centerRight,
                               child: Container(
                                 padding: EdgeInsets.all(16),
-                                child: Text('Forgot Password?',
-                                    style: TextStyle(
-                                        color: Colors.blue, fontSize: 16)),
+                                child: InkWell(
+                                  child: Text('Forgot Password?',
+                                      style: TextStyle(
+                                          color: Colors.blue, fontSize: 16)),
+                                ),
                               ),
                             ),
                           ),

@@ -1,3 +1,5 @@
+import 'package:ChatApp/Widget/customtheme.dart';
+import 'package:ChatApp/Widget/theme.dart';
 import 'package:ChatApp/Widget/widget.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/services/auth.dart';
@@ -69,6 +71,9 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
+       void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
+      CustomTheme.instanceOf(buildContext).changeTheme(key);
+    }
     return Scaffold(
       appBar: appBarMain(context),
       body: Container(

@@ -1,4 +1,6 @@
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
+import 'package:ChatApp/Widget/customtheme.dart';
+import 'package:ChatApp/Widget/theme.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/auth.dart';
@@ -93,6 +95,9 @@ class _SignUpState extends State<SignUp> {
 
   @override
   Widget build(BuildContext context) {
+     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
+      CustomTheme.instanceOf(buildContext).changeTheme(key);
+    }
     return Scaffold(
       appBar: appBarMain(context),
       body: isLoading

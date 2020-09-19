@@ -1,4 +1,6 @@
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
+import 'package:ChatApp/Views/conversationScreen.dart';
+import 'package:ChatApp/Views/forgetPassword.dart';
 import 'package:ChatApp/helper/authenticate.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
@@ -21,6 +23,8 @@ Future main() async {
 }
 
 class MyApp extends StatefulWidget {
+  
+  
   @override
   _MyAppState createState() => _MyAppState();
 }
@@ -30,14 +34,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'ChatooApp',
         theme: CustomTheme.of(context),
+        
          home: Constants.prefs.getBool('userIsLoggedIn') == true ? ChatRoom() : Authenticate()
 
-        // home: ConversationScreen(),
-        // home: ChatRoom(),
+        // home: ConversationScreen(this.chatRoomid),
+        // home: ForgotPassword(),
         );
   }
 }
