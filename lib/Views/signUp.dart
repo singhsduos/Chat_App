@@ -8,7 +8,6 @@ import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
 import 'chatRoomsScreen.dart';
 
-
 import '../Widget/widget.dart';
 
 class SignUp extends StatefulWidget {
@@ -24,10 +23,12 @@ class _SignUpState extends State<SignUp> {
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
 
-  final formKey = GlobalKey<FormState>();
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController userNameTextEditingController = TextEditingController();
   TextEditingController emailTextEditingController = TextEditingController();
   TextEditingController passwordTextEditingController = TextEditingController();
+  final TextEditingController _pass = TextEditingController();
+  final TextEditingController _confirmPass = TextEditingController();
   dynamic signMeUp() {
     if (formKey.currentState.validate()) {
       Map<String, dynamic> userInfoMap = {
@@ -42,8 +43,8 @@ class _SignUpState extends State<SignUp> {
         isLoading = true;
       });
       authMethods
-          .signUpWithEmailAndPassword(emailTextEditingController.text.trim(),
-              passwordTextEditingController.text)
+          .signUpWithEmailAndPassword(
+              emailTextEditingController.text.trim(), _pass.text)
           .then((dynamic val) {
         if (val != null) {
           // ignore: always_specify_types
@@ -74,19 +75,21 @@ class _SignUpState extends State<SignUp> {
         // ignore: unnecessary_parenthesis
         databaseMethods.uploadUserInfo(userInfoMap);
         HelperFunctions.saveUserLoggedInSharedPreference(true);
-        HelperFunctions.saveUserLoggedInSharedPreference(true);
+
         Navigator.pushReplacement(
             context,
             MaterialPageRoute<MaterialPageRoute>(
                 builder: (BuildContext context) => ChatRoom()));
       } else {
-         setState(() {
-            isLoading = false;
-             print("There was an error");
-          });
+        setState(() {
+          isLoading = false;
+          print("There was an error");
+        });
       }
     });
   }
+
+  bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
@@ -104,12 +107,18 @@ class _SignUpState extends State<SignUp> {
                       TextFormField(
                         validator: (val) {
                           return val.isEmpty || val.length < 3
-                              ? 'Enter Username 3+ characters'
+                              ? 'Username should be minimum 4 characters'
                               : null;
                         },
                         controller: userNameTextEditingController,
                         style: TextStyle(color: Colors.cyan),
                         decoration: InputDecoration(
+                          prefixIcon: Container(
+                            child: Icon(
+                              Icons.account_circle_outlined,
+                              color: Colors.black54,
+                            ),
+                          ),
                           focusedBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(22.0)),
@@ -117,7 +126,7 @@ class _SignUpState extends State<SignUp> {
                                   BorderSide(color: Colors.cyan, width: 2)),
                           enabledBorder: const OutlineInputBorder(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(20.0)),
+                                BorderRadius.all(Radius.circular(22.0)),
                             borderSide: BorderSide(color: Colors.cyan),
                           ),
                           hintText: 'Enter Username',
@@ -136,11 +145,17 @@ class _SignUpState extends State<SignUp> {
                                       r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
                                   .hasMatch(val)
                               ? null
-                              : 'Enter correct email';
+                              : 'Enter Valid Email';
                         },
                         controller: emailTextEditingController,
                         style: TextStyle(color: Colors.cyan),
                         decoration: InputDecoration(
+                          prefixIcon: Container(
+                            child: Icon(
+                              Icons.mail_outline,
+                              color: Colors.black54,
+                            ),
+                          ),
                           focusedBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(22.0)),
@@ -148,7 +163,7 @@ class _SignUpState extends State<SignUp> {
                                   BorderSide(color: Colors.cyan, width: 2)),
                           enabledBorder: const OutlineInputBorder(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(20.0)),
+                                BorderRadius.all(Radius.circular(22.0)),
                             borderSide: BorderSide(color: Colors.cyan),
                           ),
                           hintText: 'Enter E-mail',
@@ -162,15 +177,37 @@ class _SignUpState extends State<SignUp> {
                         height: 20,
                       ),
                       TextFormField(
+                        controller: _pass,
                         validator: (val) {
-                          return val.length > 5
-                              ? null
-                              : "Enter Password 6+ characters";
+                          // return val.length > 5
+                          //     ? null
+                          //     : "Password should be minimum 6 characters";
+                          if (val.isEmpty)
+                            return 'Password should be minimum 6 characters';
+                          return null;
                         },
-                        controller: passwordTextEditingController,
-                        obscureText: true,
+                        // controller: passwordTextEditingController,
+                        obscureText: _obscureText,
                         style: TextStyle(color: Colors.cyan),
                         decoration: InputDecoration(
+                          prefixIcon: Container(
+                            child: Icon(
+                              Icons.vpn_key_outlined,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          suffixIcon: Container(
+                            child: IconButton(
+                              icon: Icon(_obscureText
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                            ),
+                          ),
                           focusedBorder: OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(22.0)),
@@ -178,11 +215,64 @@ class _SignUpState extends State<SignUp> {
                                   BorderSide(color: Colors.cyan, width: 2)),
                           enabledBorder: const OutlineInputBorder(
                             borderRadius:
-                                BorderRadius.all(Radius.circular(20.0)),
+                                BorderRadius.all(Radius.circular(22.0)),
                             borderSide: BorderSide(color: Colors.cyan),
                           ),
                           hintText: 'Enter Password',
                           labelText: 'Password',
+                          filled: true,
+                          labelStyle:
+                              new TextStyle(color: Colors.cyan, fontSize: 16.0),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 20,
+                      ),
+                      TextFormField(
+                        controller: _confirmPass,
+                        validator: (val) {
+                          // return val.length > 5
+                          //     ? null
+                          //     : "Password should be minimum 6 characters";
+                          if (val.isEmpty)
+                            return 'Password should be minimum 6 characters';
+                          if (val != _pass.text) return 'Unmatch Password';
+                          return null;
+                        },
+                        // controller: passwordTextEditingController,
+                        obscureText: _obscureText,
+                        style: TextStyle(color: Colors.cyan),
+                        decoration: InputDecoration(
+                          prefixIcon: Container(
+                            child: Icon(
+                              Icons.vpn_key_outlined,
+                              color: Colors.black54,
+                            ),
+                          ),
+                          suffixIcon: Container(
+                            child: IconButton(
+                              icon: Icon(_obscureText
+                                  ? Icons.visibility
+                                  : Icons.visibility_off),
+                              onPressed: () {
+                                setState(() {
+                                  _obscureText = !_obscureText;
+                                });
+                              },
+                            ),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(22.0)),
+                              borderSide:
+                                  BorderSide(color: Colors.cyan, width: 2)),
+                          enabledBorder: const OutlineInputBorder(
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(22.0)),
+                            borderSide: BorderSide(color: Colors.cyan),
+                          ),
+                          hintText: 'Retype Password',
+                          labelText: 'Confirm Password',
                           filled: true,
                           labelStyle:
                               new TextStyle(color: Colors.cyan, fontSize: 16.0),

@@ -34,6 +34,7 @@ class _SideDrawerState extends State<SideDrawer> {
               activeColor: Colors.cyan,
               onChanged: (value) {
                 setState(() {
+                  
                   isDarkTheme = value;
                   if (!value) {
                     _changeTheme(context, MyThemeKeys.LIGHT);

@@ -78,15 +78,15 @@ class _SignInState extends State<SignIn> {
             MaterialPageRoute<MaterialPageRoute>(
                 builder: (BuildContext context) => ChatRoom()));
       } else {
-         setState(() {
-            isLoading = false;
-             print("There was an error");
-          });
-       
+        setState(() {
+          isLoading = false;
+          print("There was an error");
+        });
       }
     });
   }
 
+  bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -113,6 +113,12 @@ class _SignInState extends State<SignIn> {
                             controller: emailTextEditingController,
                             style: TextStyle(color: Colors.cyan),
                             decoration: InputDecoration(
+                              prefixIcon: Container(
+                                child: Icon(
+                                  Icons.mail_outline,
+                                  color: Colors.black54,
+                                ),
+                              ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius:
                                     BorderRadius.all(Radius.circular(22.0)),
@@ -121,7 +127,7 @@ class _SignInState extends State<SignIn> {
                               ),
                               enabledBorder: const OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
+                                    BorderRadius.all(Radius.circular(22.0)),
                                 borderSide: BorderSide(color: Colors.cyan),
                               ),
                               hintText: 'Enter E-mail',
@@ -141,9 +147,27 @@ class _SignInState extends State<SignIn> {
                                   : "Enter correct password";
                             },
                             controller: passwordTextEditingController,
-                            obscureText: true,
+                            obscureText: _obscureText,
                             style: TextStyle(color: Colors.cyan),
                             decoration: InputDecoration(
+                              prefixIcon: Container(
+                                child: Icon(
+                                  Icons.vpn_key_outlined,
+                                  color: Colors.black54,
+                                ),
+                              ),
+                              suffixIcon: Container(
+                                child: IconButton(
+                                  icon: Icon(_obscureText
+                                      ? Icons.visibility
+                                      : Icons.visibility_off),
+                                  onPressed: () {
+                                    setState(() {
+                                      _obscureText = !_obscureText;
+                                    });
+                                  },
+                                ),
+                              ),
                               focusedBorder: OutlineInputBorder(
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(22.0)),
@@ -151,7 +175,7 @@ class _SignInState extends State<SignIn> {
                                       BorderSide(color: Colors.cyan, width: 2)),
                               enabledBorder: const OutlineInputBorder(
                                 borderRadius:
-                                    BorderRadius.all(Radius.circular(20.0)),
+                                    BorderRadius.all(Radius.circular(22.0)),
                                 borderSide: BorderSide(color: Colors.cyan),
                               ),
                               hintText: 'Enter Password',
