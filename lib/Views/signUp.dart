@@ -103,23 +103,27 @@ class _SignUpState extends State<SignUp> {
                 child: Form(
                   key: formKey,
                   child: Column(
+                    
                     children: <Widget>[
                       TextFormField(
-                        validator: (val) {
-                          return val.isEmpty || val.length < 3
-                              ? 'Username should be minimum 4 characters'
-                              : null;
+                        validator: (value) => value.isEmpty || value.length < 4
+                            ? 'Username should be minimum 4 characters'
+                            : null,
+                        onSaved: (value) {
+                          setState(() {
+                            value;
+                          });
                         },
                         controller: userNameTextEditingController,
                         style: TextStyle(color: Colors.cyan),
                         decoration: InputDecoration(
                           prefixIcon: Container(
                             child: Icon(
-                              Icons.account_circle_outlined,
+                              Icons.person_outlined,
                               color: Colors.black54,
                             ),
                           ),
-                          focusedBorder: OutlineInputBorder(
+                          focusedBorder: const OutlineInputBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(22.0)),
                               borderSide:
@@ -129,6 +133,11 @@ class _SignUpState extends State<SignUp> {
                                 BorderRadius.all(Radius.circular(22.0)),
                             borderSide: BorderSide(color: Colors.cyan),
                           ),
+                          border: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(22.0)),
+                              borderSide:
+                                  BorderSide(color: Colors.cyan, width: 2)),
                           hintText: 'Enter Username',
                           labelText: 'Username',
                           filled: true,
@@ -146,6 +155,11 @@ class _SignUpState extends State<SignUp> {
                                   .hasMatch(val)
                               ? null
                               : 'Enter Valid Email';
+                        },
+                        onSaved: (value) {
+                          setState(() {
+                            value;
+                          });
                         },
                         controller: emailTextEditingController,
                         style: TextStyle(color: Colors.cyan),
@@ -166,6 +180,11 @@ class _SignUpState extends State<SignUp> {
                                 BorderRadius.all(Radius.circular(22.0)),
                             borderSide: BorderSide(color: Colors.cyan),
                           ),
+                          border: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(22.0)),
+                              borderSide:
+                                  BorderSide(color: Colors.cyan, width: 2)),
                           hintText: 'Enter E-mail',
                           labelText: 'E-mail',
                           filled: true,
@@ -178,13 +197,14 @@ class _SignUpState extends State<SignUp> {
                       ),
                       TextFormField(
                         controller: _pass,
-                        validator: (val) {
-                          // return val.length > 5
-                          //     ? null
-                          //     : "Password should be minimum 6 characters";
-                          if (val.isEmpty)
-                            return 'Password should be minimum 6 characters';
-                          return null;
+
+                        validator: (value) => value.isEmpty || value.length < 7
+                            ? 'Password should be minimum 7 characters'
+                            : null,
+                        onSaved: (value) {
+                          setState(() {
+                            value;
+                          });
                         },
                         // controller: passwordTextEditingController,
                         obscureText: _obscureText,
@@ -218,6 +238,11 @@ class _SignUpState extends State<SignUp> {
                                 BorderRadius.all(Radius.circular(22.0)),
                             borderSide: BorderSide(color: Colors.cyan),
                           ),
+                          border: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(22.0)),
+                              borderSide:
+                                  BorderSide(color: Colors.cyan, width: 2)),
                           hintText: 'Enter Password',
                           labelText: 'Password',
                           filled: true,
@@ -230,14 +255,18 @@ class _SignUpState extends State<SignUp> {
                       ),
                       TextFormField(
                         controller: _confirmPass,
-                        validator: (val) {
-                          // return val.length > 5
-                          //     ? null
-                          //     : "Password should be minimum 6 characters";
-                          if (val.isEmpty)
-                            return 'Password should be minimum 6 characters';
-                          if (val != _pass.text) return 'Unmatch Password';
+                        validator: (String value) {
+                          if (value.isEmpty || value.length < 7)
+                            return 'Password should be minimum 7 characters';
+                          if (value != _pass.text) {
+                            return 'Unmatch Password';
+                          }
                           return null;
+                        },
+                        onSaved: (value) {
+                          setState(() {
+                            value;
+                          });
                         },
                         // controller: passwordTextEditingController,
                         obscureText: _obscureText,
@@ -271,6 +300,11 @@ class _SignUpState extends State<SignUp> {
                                 BorderRadius.all(Radius.circular(22.0)),
                             borderSide: BorderSide(color: Colors.cyan),
                           ),
+                          border: const OutlineInputBorder(
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(22.0)),
+                              borderSide:
+                                  BorderSide(color: Colors.cyan, width: 2)),
                           hintText: 'Retype Password',
                           labelText: 'Confirm Password',
                           filled: true,

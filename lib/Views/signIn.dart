@@ -130,6 +130,11 @@ class _SignInState extends State<SignIn> {
                                     BorderRadius.all(Radius.circular(22.0)),
                                 borderSide: BorderSide(color: Colors.cyan),
                               ),
+                              border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(22.0)),
+                                  borderSide:
+                                      BorderSide(color: Colors.cyan, width: 2)),
                               hintText: 'Enter E-mail',
                               labelText: 'E-mail',
                               filled: true,
@@ -178,6 +183,11 @@ class _SignInState extends State<SignIn> {
                                     BorderRadius.all(Radius.circular(22.0)),
                                 borderSide: BorderSide(color: Colors.cyan),
                               ),
+                              border: const OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(22.0)),
+                                  borderSide:
+                                      BorderSide(color: Colors.cyan, width: 2)),
                               hintText: 'Enter Password',
                               labelText: 'Password',
                               filled: true,

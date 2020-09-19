@@ -29,12 +29,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 // ignore: prefer_const_literals_to_create_immutables
                 itemCount: (int.parse('${snapshot.data.documents.length}')),
                 itemBuilder: (context, index) {
-                return MessageTile(
-                  '${snapshot.data.documents[index].data["message"]}',
-                  Constants.myName ==
-                      snapshot.data.documents[index].data["sendBy"],
-                );
-              })
+                  return MessageTile(
+                    '${snapshot.data.documents[index].data["message"]}',
+                    Constants.myName ==
+                        snapshot.data.documents[index].data["sendBy"],
+                  );
+                })
             : Container();
       },
     );
