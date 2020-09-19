@@ -43,6 +43,8 @@ dependencies:
   shared_preferences: ^0.5.7+3
   flutter_switch:
   flutter_icons:
+  fluttertoast:
+  toast:
     
 
 dev_dependencies:

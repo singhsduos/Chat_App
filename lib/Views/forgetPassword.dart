@@ -6,6 +6,7 @@ import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:toast/toast.dart';
 
 class ForgotPassword extends StatefulWidget {
   ForgotPassword({Key key}) : super(key: key);
@@ -25,13 +26,14 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
+
     return Scaffold(
       backgroundColor: Color(0xFF53E0BC),
       appBar: AppBar(
         leading: IconButton(
-    icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF53E0BC)),
-    onPressed: () => Navigator.of(context).pop(),
-  ), 
+          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF53E0BC)),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
         title: Text(
           'Forgot Password',
           style: TextStyle(
@@ -145,6 +147,20 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 .resetPass(
                                     emailTextEditingController.text.trim())
                                 .then((dynamic val) {
+                              showToast(
+                                "Email Sent",
+                                gravity: Toast.CENTER,
+                                duration: 3,
+                              );
+                              // Fluttertoast.showToast(
+
+                              //    context, msg: "Email Sent",
+                              //      textColor: Colors.white,
+                              //                               backgroundColor: Colors.purple,
+                              //                               gravity: Toast.CENTER
+                              //     duration: 3,
+                              // );
+
                               if (val != null) {
                                 HelperFunctions.saveUserEmailSharedPreference(
                                     emailTextEditingController.text.trim());
@@ -154,7 +170,22 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                         builder: (BuildContext context) =>
                                             ForgotPassword()));
                               }
-                            });
+                            }).catchError(
+                              (dynamic onError) {
+                                print(onError);
+
+                                //     dynamic errorCode = onError.code;
+                                //  dynamic errorMessage = ErrorHandler(errrorCode);
+                                //     showDialog<dynamic>(
+                                //         context: context,
+                                //         builder: (cxt) {
+                                //           return AlertDialog(
+                                //             content: Text(errorMessage),
+                                //             actions: [cancelbutton],
+                                //           );
+                                //         });
+                              },
+                            );
                           }
                         },
                         shape: RoundedRectangleBorder(
@@ -181,5 +212,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         ],
       ),
     );
+  }
+
+  void showToast(String msg, {int duration, int gravity}) {
+    Toast.show(msg, context, duration: duration, gravity: gravity);
   }
 }
