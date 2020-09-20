@@ -180,6 +180,9 @@ class _ForgotPasswordState extends State<ForgotPassword> {
           msg: 'Enter valid email',
           textColor: Color(0xFF53E0BC),
           backgroundColor: Color(0xFFFFFFFF),
+          fontSize: 16,
+          gravity: ToastGravity.CENTER,
+          timeInSecForIosWeb: 3,
         );
         return;
       }
@@ -189,8 +192,10 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         msg: 'Email Sent',
         textColor: Color(0xFF53E0BC),
         backgroundColor: Color(0xFFFFFFFF),
+        fontSize: 16.0,
+        gravity: ToastGravity.CENTER,
+        timeInSecForIosWeb: 3,
       );
-     
     }
   }
 }
