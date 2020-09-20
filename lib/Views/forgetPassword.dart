@@ -31,7 +31,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       backgroundColor: Color(0xFF53E0BC),
       appBar: AppBar(
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios, color: Color(0xFF53E0BC)),
+          icon: const Icon(Icons.clear, color: Color(0xFF53E0BC)),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
@@ -81,7 +81,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         hintColor: Color(0xFFFFFFFF),
                       ),
                       child: Container(
-                        padding: EdgeInsets.only(top: 100, right: 20, left: 20),
+                        padding: EdgeInsets.only(top: 150, right: 20, left: 20),
                         child: Form(
                           child: Column(
                             children: <Widget>[
@@ -147,19 +147,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                 .resetPass(
                                     emailTextEditingController.text.trim())
                                 .then((dynamic val) {
-                              showToast(
-                                "Email Sent",
-                                gravity: Toast.CENTER,
-                                duration: 3,
-                              );
-                              // Fluttertoast.showToast(
-
-                              //    context, msg: "Email Sent",
-                              //      textColor: Colors.white,
-                              //                               backgroundColor: Colors.purple,
-                              //                               gravity: Toast.CENTER
-                              //     duration: 3,
-                              // );
+                              showToast("Email Sent", val,
+                                  gravity: Toast.CENTER,
+                                  duration: 3,
+                                  textColor: Color(0xFF53E0BC),
+                                  backgroundColor: Color(0xFFFFFFFF));
 
                               if (val != null) {
                                 HelperFunctions.saveUserEmailSharedPreference(
@@ -171,19 +163,12 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                                             ForgotPassword()));
                               }
                             }).catchError(
-                              (dynamic onError) {
-                                print(onError);
-
-                                //     dynamic errorCode = onError.code;
-                                //  dynamic errorMessage = ErrorHandler(errrorCode);
-                                //     showDialog<dynamic>(
-                                //         context: context,
-                                //         builder: (cxt) {
-                                //           return AlertDialog(
-                                //             content: Text(errorMessage),
-                                //             actions: [cancelbutton],
-                                //           );
-                                //         });
+                              (dynamic val) {
+                                showToast('Unkown Error', val,
+                                    duration: 3,
+                                    gravity: Toast.CENTER,
+                                    textColor: Color(0xFF53E0BC),
+                                    backgroundColor: Color(0xFFFFFFFF));
                               },
                             );
                           }
@@ -214,7 +199,13 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
-  void showToast(String msg, {int duration, int gravity}) {
-    Toast.show(msg, context, duration: duration, gravity: gravity);
+  void showToast(String msg, dynamic val,
+      {int duration, int gravity, Color textColor, Color backgroundColor}) {
+    // Toast.show(msg, context, duration: duration, gravity: gravity);
+    Toast.show(msg, context,
+        duration: duration,
+        gravity: gravity,
+        textColor: textColor,
+        backgroundColor: backgroundColor);
   }
 }
