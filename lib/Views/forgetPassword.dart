@@ -1,3 +1,4 @@
+import 'package:ChatApp/Views/signIn.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
 import 'package:ChatApp/Widget/widget.dart';
@@ -6,6 +7,7 @@ import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:toast/toast.dart';
 
 class ForgotPassword extends StatefulWidget {
@@ -59,7 +61,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       style: TextStyle(
                         fontSize: 23.0,
                         height: 7,
-                        color: Colors.white.withOpacity(1.0),
+                        color: Color(0xFFFFFFFF),
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -70,7 +72,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                         style: TextStyle(
                           fontSize: 18.0,
                           height: 0,
-                          color: Colors.white.withOpacity(1.0),
+                          color: const Color(0xFFFFFFFF),
                           fontWeight: FontWeight.normal,
                         ),
                       ),
@@ -142,36 +144,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                       padding: EdgeInsets.only(left: 30, right: 30),
                       child: RaisedButton(
                         onPressed: () {
-                          if (formKey.currentState.validate()) {
-                            authMethods
-                                .resetPass(
-                                    emailTextEditingController.text.trim())
-                                .then((dynamic val) {
-                              showToast("Email Sent", val,
-                                  gravity: Toast.CENTER,
-                                  duration: 3,
-                                  textColor: Color(0xFF53E0BC),
-                                  backgroundColor: Color(0xFFFFFFFF));
-
-                              if (val != null) {
-                                HelperFunctions.saveUserEmailSharedPreference(
-                                    emailTextEditingController.text.trim());
-                                Navigator.pushReplacement(
-                                    context,
-                                    MaterialPageRoute<MaterialPageRoute>(
-                                        builder: (BuildContext context) =>
-                                            ForgotPassword()));
-                              }
-                            }).catchError(
-                              (dynamic val) {
-                                showToast('Unkown Error', val,
-                                    duration: 3,
-                                    gravity: Toast.CENTER,
-                                    textColor: Color(0xFF53E0BC),
-                                    backgroundColor: Color(0xFFFFFFFF));
-                              },
-                            );
-                          }
+                          resetPassword(context);
                         },
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(22),
@@ -199,13 +172,25 @@ class _ForgotPasswordState extends State<ForgotPassword> {
     );
   }
 
-  void showToast(String msg, dynamic val,
-      {int duration, int gravity, Color textColor, Color backgroundColor}) {
-    // Toast.show(msg, context, duration: duration, gravity: gravity);
-    Toast.show(msg, context,
-        duration: duration,
-        gravity: gravity,
-        textColor: textColor,
-        backgroundColor: backgroundColor);
+  void resetPassword(BuildContext context) async {
+    if (formKey.currentState.validate()) {
+      if (emailTextEditingController.text.isEmpty == 0 ||
+          !emailTextEditingController.text.contains('@')) {
+        Fluttertoast.showToast(
+          msg: 'Enter valid email',
+          textColor: Color(0xFF53E0BC),
+          backgroundColor: Color(0xFFFFFFFF),
+        );
+        return;
+      }
+      await FirebaseAuth.instance
+          .sendPasswordResetEmail(email: emailTextEditingController.text);
+      Fluttertoast.showToast(
+        msg: 'Email Sent',
+        textColor: Color(0xFF53E0BC),
+        backgroundColor: Color(0xFFFFFFFF),
+      );
+     
+    }
   }
 }
