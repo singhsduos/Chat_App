@@ -81,10 +81,14 @@ class _ChatRoomState extends State<ChatRoom> {
             onTap: () {
               Constants.prefs.setBool('userIsLoggedIn', false);
                authMethods.signOut();
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute<MaterialPageRoute>(
-                      builder: (BuildContext context) => Authenticate()));
+              // Navigator.pushReplacement(
+              //     context,
+              //     MaterialPageRoute<MaterialPageRoute>(
+              //         builder: (BuildContext context) => Authenticate()));
+
+    Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute<MaterialPageRoute>(builder: (context) => Authenticate()),
+        (Route<dynamic> route) => false);
             },
             child: Container(
               child: Padding(

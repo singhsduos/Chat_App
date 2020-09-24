@@ -11,6 +11,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../Widget/widget.dart';
 import 'chatRoomsScreen.dart';
@@ -31,6 +34,8 @@ class _SignInState extends State<SignIn> {
   TextEditingController passwordTextEditingController = TextEditingController();
 
   bool isLoading = false;
+   bool isLoggedIn = false;
+  User currentUser;
   QuerySnapshot snapshotUserInfo;
   void signIn() {
     if (formKey.currentState.validate()) {
@@ -69,29 +74,75 @@ class _SignInState extends State<SignIn> {
     }
   }
 
-  void performLogin() {
-    
-      setState(() {
-        isLoading = true;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+   SharedPreferences prefs;
+
+Future<Null> handleSignIn() async {
+ 
+     prefs = await SharedPreferences.getInstance();
+    this.setState(() {
+      isLoading = true;
+    });
+  final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+  final AuthCredential credential = GoogleAuthProvider.getCredential(
+    accessToken: googleAuth.accessToken,
+    idToken: googleAuth.idToken,
+  );
+  final UserCredential authResult = await _auth.signInWithCredential(credential);
+  User user = authResult.user;
+  print("signed in " + user.displayName);
+  
+    if (user != null) {
+      // Check is already sign up
+      final QuerySnapshot result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('id', isEqualTo: user.uid)
+          .get();
+      final List<DocumentSnapshot> documents = result.docs;
+      if (documents.length == 0) {
+        // Update data to server if new user
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            // ignore: always_specify_types
+            .set(<String,dynamic>{
+          'nickname': user.displayName,
+          'photoUrl': user.photoURL,
+          'id': user.uid,
+          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+          'chattingWith': null
+        });
+
+        // Write data to local
+        currentUser = user;
+        await prefs.setString('id', currentUser.uid);
+        await prefs.setString('nickname', currentUser.displayName);
+        await prefs.setString('photoUrl', currentUser.photoURL);
+      } else {
+        // Write data to local
+        await prefs.setString('id', '${documents[0].data()['id']}');
+        await prefs.setString('nickname', '${documents[0].data()['nickname']}');
+        await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
+        
+      }
+      Fluttertoast.showToast(msg: "SignIn successful");
+      this.setState(() {
+        isLoading = false;
       });
 
-      authMethods.handleSignIn().then((bool user ) {
-        if (user != null) {
-          HelperFunctions.saveUserLoggedInSharedPreference(true);
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute<MaterialPageRoute>(
-                  builder: (BuildContext context) => ChatRoom()));
-        } else {
-          setState(() {
-            isLoading = false;
-            print("There was an error");
-          });
-        }
+       Navigator.pushReplacement(
+            context,
+            MaterialPageRoute<MaterialPageRoute>(
+                builder: (BuildContext context) => ChatRoom()));
+    } else {
+      Fluttertoast.showToast(msg: "SignIn fail");
+      this.setState(() {
+        isLoading = false;
       });
-   
-  }
-
+    }
+}
   bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
@@ -254,10 +305,12 @@ class _SignInState extends State<SignIn> {
                             height: 20,
                           ),
                           InkWell(
-                            onTap: () {
-                              Constants.prefs.setBool('userIsLoggedIn', true);
-                              performLogin();
-                            },
+                           onTap: () {
+                          Constants.prefs.setBool('userIsLoggedIn', true);
+                          handleSignIn()
+                              .then((User user) => print(user))
+                              .catchError((dynamic e) => print(e));
+                        },
                             child: Container(
                               child: Column(
                                 children: [
@@ -273,24 +326,27 @@ class _SignInState extends State<SignIn> {
                                     child: Row(
                                       children: [
                                         Expanded(
-                                          
-                                          child: const Text('Sign In with Google',
-                                              textAlign: TextAlign.center,
-                                              
-                                              // textDirection: ,
-                                              style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 17,
-                                                  
+                                          child:
+                                              const Text('Sign In with Google',
+                                                  textAlign: TextAlign.center,
+                                                  // textDirection: ,
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 17,
                                                   )),
                                         ),
                                         Container(
-                                            height: 40,
-                                            width: 40,
-                                            padding: EdgeInsets.symmetric(horizontal:5, vertical: 5),
-                                            child: Image.asset(
-                                                'images/signIn.png',
-                                                alignment: Alignment.centerLeft,))
+                                          decoration: BoxDecoration(
+                                              image: DecorationImage(
+                                                  image: AssetImage(
+                                                      'images/signIn.png'),
+                                                  fit: BoxFit.values[3])),
+                                          height: 40,
+                                          width: 40,
+                                          padding: EdgeInsets.symmetric(
+                                              horizontal: 5, vertical: 5),
+                                          
+                                        )
                                       ],
                                     ),
                                   )

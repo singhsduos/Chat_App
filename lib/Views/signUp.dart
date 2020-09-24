@@ -5,9 +5,13 @@ import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'chatRoomsScreen.dart';
 
 import '../Widget/widget.dart';
@@ -22,6 +26,8 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   bool isLoading = false;
+   bool isLoggedIn = false;
+  User currentUser;
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
 
@@ -49,8 +55,6 @@ class _SignUpState extends State<SignUp> {
               emailTextEditingController.text.trim(), _pass.text)
           .then((dynamic val) {
         if (val != null) {
-          // ignore: always_specify_types
-
           // ignore: unnecessary_parenthesis
           databaseMethods.uploadUserInfo((userInfoMap));
           HelperFunctions.saveUserLoggedInSharedPreference(true);
@@ -63,41 +67,86 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
-  void performLogin() {
-    setState(() {
+
+
+   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
+   SharedPreferences prefs;
+
+Future<Null> handleSignIn() async {
+ 
+     prefs = await SharedPreferences.getInstance();
+    this.setState(() {
       isLoading = true;
     });
+  final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+  final AuthCredential credential = GoogleAuthProvider.getCredential(
+    accessToken: googleAuth.accessToken,
+    idToken: googleAuth.idToken,
+  );
+  final UserCredential authResult = await _auth.signInWithCredential(credential);
+  User user = authResult.user;
+  print("signed in " + user.displayName);
+  
+    if (user != null) {
+      // Check is already sign up
+      final QuerySnapshot result = await FirebaseFirestore.instance
+          .collection('users')
+          .where('id', isEqualTo: user.uid)
+          .get();
+      final List<DocumentSnapshot> documents = result.docs;
+      if (documents.length == 0) {
+        // Update data to server if new user
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid)
+            // ignore: always_specify_types
+            .set(<String,dynamic>{
+          'nickname': user.displayName,
+          'photoUrl': user.photoURL,
+          'id': user.uid,
+          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+          'chattingWith': null
+        });
 
-    authMethods.handleSignIn().then((bool user) {
-      if (user != null) {
-        final Map<String, dynamic> userInfoMap = {
-          'name': userNameTextEditingController.text,
-          'email': emailTextEditingController.text.trim()
-        }.cast<String, dynamic>();
-        // ignore: unnecessary_parenthesis
-        databaseMethods.uploadUserInfo(userInfoMap);
-        HelperFunctions.saveUserLoggedInSharedPreference(true);
+        // Write data to local
+        currentUser = user;
+        await prefs.setString('id', currentUser.uid);
+        await prefs.setString('nickname', currentUser.displayName);
+        await prefs.setString('photoUrl', currentUser.photoURL);
+      } else {
+        // Write data to local
+        await prefs.setString('id', '${documents[0].data()['id']}');
+        await prefs.setString('nickname', '${documents[0].data()['nickname']}');
+        await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
+        
+      }
+      Fluttertoast.showToast(msg: "SignUp successful");
+      this.setState(() {
+        isLoading = false;
+      });
 
-        Navigator.pushReplacement(
+       Navigator.pushReplacement(
             context,
             MaterialPageRoute<MaterialPageRoute>(
                 builder: (BuildContext context) => ChatRoom()));
-      } else {
-        setState(() {
-          isLoading = false;
-          print('There was an error');
-        });
-      }
-    });
-  }
+    } else {
+      Fluttertoast.showToast(msg: "SignUp fail");
+      this.setState(() {
+        isLoading = false;
+      });
+    }
+}
 
   bool _obscureText = true;
 
   @override
   Widget build(BuildContext context) {
-     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
+    void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
+
     return Scaffold(
       appBar: appBarMain(context),
       body: isLoading
@@ -108,7 +157,6 @@ class _SignUpState extends State<SignUp> {
                 child: Form(
                   key: formKey,
                   child: Column(
-                    
                     children: <Widget>[
                       TextFormField(
                         validator: (value) => value.isEmpty || value.length < 4
@@ -344,20 +392,52 @@ class _SignUpState extends State<SignUp> {
                       ),
                       InkWell(
                         onTap: () {
-                          performLogin();
+                          Constants.prefs.setBool('userIsLoggedIn', true);
+                          handleSignIn()
+                              .then((User user) => print(user))
+                              .catchError((dynamic e) => print(e));
                         },
                         child: Container(
-                            alignment: Alignment.center,
-                            width: MediaQuery.of(context).size.width,
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: Color(0xfff99AAAB),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(30.0)),
-                            ),
-                            child: Text('Sign Up with Google',
-                                style: TextStyle(
-                                    color: Colors.white, fontSize: 17))),
+                          child: Column(
+                            children: [
+                              Container(
+                                alignment: Alignment.center,
+                                width: MediaQuery.of(context).size.width,
+                                padding: EdgeInsets.all(6),
+                                decoration: BoxDecoration(
+                                  color: Color(0xfff99AAAB),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30.0)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: const Text('Sign Up with Google',
+                                          textAlign: TextAlign.center,
+                                          // textDirection: ,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 17,
+                                          )),
+                                    ),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                              image: AssetImage(
+                                                  'images/signIn.png'),
+                                              fit: BoxFit.values[3])),
+                                      height: 40,
+                                      width: 40,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 5),
+                                      
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
+                        ),
                       ),
                       SizedBox(
                         height: 20,

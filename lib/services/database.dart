@@ -2,20 +2,7 @@ import 'package:ChatApp/Views/chatRoomsScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-// class DatabaseMethods {
-//   dynamic getUserByUserName(String username) {
-//     Firestore.instance
-//         .collection('users')
-//         .where("name", isEqualTo: username)
-//         .getDocuments();
-//   }
 
-//   dynamic uploadUserInfo(String name, String email) {
-//     Firestore.instance.collection('users').add(userMap).catchError((dynamic e) {
-//       print(e.toString());
-//     });
-//   }
-// }
 
 class DatabaseMethods {
   final String username;
@@ -43,11 +30,11 @@ class DatabaseMethods {
     return email;
   }
 
-  Future<bool> authenticateUser(UserCredential user) async {
+  Future<bool> authenticateUser(String user) async {
     QuerySnapshot result = '' as QuerySnapshot;
     await Firestore.instance
         .collection('users')
-        .where('email', isEqualTo: user.user)
+        .where('email', isEqualTo: user )
         .getDocuments();
 
 
@@ -55,19 +42,7 @@ class DatabaseMethods {
          return docs.length == 0 ? true : false;
   }
 
-  // Future<String> uploadUserInfo(String username) async {
-  //   final DocumentSnapshot snap = await users.document(username).get();
-  //   Map<String, String> map = snap.data.toString() as Map<String, String>;
-  //   final String email = map['name'];
-  //   return username;
-  // }
 
-  // dynamic uploadUserInfo(String userMap) async {
-  //   return await Firestore.instance
-  //       .collection('users')
-  //       .where('users', arrayContains: userMap)
-  //       .snapshots();
-  // }
   Future<void> uploadUserInfo(dynamic userMap) async {
     Map<String, dynamic> userMap;
     return await Firestore.instance
