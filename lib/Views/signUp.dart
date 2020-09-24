@@ -68,7 +68,7 @@ class _SignUpState extends State<SignUp> {
       isLoading = true;
     });
 
-    authMethods.handleSignIn().then((User user) {
+    authMethods.handleSignIn().then((bool user) {
       if (user != null) {
         final Map<String, dynamic> userInfoMap = {
           'name': userNameTextEditingController.text,
@@ -85,7 +85,7 @@ class _SignUpState extends State<SignUp> {
       } else {
         setState(() {
           isLoading = false;
-          print("There was an error");
+          print('There was an error');
         });
       }
     });
@@ -320,7 +320,7 @@ class _SignUpState extends State<SignUp> {
                       SizedBox(
                         height: 20,
                       ),
-                      GestureDetector(
+                      InkWell(
                         onTap: () {
                           Constants.prefs.setBool('userIsLoggedIn', true);
                           signMeUp();
@@ -342,7 +342,7 @@ class _SignUpState extends State<SignUp> {
                       SizedBox(
                         height: 20,
                       ),
-                      GestureDetector(
+                      InkWell(
                         onTap: () {
                           performLogin();
                         },
@@ -368,7 +368,7 @@ class _SignUpState extends State<SignUp> {
                           Text("Already have account? ",
                               style:
                                   TextStyle(color: Colors.blue, fontSize: 16)),
-                          GestureDetector(
+                          InkWell(
                             onTap: () {
                               widget.toggle();
                             },

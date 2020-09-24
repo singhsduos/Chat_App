@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/animation.dart';
 
 // ignore: avoid_void_async
 Future main() async {

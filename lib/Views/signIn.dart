@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:ChatApp/Views/forgetPassword.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
@@ -68,24 +70,26 @@ class _SignInState extends State<SignIn> {
   }
 
   void performLogin() {
-    setState(() {
-      isLoading = true;
-    });
+    
+      setState(() {
+        isLoading = true;
+      });
 
-    authMethods.handleSignIn().then((User user) {
-      if (user != null) {
-        HelperFunctions.saveUserLoggedInSharedPreference(true);
-        Navigator.pushReplacement(
-            context,
-            MaterialPageRoute<MaterialPageRoute>(
-                builder: (BuildContext context) => ChatRoom()));
-      } else {
-        setState(() {
-          isLoading = false;
-          print("There was an error");
-        });
-      }
-    });
+      authMethods.handleSignIn().then((bool user ) {
+        if (user != null) {
+          HelperFunctions.saveUserLoggedInSharedPreference(true);
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute<MaterialPageRoute>(
+                  builder: (BuildContext context) => ChatRoom()));
+        } else {
+          setState(() {
+            isLoading = false;
+            print("There was an error");
+          });
+        }
+      });
+   
   }
 
   bool _obscureText = true;
@@ -204,7 +208,7 @@ class _SignInState extends State<SignIn> {
                           SizedBox(
                             height: 20,
                           ),
-                          GestureDetector(
+                          InkWell(
                             onTap: () {
                               Navigator.push(
                                   context,
@@ -227,7 +231,7 @@ class _SignInState extends State<SignIn> {
                           SizedBox(
                             height: 20,
                           ),
-                          GestureDetector(
+                          InkWell(
                             onTap: () {
                               Constants.prefs.setBool('userIsLoggedIn', true);
                               signIn();
@@ -249,23 +253,49 @@ class _SignInState extends State<SignIn> {
                           SizedBox(
                             height: 20,
                           ),
-                          GestureDetector(
+                          InkWell(
                             onTap: () {
                               Constants.prefs.setBool('userIsLoggedIn', true);
                               performLogin();
                             },
                             child: Container(
-                              alignment: Alignment.center,
-                              width: MediaQuery.of(context).size.width,
-                              padding: EdgeInsets.all(16),
-                              decoration: BoxDecoration(
-                                color: Color(0xfff99AAAB),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(30.0)),
+                              child: Column(
+                                children: [
+                                  Container(
+                                    alignment: Alignment.center,
+                                    width: MediaQuery.of(context).size.width,
+                                    padding: EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: Color(0xfff99AAAB),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(30.0)),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          
+                                          child: const Text('Sign In with Google',
+                                              textAlign: TextAlign.center,
+                                              
+                                              // textDirection: ,
+                                              style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontSize: 17,
+                                                  
+                                                  )),
+                                        ),
+                                        Container(
+                                            height: 40,
+                                            width: 40,
+                                            padding: EdgeInsets.symmetric(horizontal:5, vertical: 5),
+                                            child: Image.asset(
+                                                'images/signIn.png',
+                                                alignment: Alignment.centerLeft,))
+                                      ],
+                                    ),
+                                  )
+                                ],
                               ),
-                              child: Text('Sign In with Google',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 17)),
                             ),
                           ),
                           SizedBox(
@@ -277,7 +307,7 @@ class _SignInState extends State<SignIn> {
                               Text("Don't have account? ",
                                   style: TextStyle(
                                       color: Colors.blue, fontSize: 16)),
-                              GestureDetector(
+                              InkWell(
                                 onTap: () {
                                   widget.toggle();
                                 },
@@ -304,3 +334,16 @@ class _SignInState extends State<SignIn> {
     );
   }
 }
+
+// alignment: Alignment.center,
+//                                   width: MediaQuery.of(context).size.width,
+//                                   padding: EdgeInsets.all(16),
+//                                   decoration: BoxDecoration(
+//                                     child: Image(image: AssetImage('images/signin.png'),)
+//                                     color: Color(0xfff99AAAB),
+//                                     borderRadius: BorderRadius.all(
+//                                         Radius.circular(30.0)),
+//                                   ),
+//                                   child: Text('Sign In with Google',
+//                                       style: TextStyle(
+//                                           color: Colors.white, fontSize: 17)),
