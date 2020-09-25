@@ -31,10 +31,10 @@ class _ChatRoomState extends State<ChatRoom> {
             ? ListView.builder(
                 itemCount: (int.parse('${snapshot.data.documents.length}')),
                 itemBuilder: (context, index) {
-                return ChatRoomTile(
-                    '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}',
-                    '${snapshot.data.documents[index].data['chatroomid']}');
-              })
+                  return ChatRoomTile(
+                      '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}',
+                      '${snapshot.data.documents[index].data['chatroomid']}');
+                })
             : Container();
       },
     );
@@ -80,15 +80,11 @@ class _ChatRoomState extends State<ChatRoom> {
           GestureDetector(
             onTap: () {
               Constants.prefs.setBool('userIsLoggedIn', false);
-               authMethods.signOut();
-              // Navigator.pushReplacement(
-              //     context,
-              //     MaterialPageRoute<MaterialPageRoute>(
-              //         builder: (BuildContext context) => Authenticate()));
-
-    Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute<MaterialPageRoute>(builder: (context) => Authenticate()),
-        (Route<dynamic> route) => false);
+              authMethods.signOut();
+              Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute<MaterialPageRoute>(
+                      builder: (BuildContext context) => Authenticate()));
             },
             child: Container(
               child: Padding(

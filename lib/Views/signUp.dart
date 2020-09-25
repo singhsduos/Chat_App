@@ -26,8 +26,9 @@ class SignUp extends StatefulWidget {
 
 class _SignUpState extends State<SignUp> {
   bool isLoading = false;
-   bool isLoggedIn = false;
+  bool isLoggedIn = false;
   User currentUser;
+  final _firestore = Firestore.instance;
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
 
@@ -37,58 +38,65 @@ class _SignUpState extends State<SignUp> {
   TextEditingController passwordTextEditingController = TextEditingController();
   final TextEditingController _pass = TextEditingController();
   final TextEditingController _confirmPass = TextEditingController();
-  dynamic signMeUp() {
+  // ignore: missing_return
+  Future<Null> signMeUp() {
     if (formKey.currentState.validate()) {
-      Map<String, dynamic> userInfoMap = {
-        'name': userNameTextEditingController.text,
+      Map<String, String> userInfoMap = {
+        'username': userNameTextEditingController.text,
         'email': emailTextEditingController.text.trim()
-      }.cast<String, dynamic>();
+      }.cast<String, String>();
       HelperFunctions.saveUserEmailSharedPreference(
           emailTextEditingController.text.trim());
       HelperFunctions.saveUserNameSharedPreference(
           userNameTextEditingController.text);
       setState(() {
+        Fluttertoast.showToast(msg: "SignUp successful");
         isLoading = true;
       });
       authMethods
           .signUpWithEmailAndPassword(
               emailTextEditingController.text.trim(), _pass.text)
-          .then((dynamic val) {
-        if (val != null) {
-          // ignore: unnecessary_parenthesis
-          databaseMethods.uploadUserInfo((userInfoMap));
-          HelperFunctions.saveUserLoggedInSharedPreference(true);
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute<MaterialPageRoute>(
-                  builder: (BuildContext context) => ChatRoom()));
-        }
+          .then((dynamic signedInUser) {
+        _firestore.collection('users').add(<String, String>{
+          'username': userNameTextEditingController.text,
+          'email': emailTextEditingController.text.trim(),
+        }).then((dynamic value) {
+          if (signedInUser != null) {
+            HelperFunctions.saveUserLoggedInSharedPreference(true);
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute<MaterialPageRoute>(
+                    builder: (BuildContext context) => ChatRoom()));
+          }
+        }).catchError((dynamic e) {
+          print(e);
+        });
+      }).catchError((dynamic e) {
+        print(e);
       });
     }
   }
 
-
-
-   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
-   SharedPreferences prefs;
+  SharedPreferences prefs;
 
-Future<Null> handleSignIn() async {
- 
-     prefs = await SharedPreferences.getInstance();
+  Future<Null> handleSignIn() async {
+    prefs = await SharedPreferences.getInstance();
     this.setState(() {
       isLoading = true;
     });
-  final GoogleSignInAccount googleUser = await googleSignIn.signIn();
-  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-  final UserCredential authResult = await _auth.signInWithCredential(credential);
-  User user = authResult.user;
-  print("signed in " + user.displayName);
-  
+    final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    final UserCredential authResult =
+        await _auth.signInWithCredential(credential);
+    User user = authResult.user;
+    print("signed in " + user.displayName);
+
     if (user != null) {
       // Check is already sign up
       final QuerySnapshot result = await FirebaseFirestore.instance
@@ -98,46 +106,46 @@ Future<Null> handleSignIn() async {
       final List<DocumentSnapshot> documents = result.docs;
       if (documents.length == 0) {
         // Update data to server if new user
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
+        FirebaseFirestore.instance.collection('users').doc(user.uid)
             // ignore: always_specify_types
-            .set(<String,dynamic>{
-          'nickname': user.displayName,
+            .set(<String, dynamic>{
+          'username': user.displayName,
           'photoUrl': user.photoURL,
           'id': user.uid,
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-          'chattingWith': null
+          'chattingWith': null,
+          'email': user.email,
         });
 
         // Write data to local
         currentUser = user;
         await prefs.setString('id', currentUser.uid);
-        await prefs.setString('nickname', currentUser.displayName);
+        await prefs.setString('username', currentUser.displayName);
         await prefs.setString('photoUrl', currentUser.photoURL);
+        await prefs.setString('email', currentUser.email);
       } else {
         // Write data to local
         await prefs.setString('id', '${documents[0].data()['id']}');
-        await prefs.setString('nickname', '${documents[0].data()['nickname']}');
+        await prefs.setString('username', '${documents[0].data()['username']}');
         await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
-        
+        await prefs.setString('email', '${documents[0].data()['email']}');
       }
       Fluttertoast.showToast(msg: "SignUp successful");
       this.setState(() {
         isLoading = false;
       });
 
-       Navigator.pushReplacement(
-            context,
-            MaterialPageRoute<MaterialPageRoute>(
-                builder: (BuildContext context) => ChatRoom()));
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute<MaterialPageRoute>(
+              builder: (BuildContext context) => ChatRoom()));
     } else {
       Fluttertoast.showToast(msg: "SignUp fail");
       this.setState(() {
         isLoading = false;
       });
     }
-}
+  }
 
   bool _obscureText = true;
 
@@ -430,7 +438,6 @@ Future<Null> handleSignIn() async {
                                       width: 40,
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 5, vertical: 5),
-                                      
                                     )
                                   ],
                                 ),

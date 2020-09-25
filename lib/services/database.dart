@@ -30,21 +30,21 @@ class DatabaseMethods {
     return email;
   }
 
-  Future<bool> authenticateUser(String user) async {
-    QuerySnapshot result = '' as QuerySnapshot;
-    await Firestore.instance
-        .collection('users')
-        .where('email', isEqualTo: user )
-        .getDocuments();
+  // Future<bool> authenticateUser(String user) async {
+  //   QuerySnapshot result = '' as QuerySnapshot;
+  //   await Firestore.instance
+  //       .collection('users')
+  //       .where('email', isEqualTo: user )
+  //       .getDocuments();
 
 
-        final List<DocumentSnapshot> docs = result.documents;
-         return docs.length == 0 ? true : false;
-  }
+  //       final List<DocumentSnapshot> docs = result.documents;
+  //        return docs.length == 0 ? true : false;
+  // }
 
 
   Future<void> uploadUserInfo(dynamic userMap) async {
-    Map<String, dynamic> userMap;
+    Map<String, String> userMap;
     return await Firestore.instance
         .collection("users")
         .add(userMap)
@@ -88,10 +88,10 @@ class DatabaseMethods {
         .snapshots();
   }
 
-  dynamic getChatRooms(String userName) async {
+  dynamic getChatRooms(String username) async {
     return await Firestore.instance
         .collection('ChatRoom')
-        .where('users', arrayContains: userName)
+        .where('users', arrayContains: username)
         .snapshots();
   }
 }

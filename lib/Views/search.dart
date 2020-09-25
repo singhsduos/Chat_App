@@ -45,20 +45,20 @@ class _SearchScreenState extends State<SearchScreen> {
             itemCount: searchSnapshot.documents.length,
             itemBuilder: (context, index) {
               return SearchTile(
-                userName: ('${searchSnapshot.documents[index].data()['name']}'),
-                userEmail:
-                    ('${searchSnapshot.documents[index].data()['email']}'),
+                username: ('${searchSnapshot.documents[0].data()['username']}'),
+                email:
+                    ('${searchSnapshot.documents[0].data()['email']}'),
               );
             })
         : Container();
   }
 
-  dynamic createChatroomAndStartConversation({String userName}) {
+  dynamic createChatroomAndStartConversation({String username}) {
     print('${Constants.myName}');
-    if (userName != Constants.myName) {
-      String chatRoomid = getChatRoomid(userName, Constants.myName).toString();
+    if (username != Constants.myName) {
+      String chatRoomid = getChatRoomid(username, Constants.myName).toString();
 
-      List<String> users = [userName, Constants.myName];
+      List<String> users = [username, Constants.myName];
       Map<String, dynamic> chatRoomMap = {
         'users': users,
         'chatroomid': chatRoomid,
@@ -74,7 +74,7 @@ class _SearchScreenState extends State<SearchScreen> {
     }
   }
 
-  Widget SearchTile({String userName, String userEmail}) {
+  Widget SearchTile({String username, String email}) {
     return Container(
       padding: EdgeInsets.all(16),
       child: Row(
@@ -83,15 +83,15 @@ class _SearchScreenState extends State<SearchScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               Text(
-                userName,
+                username,
               ),
-              Text(userEmail)
+              Text(email)
             ],
           ),
           Spacer(),
           GestureDetector(
             onTap: () {
-              createChatroomAndStartConversation(userName: userName);
+              createChatroomAndStartConversation(username: username);
             },
             child: Container(
                 decoration: BoxDecoration(
@@ -129,7 +129,7 @@ class _SearchScreenState extends State<SearchScreen> {
               child: Row(
                 children: [
                   Expanded(
-                    child: GestureDetector(
+                    child: InkWell(
                       onTap: () {
                         initiateSearch();
                         databaseMethods

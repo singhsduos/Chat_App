@@ -34,7 +34,7 @@ class _SignInState extends State<SignIn> {
   TextEditingController passwordTextEditingController = TextEditingController();
 
   bool isLoading = false;
-   bool isLoggedIn = false;
+  bool isLoggedIn = false;
   User currentUser;
   QuerySnapshot snapshotUserInfo;
   void signIn() {
@@ -52,6 +52,7 @@ class _SignInState extends State<SignIn> {
       });
 
       setState(() {
+        Fluttertoast.showToast(msg: "SignIn successful");
         isLoading = true;
       });
 
@@ -67,6 +68,12 @@ class _SignInState extends State<SignIn> {
                   builder: (BuildContext context) => ChatRoom()));
         } else {
           setState(() {
+            Fluttertoast.showToast(msg: "Invalid email/password",
+             textColor: Color(0xFFFFFFFF),
+        backgroundColor: Colors.cyan,
+        fontSize: 16.0,
+        
+        timeInSecForIosWeb: 3,);
             isLoading = false;
           });
         }
@@ -76,24 +83,24 @@ class _SignInState extends State<SignIn> {
 
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
-   SharedPreferences prefs;
+  SharedPreferences prefs;
 
-Future<Null> handleSignIn() async {
- 
-     prefs = await SharedPreferences.getInstance();
+  Future<Null> handleSignIn() async {
+    prefs = await SharedPreferences.getInstance();
     this.setState(() {
       isLoading = true;
     });
-  final GoogleSignInAccount googleUser = await googleSignIn.signIn();
-  GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  final AuthCredential credential = GoogleAuthProvider.getCredential(
-    accessToken: googleAuth.accessToken,
-    idToken: googleAuth.idToken,
-  );
-  final UserCredential authResult = await _auth.signInWithCredential(credential);
-  User user = authResult.user;
-  print("signed in " + user.displayName);
-  
+    final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+    GoogleSignInAuthentication googleAuth = await googleUser.authentication;
+    final AuthCredential credential = GoogleAuthProvider.getCredential(
+      accessToken: googleAuth.accessToken,
+      idToken: googleAuth.idToken,
+    );
+    final UserCredential authResult =
+        await _auth.signInWithCredential(credential);
+    User user = authResult.user;
+    print("signed in " + user.displayName);
+
     if (user != null) {
       // Check is already sign up
       final QuerySnapshot result = await FirebaseFirestore.instance
@@ -103,46 +110,47 @@ Future<Null> handleSignIn() async {
       final List<DocumentSnapshot> documents = result.docs;
       if (documents.length == 0) {
         // Update data to server if new user
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(user.uid)
+        FirebaseFirestore.instance.collection('users').doc(user.uid)
             // ignore: always_specify_types
-            .set(<String,dynamic>{
-          'nickname': user.displayName,
+            .set(<String, dynamic>{
+          'username': user.displayName,
           'photoUrl': user.photoURL,
           'id': user.uid,
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-          'chattingWith': null
+          'chattingWith': null,
+          'email': user.email,
         });
 
         // Write data to local
         currentUser = user;
         await prefs.setString('id', currentUser.uid);
-        await prefs.setString('nickname', currentUser.displayName);
+        await prefs.setString('username', currentUser.displayName);
         await prefs.setString('photoUrl', currentUser.photoURL);
+        await prefs.setString('email', currentUser.email);
       } else {
         // Write data to local
         await prefs.setString('id', '${documents[0].data()['id']}');
-        await prefs.setString('nickname', '${documents[0].data()['nickname']}');
+        await prefs.setString('username', '${documents[0].data()['username']}');
         await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
-        
+        await prefs.setString('email', '${documents[0].data()['email']}');
       }
       Fluttertoast.showToast(msg: "SignIn successful");
       this.setState(() {
         isLoading = false;
       });
 
-       Navigator.pushReplacement(
-            context,
-            MaterialPageRoute<MaterialPageRoute>(
-                builder: (BuildContext context) => ChatRoom()));
+      Navigator.pushReplacement(
+          context,
+          MaterialPageRoute<MaterialPageRoute>(
+              builder: (BuildContext context) => ChatRoom()));
     } else {
       Fluttertoast.showToast(msg: "SignIn fail");
       this.setState(() {
         isLoading = false;
       });
     }
-}
+  }
+
   bool _obscureText = true;
   @override
   Widget build(BuildContext context) {
@@ -305,12 +313,12 @@ Future<Null> handleSignIn() async {
                             height: 20,
                           ),
                           InkWell(
-                           onTap: () {
-                          Constants.prefs.setBool('userIsLoggedIn', true);
-                          handleSignIn()
-                              .then((User user) => print(user))
-                              .catchError((dynamic e) => print(e));
-                        },
+                            onTap: () {
+                              Constants.prefs.setBool('userIsLoggedIn', true);
+                              handleSignIn()
+                                  .then((User user) => print(user))
+                                  .catchError((dynamic e) => print(e));
+                            },
                             child: Container(
                               child: Column(
                                 children: [
@@ -345,7 +353,6 @@ Future<Null> handleSignIn() async {
                                           width: 40,
                                           padding: EdgeInsets.symmetric(
                                               horizontal: 5, vertical: 5),
-                                          
                                         )
                                       ],
                                     ),
