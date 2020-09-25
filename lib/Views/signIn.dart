@@ -68,12 +68,13 @@ class _SignInState extends State<SignIn> {
                   builder: (BuildContext context) => ChatRoom()));
         } else {
           setState(() {
-            Fluttertoast.showToast(msg: "Invalid email/password",
-             textColor: Color(0xFFFFFFFF),
-        backgroundColor: Colors.cyan,
-        fontSize: 16.0,
-        
-        timeInSecForIosWeb: 3,);
+            Fluttertoast.showToast(
+              msg: "Invalid email/password",
+              textColor: Color(0xFFFFFFFF),
+              backgroundColor: Colors.cyan,
+              fontSize: 16.0,
+              timeInSecForIosWeb: 3,
+            );
             isLoading = false;
           });
         }
@@ -328,32 +329,38 @@ class _SignInState extends State<SignIn> {
                                     padding: EdgeInsets.all(6),
                                     decoration: BoxDecoration(
                                       color: Color(0xfff99AAAB),
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(30.0)),
+                                      borderRadius: BorderRadius.circular(30.0),
                                     ),
                                     child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
-                                        Expanded(
+                                        Center(
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                                image: DecorationImage(
+                                              image: AssetImage(
+                                                  'images/signIn.png'),
+                                            )),
+                                            height: 40,
+                                            width: 40,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 5, vertical: 5),
+                                          ),
+                                        ),
+                                        SizedBox(
+                                          width: 10.0,
+                                        ),
+                                        Center(
                                           child:
                                               const Text('Sign In with Google',
-                                                  textAlign: TextAlign.center,
+
                                                   // textDirection: ,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 17,
                                                   )),
                                         ),
-                                        Container(
-                                          decoration: BoxDecoration(
-                                              image: DecorationImage(
-                                                  image: AssetImage(
-                                                      'images/signIn.png'),
-                                                  fit: BoxFit.values[3])),
-                                          height: 40,
-                                          width: 40,
-                                          padding: EdgeInsets.symmetric(
-                                              horizontal: 5, vertical: 5),
-                                        )
                                       ],
                                     ),
                                   )
