@@ -20,7 +20,7 @@ class _SearchState extends State<Search> {
 
   dynamic handleSearch(String query) {
     Future<QuerySnapshot> users =
-        useref.where("username", isEqualTo: query).getDocuments();
+        useref.where("username", isGreaterThanOrEqualTo: query).getDocuments();
     setState(() {
       searchResultsFuture = users;
     });
@@ -30,63 +30,45 @@ class _SearchState extends State<Search> {
     searchController.clear();
   }
 
-  AppBar buildSearchField() {
-    return AppBar(
-      backgroundColor: Color(0xfff99AAAB),
-      title: TextFormField(
-        controller: searchController,
-        decoration: InputDecoration(
-          fillColor: Color(0xfff99AAAB),
-         
-          hintText: 'search Username...',
-          hintStyle: TextStyle(
-            color: Colors.black54,
-          ),
-          filled: true,
-          labelStyle:
-              const TextStyle(color: Color(0xfff99AAAB), fontSize: 16.0),
-         
-          prefixIcon: Icon(
-            Icons.person_pin,
-            size: 28.0,
-            color: Colors.black54,
-          ),
-          suffixIcon: IconButton(
-            icon: Icon(Icons.clear),
-            color: Colors.black54,
-            onPressed: clearSearch,
-          ),
-        ),
-        onFieldSubmitted: handleSearch,
-      ),
-    );
-  }
-
-  Container buildNoContent() {
-    // final Orientation orientation = MediaQuery.of(context).orientation;
-    return Container(
-      child: Center(
-        child: ListView(
-          shrinkWrap: true,
-          children: <Widget>[
-            Text(
-              "Find Users",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: Colors.cyan,
-                fontStyle: FontStyle.italic,
-                fontWeight: FontWeight.w600,
-                fontSize: 60.0,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget buildSearchResults() {
+  // AppBar buildSearchField() {
+  //   return AppBar(
+  //     backgroundColor: Colors.white,
+  //     title: TextFormField(
+  //       controller: searchController,
+  //       decoration: InputDecoration(
+  //         hintText: "Search for a user...",
+  //         filled: true,
+  //         prefixIcon: Icon(
+  //           Icons.account_box,
+  //           size: 28.0,
+  //         ),
+  //         suffixIcon: IconButton(
+  //           icon: Icon(Icons.clear),
+  //           onPressed: clearSearch,
+  //         ),
+  //       ),
+  //       onFieldSubmitted: handleSearch,
+  //     ),
+  //   );
+  // }
+//   Widget userList() {
+//     return haveUserSearched
+//         ? ListView.builder(
+//             shrinkWrap: true,
+//             itemCount: searchResultSnapshot.docs.length,
+//             itemBuilder: (context, index) {
+//               return userTile(
+//                 username:
+//                     ('${searchResultSnapshot.docs[0].data()['username']}'),
+//                 email:
+//                     ('${searchResultSnapshot.docs[0].data()['username']}'),
+//               );
+//             })
+//         : Container();
+//   }
+    Widget userList() {
     return FutureBuilder(
+      
       future: searchResultsFuture,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -97,24 +79,104 @@ class _SearchState extends State<Search> {
           Users user = Users.fromDocument(doc);
           searchResults.add(Text(user.username));
         });
-        return Container(
-          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-          child: ListView(
-            shrinkWrap: true,
-            children: searchResults,
-          ),
+        return ListView(
+          children: searchResults,
         );
       },
     );
+        
   }
+  
+
+ 
+
+  Widget buildSearchResults(BuildContext context) {
+    return Scaffold(
+      body: 
+          searchResultsFuture != null ? Container( child: Center(
+                child: CircularProgressIndicator(),
+              ),) : Container(
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              color: Colors.cyan,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: searchController,
+                      style: TextStyle(
+                        fontSize: 16,
+                        letterSpacing: 1.0,
+                      ),
+                      decoration: InputDecoration(
+                          hintText: "search username ...",
+                          hintStyle: TextStyle(
+                            color: Colors.black,
+                            fontSize: 16,
+                          ),
+                          border: InputBorder.none),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () {
+                      // handleSearch();
+                    },
+                    child: Container(
+                        height: 40,
+                        width: 40,
+                        decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                                colors: [
+                                  const Color(0x36FFFFFF),
+                                  const Color(0x0FFFFFFF)
+                                ],
+                                begin: FractionalOffset.topLeft,
+                                end: FractionalOffset.bottomRight),
+                            borderRadius: BorderRadius.circular(40)),
+                        padding: EdgeInsets.all(12),
+                        child: Image.asset(
+                          "images/search_white.png",
+                          height: 25,
+                          width: 25,
+                        )),
+                  )
+                ],
+              ),
+            ),
+            userList(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget buildSearchResults() {
+  //   return FutureBuilder(
+  //     future: searchResultsFuture,
+  //     builder: (context, snapshot) {
+  //       if (!snapshot.hasData) {
+  //         return CircularProgressIndicator();
+  //       }
+  //       List<Text> searchResults = [];
+  //       snapshot.data.documents.forEach((DocumentSnapshot doc) {
+  //         Users user = Users.fromDocument(doc);
+  //         searchResults.add(Text(user.username));
+  //       });
+  //       return ListView(
+  //         children: searchResults,
+  //       );
+  //     },
+  //   );
+  // }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       // backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
-      appBar: buildSearchField(),
-      body:
-          searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
+      appBar: appBarMain(context),
+      body: buildSearchResults(context),
     );
   }
 }

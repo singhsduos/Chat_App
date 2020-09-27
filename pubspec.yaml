@@ -45,6 +45,7 @@ dependencies:
   flutter_icons:
   fluttertoast:
   toast:
+  algolia:
     
 
 dev_dependencies:

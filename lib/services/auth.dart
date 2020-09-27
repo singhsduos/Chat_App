@@ -43,29 +43,13 @@ class AuthMethods {
     }
   }
 
-  Future signOut() async {
+  Future<void> signOut() async {
     try {
-    return await FirebaseAuth.instance.signOut();
-    // await googleSignIn.disconnect();
-    // await googleSignIn.signOut();
+      await FirebaseAuth.instance.signOut();
+      await googleSignIn.signOut();
+      // await googleSignIn.disconnect();
     } catch (e) {
       print(e.toString());
     }
   }
-
-  
-
-  // Future<User> handleSignIn() async {
-  //   final GoogleSignInAccount googleUser = await googleSignIn.signIn();
-  //   GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-  //   final AuthCredential credential = GoogleAuthProvider.getCredential(
-  //     accessToken: googleAuth.accessToken,
-  //     idToken: googleAuth.idToken,
-  //   );
-  //   final UserCredential authResult =
-  //       (await _auth.signInWithCredential(credential)).user as UserCredential;
-  //   User user = authResult.user;
-  //   print("signed in " + user.displayName);
-  //   return user;
-  // }
 }

@@ -1,6 +1,7 @@
 import 'package:ChatApp/Views/conversationScreen.dart';
 import 'package:ChatApp/Views/drawer.dart';
 import 'package:ChatApp/Views/search.dart';
+import 'package:ChatApp/Views/search.dart';
 import 'package:ChatApp/Views/signIn.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
@@ -107,7 +108,7 @@ class _ChatRoomState extends State<ChatRoom> {
           Navigator.push<MaterialPageRoute>(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => SearchScreen()));
+                  builder: (BuildContext context) => Search()));
         },
         child: Icon(
           Icons.search,

@@ -1,8 +1,6 @@
-import 'package:ChatApp/Views/chatRoomsScreen.dart';
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
-
 
 class DatabaseMethods {
   final String username;
@@ -10,11 +8,11 @@ class DatabaseMethods {
 
   final CollectionReference users = Firestore.instance.collection("users");
 
-  Future<String> getByUserName(String username) async {
-    String user = '';
+  Future<QuerySnapshot> getByUserName(String username) async {
+    QuerySnapshot user;
     await Firestore.instance
         .collection('users')
-        .where('userName', isEqualTo: username)
+        .where('username', isEqualTo: username)
         .getDocuments();
 
     return user;
@@ -29,18 +27,6 @@ class DatabaseMethods {
 
     return email;
   }
-
-  // Future<bool> authenticateUser(String user) async {
-  //   QuerySnapshot result = '' as QuerySnapshot;
-  //   await Firestore.instance
-  //       .collection('users')
-  //       .where('email', isEqualTo: user )
-  //       .getDocuments();
-
-
-  //       final List<DocumentSnapshot> docs = result.documents;
-  //        return docs.length == 0 ? true : false;
-  // }
 
 
   Future<void> uploadUserInfo(dynamic userMap) async {
