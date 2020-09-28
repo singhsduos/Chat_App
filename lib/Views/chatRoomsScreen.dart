@@ -14,11 +14,15 @@ import 'package:ChatApp/services/database.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoom extends StatefulWidget {
+  final String uid;
+  ChatRoom({Key key, @required this.uid}) : super(key: key);
   @override
-  _ChatRoomState createState() => _ChatRoomState();
+  _ChatRoomState createState() => _ChatRoomState(uid);
 }
 
 class _ChatRoomState extends State<ChatRoom> {
+  final String uid;
+  _ChatRoomState(this.uid);
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
 
@@ -105,10 +109,10 @@ class _ChatRoomState extends State<ChatRoom> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.cyan,
         onPressed: () {
-          Navigator.push<MaterialPageRoute>(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) => Search()));
+          // Navigator.push<MaterialPageRoute>(
+          //     context,
+          //     MaterialPageRoute(
+          //         builder: (BuildContext context) => Search()));
         },
         child: Icon(
           Icons.search,

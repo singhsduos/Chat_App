@@ -48,24 +48,28 @@ class _SignInState extends State<SignIn> {
         snapshotUserInfo = val as QuerySnapshot;
         HelperFunctions.saveUserNameSharedPreference(
             "${snapshotUserInfo.docs[0].data()['name']}");
+        
         // print("${snapshotUserInfo.docs[0].data()['name']} this is not good");
       });
 
       setState(() {
-        Fluttertoast.showToast(msg: "SignIn successful");
         isLoading = true;
       });
 
       authMethods
           .signInWithEmailAndPassword(emailTextEditingController.text.trim(),
-              passwordTextEditingController.text)
+              passwordTextEditingController.text,context)
           .then((dynamic val) {
         if (val != null) {
+          Fluttertoast.showToast(msg: "SignIn successful");
           HelperFunctions.saveUserLoggedInSharedPreference(true);
+          User user = FirebaseAuth.instance.currentUser;
           Navigator.pushReplacement(
               context,
               MaterialPageRoute<MaterialPageRoute>(
-                  builder: (BuildContext context) => ChatRoom()));
+                  builder: (BuildContext context) => ChatRoom(
+                        uid: user.uid,
+                      )));
         } else {
           setState(() {
             Fluttertoast.showToast(
@@ -143,7 +147,7 @@ class _SignInState extends State<SignIn> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute<MaterialPageRoute>(
-              builder: (BuildContext context) => ChatRoom()));
+              builder: (BuildContext context) => ChatRoom(uid: user.uid)));
     } else {
       Fluttertoast.showToast(msg: "SignIn fail");
       this.setState(() {

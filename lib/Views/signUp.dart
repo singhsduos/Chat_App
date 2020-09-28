@@ -13,6 +13,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'chatRoomsScreen.dart';
+import 'package:ChatApp/modal/user.dart';
 
 import '../Widget/widget.dart';
 
@@ -28,9 +29,12 @@ class _SignUpState extends State<SignUp> {
   bool isLoading = false;
   bool isLoggedIn = false;
   User currentUser;
+
   final _firestore = Firestore.instance;
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn googleSignIn = GoogleSignIn();
 
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   TextEditingController userNameTextEditingController = TextEditingController();
@@ -38,32 +42,41 @@ class _SignUpState extends State<SignUp> {
   TextEditingController passwordTextEditingController = TextEditingController();
   final TextEditingController _pass = TextEditingController();
   final TextEditingController _confirmPass = TextEditingController();
+
   // ignore: missing_return
-  Future<Null> signMeUp() {
+  Future<Null> signMeUp() async {
     if (formKey.currentState.validate()) {
       HelperFunctions.saveUserEmailSharedPreference(
           emailTextEditingController.text.trim());
       HelperFunctions.saveUserNameSharedPreference(
           userNameTextEditingController.text);
       setState(() {
-        Fluttertoast.showToast(msg: "SignUp successful");
+      
         isLoading = true;
       });
+
       authMethods
           .signUpWithEmailAndPassword(
-              emailTextEditingController.text.trim(), _pass.text)
+              emailTextEditingController.text.trim(), _pass.text,context)
           .then((dynamic signedInUser) {
-        _firestore.collection('users').add(<String, String>{
+            
+             User user = FirebaseAuth.instance.currentUser;
+        _firestore.collection('users').doc(user.uid).set(<String, dynamic>{
           'username': userNameTextEditingController.text,
           'email': emailTextEditingController.text.trim(),
-          
+          'id': FirebaseAuth.instance.currentUser.uid,
+          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
         }).then((dynamic value) {
           if (signedInUser != null) {
+             Fluttertoast.showToast(msg: "SignUp successful");
             HelperFunctions.saveUserLoggedInSharedPreference(true);
+            User user = FirebaseAuth.instance.currentUser;
+
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute<MaterialPageRoute>(
-                    builder: (BuildContext context) => ChatRoom()));
+                    builder: (BuildContext context) =>
+                        ChatRoom(uid: user.uid)));
           }
         }).catchError((dynamic e) {
           print(e);
@@ -74,8 +87,7 @@ class _SignUpState extends State<SignUp> {
     }
   }
 
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-  final GoogleSignIn googleSignIn = GoogleSignIn();
+
   SharedPreferences prefs;
 
   Future<Null> handleSignIn() async {
@@ -131,11 +143,11 @@ class _SignUpState extends State<SignUp> {
       this.setState(() {
         isLoading = false;
       });
-
+    //  User user = FirebaseAuth.instance.currentUser;
       Navigator.pushReplacement(
           context,
           MaterialPageRoute<MaterialPageRoute>(
-              builder: (BuildContext context) => ChatRoom()));
+              builder: (BuildContext context) => ChatRoom(uid : user.uid)));
     } else {
       Fluttertoast.showToast(msg: "SignUp fail");
       this.setState(() {

@@ -20,7 +20,7 @@ class _SearchState extends State<Search> {
 
   dynamic handleSearch(String query) {
     Future<QuerySnapshot> users =
-        useref.where("username", isGreaterThanOrEqualTo: query).getDocuments();
+        useref.where("username", isEqualTo: query).get();
     setState(() {
       searchResultsFuture = users;
     });
@@ -66,9 +66,8 @@ class _SearchState extends State<Search> {
 //             })
 //         : Container();
 //   }
-    Widget userList() {
+  Widget userList() {
     return FutureBuilder(
-      
       future: searchResultsFuture,
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
@@ -84,71 +83,60 @@ class _SearchState extends State<Search> {
         );
       },
     );
-        
   }
-  
-
- 
 
   Widget buildSearchResults(BuildContext context) {
     return Scaffold(
-      body: 
-          searchResultsFuture != null ? Container( child: Center(
+      body: searchResultsFuture != null
+          ? Container(
+              child: Center(
                 child: CircularProgressIndicator(),
-              ),) : Container(
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-              color: Colors.cyan,
-              child: Row(
+              ),
+            )
+          : Container(
+              child: Column(
                 children: [
-                  Expanded(
-                    child: TextField(
-                      controller: searchController,
-                      style: TextStyle(
-                        fontSize: 16,
-                        letterSpacing: 1.0,
-                      ),
-                      decoration: InputDecoration(
-                          hintText: "search username ...",
-                          hintStyle: TextStyle(
-                            color: Colors.black,
-                            fontSize: 16,
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+                    color: Colors.cyan,
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: searchController,
+                            style: TextStyle(
+                              fontSize: 16,
+                              letterSpacing: 1.0,
+                            ),
+                            decoration: InputDecoration(
+                                hintText: "search username ...",
+                                hintStyle: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 16,
+                                ),
+                                border: InputBorder.none),
                           ),
-                          border: InputBorder.none),
+                        ),
+                        TextField(
+                          onChanged: (value) {
+                            handleSearch(value);
+                          },
+                          controller: searchController,
+                          decoration: InputDecoration(
+                              labelText: "Search",
+                              hintText: "Search",
+                              prefixIcon: Icon(Icons.search),
+                              border: OutlineInputBorder(
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(25.0)))),
+                        )
+                      ],
                     ),
                   ),
-                  GestureDetector(
-                    onTap: () {
-                      // handleSearch();
-                    },
-                    child: Container(
-                        height: 40,
-                        width: 40,
-                        decoration: BoxDecoration(
-                            gradient: LinearGradient(
-                                colors: [
-                                  const Color(0x36FFFFFF),
-                                  const Color(0x0FFFFFFF)
-                                ],
-                                begin: FractionalOffset.topLeft,
-                                end: FractionalOffset.bottomRight),
-                            borderRadius: BorderRadius.circular(40)),
-                        padding: EdgeInsets.all(12),
-                        child: Image.asset(
-                          "images/search_white.png",
-                          height: 25,
-                          width: 25,
-                        )),
-                  )
+                  userList(),
                 ],
               ),
             ),
-            userList(),
-          ],
-        ),
-      ),
     );
   }
 
