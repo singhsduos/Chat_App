@@ -29,6 +29,7 @@ class _SignUpState extends State<SignUp> {
   bool isLoading = false;
   bool isLoggedIn = false;
   User currentUser;
+  dynamic _error;
 
   final _firestore = Firestore.instance;
   AuthMethods authMethods = AuthMethods();
@@ -42,6 +43,7 @@ class _SignUpState extends State<SignUp> {
   TextEditingController passwordTextEditingController = TextEditingController();
   final TextEditingController _pass = TextEditingController();
   final TextEditingController _confirmPass = TextEditingController();
+
 
   // ignore: missing_return
   Future<Null> signMeUp() async {
@@ -78,9 +80,30 @@ class _SignUpState extends State<SignUp> {
           }
         }).catchError((dynamic e) {
           print(e);
+          setState(() {
+             isLoading = false;
+            Fluttertoast.showToast(
+              msg: 'Email already in use',
+              textColor: Color(0xFFFFFFFF),
+              backgroundColor: Colors.cyan,
+              fontSize: 16.0,
+              timeInSecForIosWeb: 4,
+            );
+          });
         });
       }).catchError((dynamic e) {
         print(e);
+         setState(() {
+            isLoading = false;
+            Fluttertoast.showToast(
+              msg: 'Email already in use',
+              textColor: Color(0xFFFFFFFF),
+              backgroundColor: Colors.cyan,
+              fontSize: 16.0,
+              timeInSecForIosWeb: 4,
+            );
+            
+          });
       });
     }
   }
@@ -160,6 +183,43 @@ class _SignUpState extends State<SignUp> {
     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
+     Widget showAlert() {
+    if (_error != null) {
+      return Container(
+        color: Colors.amberAccent,
+        width: double.infinity,
+        padding: EdgeInsets.all(8.0),
+        child: Row(
+          children: <Widget>[
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: Icon(Icons.error_outline),
+            ),
+            Expanded(
+              child: Text(
+                _error.toString(),
+                maxLines: 3,
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(left: 8.0),
+              child: IconButton(
+                icon: Icon(Icons.close),
+                onPressed: () {
+                  setState(() {
+                    _error = null;
+                  });
+                },
+              ),
+            )
+          ],
+        ),
+      );
+    }
+    return SizedBox(
+      height: 0,
+    );
+  }
 
     return Scaffold(
       appBar: appBarMain(context),
@@ -172,6 +232,8 @@ class _SignUpState extends State<SignUp> {
                   key: formKey,
                   child: Column(
                     children: <Widget>[
+                       const SizedBox(),
+                         showAlert(),
                       TextFormField(
                         validator: (String value) {
                           if (value.isEmpty) {
