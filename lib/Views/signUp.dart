@@ -51,16 +51,14 @@ class _SignUpState extends State<SignUp> {
       HelperFunctions.saveUserNameSharedPreference(
           userNameTextEditingController.text);
       setState(() {
-      
         isLoading = true;
       });
 
       authMethods
           .signUpWithEmailAndPassword(
-              emailTextEditingController.text.trim(), _pass.text,context)
+              emailTextEditingController.text.trim(), _pass.text, context)
           .then((dynamic signedInUser) {
-            
-             User user = FirebaseAuth.instance.currentUser;
+        User user = FirebaseAuth.instance.currentUser;
         _firestore.collection('users').doc(user.uid).set(<String, dynamic>{
           'username': userNameTextEditingController.text,
           'email': emailTextEditingController.text.trim(),
@@ -68,7 +66,7 @@ class _SignUpState extends State<SignUp> {
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
         }).then((dynamic value) {
           if (signedInUser != null) {
-             Fluttertoast.showToast(msg: "SignUp successful");
+            Fluttertoast.showToast(msg: "SignUp successful");
             HelperFunctions.saveUserLoggedInSharedPreference(true);
             User user = FirebaseAuth.instance.currentUser;
 
@@ -86,7 +84,6 @@ class _SignUpState extends State<SignUp> {
       });
     }
   }
-
 
   SharedPreferences prefs;
 
@@ -143,11 +140,11 @@ class _SignUpState extends State<SignUp> {
       this.setState(() {
         isLoading = false;
       });
-    //  User user = FirebaseAuth.instance.currentUser;
+      //  User user = FirebaseAuth.instance.currentUser;
       Navigator.pushReplacement(
           context,
           MaterialPageRoute<MaterialPageRoute>(
-              builder: (BuildContext context) => ChatRoom(uid : user.uid)));
+              builder: (BuildContext context) => ChatRoom(uid: user.uid)));
     } else {
       Fluttertoast.showToast(msg: "SignUp fail");
       this.setState(() {
@@ -176,9 +173,18 @@ class _SignUpState extends State<SignUp> {
                   child: Column(
                     children: <Widget>[
                       TextFormField(
-                        validator: (value) => value.isEmpty || value.length < 4
-                            ? 'Username should be minimum 4 characters'
-                            : null,
+                        validator: (String value) {
+                          if (value.isEmpty) {
+                            return "Username can't be empty";
+                          }
+                          if (value.length < 4) {
+                            return 'Password must be atleast 4 characters long';
+                          }
+                          if (value.length > 20) {
+                            return 'Password must be less than 20 characters';
+                          }
+                          return null;
+                        },
                         onSaved: (value) {
                           setState(() {
                             value;
@@ -268,9 +274,18 @@ class _SignUpState extends State<SignUp> {
                       TextFormField(
                         controller: _pass,
 
-                        validator: (value) => value.isEmpty || value.length < 7
-                            ? 'Password should be minimum 7 characters'
-                            : null,
+                        validator: (String value) {
+                          if (value.isEmpty) {
+                            return "Password can't be empty";
+                          }
+                          if (value.length < 7) {
+                            return 'Password must be atleast 7 characters long';
+                          }
+                          if (value.length > 20) {
+                            return 'Password must be less than 20 characters';
+                          }
+                          return null;
+                        },
                         onSaved: (value) {
                           setState(() {
                             value;
@@ -326,8 +341,13 @@ class _SignUpState extends State<SignUp> {
                       TextFormField(
                         controller: _confirmPass,
                         validator: (String value) {
-                          if (value.isEmpty || value.length < 7)
-                            return 'Password should be minimum 7 characters';
+                          if (value.isEmpty) return "Password can't be empty";
+                          if (value.length < 7)
+                            return 'Password must be atleast 7 characters long';
+                          if (value.length > 20) {
+                            return 'Password must be less than 20 characters';
+                          }
+
                           if (value != _pass.text) {
                             return 'Unmatch Password';
                           }

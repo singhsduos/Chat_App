@@ -48,7 +48,7 @@ class _SignInState extends State<SignIn> {
         snapshotUserInfo = val as QuerySnapshot;
         HelperFunctions.saveUserNameSharedPreference(
             "${snapshotUserInfo.docs[0].data()['name']}");
-        
+
         // print("${snapshotUserInfo.docs[0].data()['name']} this is not good");
       });
 
@@ -58,7 +58,7 @@ class _SignInState extends State<SignIn> {
 
       authMethods
           .signInWithEmailAndPassword(emailTextEditingController.text.trim(),
-              passwordTextEditingController.text,context)
+              passwordTextEditingController.text, context)
           .then((dynamic val) {
         if (val != null) {
           Fluttertoast.showToast(msg: "SignIn successful");
@@ -220,11 +220,18 @@ class _SignInState extends State<SignIn> {
                             height: 20,
                           ),
                           TextFormField(
-                            validator: (val) {
-                              return val.length > 5
-                                  ? null
-                                  : "Enter correct password";
-                            },
+                            validator: (value) {
+                          if (value.isEmpty) {
+                            return 'Enter correct Password';
+                          }
+                          if (value.length < 7) {
+                            return 'Enter correct Password';
+                          }
+                          if (value.length > 20) {
+                            return 'Enter correct Password';
+                          }
+                          return null;
+                        },
                             controller: passwordTextEditingController,
                             obscureText: _obscureText,
                             style: TextStyle(color: Colors.cyan),

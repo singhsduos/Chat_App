@@ -56,6 +56,7 @@ class AuthMethods {
     try {
       final UserCredential result = await _auth.createUserWithEmailAndPassword(
           email: email, password: password);
+         
       User firebaseUser = result.user;
       return _userFromFirebaseUser(firebaseUser);
     } catch (e) {

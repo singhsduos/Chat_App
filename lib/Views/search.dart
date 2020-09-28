@@ -234,570 +234,570 @@
 
 
 
-// // class _SearchState extends State<Search> {
-// //   TextEditingController searchController = TextEditingController();
-// //   Future<QuerySnapshot> searchResultsFuture;
-// //   final CollectionReference useref =
-// //       FirebaseFirestore.instance.collection("users");
+// // // class _SearchState extends State<Search> {
+// // //   TextEditingController searchController = TextEditingController();
+// // //   Future<QuerySnapshot> searchResultsFuture;
+// // //   final CollectionReference useref =
+// // //       FirebaseFirestore.instance.collection("users");
 
-// //   dynamic handleSearch(String query) async {
-// //     Future<QuerySnapshot> users = FirebaseFirestore.instance
-// //         .collection("users")
-// //         .where("username", isEqualTo: query)
-// //         .get();
-// //     setState(() {
-// //       searchResultsFuture = users;
-// //     });
-// //   }
+// // //   dynamic handleSearch(String query) async {
+// // //     Future<QuerySnapshot> users = FirebaseFirestore.instance
+// // //         .collection("users")
+// // //         .where("username", isEqualTo: query)
+// // //         .get();
+// // //     setState(() {
+// // //       searchResultsFuture = users;
+// // //     });
+// // //   }
 
-// //   dynamic clearSearch() {
-// //     searchController.clear();
-// //   }
+// // //   dynamic clearSearch() {
+// // //     searchController.clear();
+// // //   }
 
-// //   AppBar buildSearchField() {
-// //     return AppBar(
-// //       backgroundColor: Color(0xfff99AAAB),
-// //       title: TextFormField(
-// //         controller: searchController,
-// //         decoration: InputDecoration(
-// //           fillColor: Color(0xfff99AAAB),
-// //           hintText: 'search Username...',
-// //           hintStyle: TextStyle(
-// //             color: Colors.black54,
-// //           ),
-// //           filled: true,
-// //           labelStyle:
-// //               const TextStyle(color: Color(0xfff99AAAB), fontSize: 16.0),
-// //           prefixIcon: Icon(
-// //             Icons.person_pin,
-// //             size: 28.0,
-// //             color: Colors.black54,
-// //           ),
-// //           suffixIcon: IconButton(
-// //             icon: Icon(Icons.clear),
-// //             color: Colors.black54,
-// //             onPressed: clearSearch,
-// //           ),
-// //         ),
-// //         onFieldSubmitted: handleSearch,
-// //       ),
-// //     );
-// //   }
+// // //   AppBar buildSearchField() {
+// // //     return AppBar(
+// // //       backgroundColor: Color(0xfff99AAAB),
+// // //       title: TextFormField(
+// // //         controller: searchController,
+// // //         decoration: InputDecoration(
+// // //           fillColor: Color(0xfff99AAAB),
+// // //           hintText: 'search Username...',
+// // //           hintStyle: TextStyle(
+// // //             color: Colors.black54,
+// // //           ),
+// // //           filled: true,
+// // //           labelStyle:
+// // //               const TextStyle(color: Color(0xfff99AAAB), fontSize: 16.0),
+// // //           prefixIcon: Icon(
+// // //             Icons.person_pin,
+// // //             size: 28.0,
+// // //             color: Colors.black54,
+// // //           ),
+// // //           suffixIcon: IconButton(
+// // //             icon: Icon(Icons.clear),
+// // //             color: Colors.black54,
+// // //             onPressed: clearSearch,
+// // //           ),
+// // //         ),
+// // //         onFieldSubmitted: handleSearch,
+// // //       ),
+// // //     );
+// // //   }
 
-// //   Container buildNoContent() {
-// //     // final Orientation orientation = MediaQuery.of(context).orientation;
-// //     return Container(
-// //       child: Center(
-// //         child: ListView(
-// //           shrinkWrap: true,
-// //           children: <Widget>[
-// //             Text(
-// //               "Find Users",
-// //               textAlign: TextAlign.center,
-// //               style: TextStyle(
-// //                 color: Colors.cyan,
-// //                 fontStyle: FontStyle.italic,
-// //                 fontWeight: FontWeight.w600,
-// //                 fontSize: 60.0,
-// //               ),
-// //             ),
-// //           ],
-// //         ),
-// //       ),
-// //     );
-// //   }
+// // //   Container buildNoContent() {
+// // //     // final Orientation orientation = MediaQuery.of(context).orientation;
+// // //     return Container(
+// // //       child: Center(
+// // //         child: ListView(
+// // //           shrinkWrap: true,
+// // //           children: <Widget>[
+// // //             Text(
+// // //               "Find Users",
+// // //               textAlign: TextAlign.center,
+// // //               style: TextStyle(
+// // //                 color: Colors.cyan,
+// // //                 fontStyle: FontStyle.italic,
+// // //                 fontWeight: FontWeight.w600,
+// // //                 fontSize: 60.0,
+// // //               ),
+// // //             ),
+// // //           ],
+// // //         ),
+// // //       ),
+// // //     );
+// // //   }
 
-// //   Widget buildSearchResults() {
-// //     return FutureBuilder(
-// //       future: searchResultsFuture,
-// //       builder: (context, snapshot) {
-// //         if (!snapshot.hasData) {
-// //           return Center(
-// //             child: CircularProgressIndicator(),
-// //           );
-// //         }
-// //         List<Text> searchResults = [];
-// //         snapshot.data.documents.forEach((DocumentSnapshot doc) {
-// //           Users user = Users.fromDocument(doc);
-// //           searchResults.add(Text(
-// //             user.username,
-// //             style: TextStyle(fontSize: 18),
-// //           ));
-// //           searchResults.add(Text(
-// //             user.email,
-// //             style: TextStyle(fontSize: 16),
-// //           ));
-// //           searchResults.add(Text(
-// //             'Message me',
-// //             style: TextStyle(fontSize: 16,),
+// // //   Widget buildSearchResults() {
+// // //     return FutureBuilder(
+// // //       future: searchResultsFuture,
+// // //       builder: (context, snapshot) {
+// // //         if (!snapshot.hasData) {
+// // //           return Center(
+// // //             child: CircularProgressIndicator(),
+// // //           );
+// // //         }
+// // //         List<Text> searchResults = [];
+// // //         snapshot.data.documents.forEach((DocumentSnapshot doc) {
+// // //           Users user = Users.fromDocument(doc);
+// // //           searchResults.add(Text(
+// // //             user.username,
+// // //             style: TextStyle(fontSize: 18),
+// // //           ));
+// // //           searchResults.add(Text(
+// // //             user.email,
+// // //             style: TextStyle(fontSize: 16),
+// // //           ));
+// // //           searchResults.add(Text(
+// // //             'Message me',
+// // //             style: TextStyle(fontSize: 16,),
 
-// //           ));
+// // //           ));
 
-// //         });
-// //         return Container(
-// //           padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-// //           child: Row(children: [
-// //             Column(
-// //               crossAxisAlignment: CrossAxisAlignment.start,
-// //               children: searchResults
-// //             ),
-// //             Spacer(),
-// //             // Container(
-// //             //   decoration: BoxDecoration(
-// //             //     color: Colors.cyan,
-// //             //     borderRadius: BorderRadius.circular(30)
-// //             //   ),
-// //             //   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-// //             //   child: Text('Message'),
-// //             // )
-// //           ],
-// //           ),
-// //         );
-// //       },
-// //     );
-// //   }
+// // //         });
+// // //         return Container(
+// // //           padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+// // //           child: Row(children: [
+// // //             Column(
+// // //               crossAxisAlignment: CrossAxisAlignment.start,
+// // //               children: searchResults
+// // //             ),
+// // //             Spacer(),
+// // //             // Container(
+// // //             //   decoration: BoxDecoration(
+// // //             //     color: Colors.cyan,
+// // //             //     borderRadius: BorderRadius.circular(30)
+// // //             //   ),
+// // //             //   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+// // //             //   child: Text('Message'),
+// // //             // )
+// // //           ],
+// // //           ),
+// // //         );
+// // //       },
+// // //     );
+// // //   }
 
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       // backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
-// //       appBar: buildSearchField(),
-// //       body:
-// //           searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
-// //     );
-// //   }
-// // }
+// // //   @override
+// // //   Widget build(BuildContext context) {
+// // //     return Scaffold(
+// // //       // backgroundColor: Theme.of(context).primaryColor.withOpacity(0.8),
+// // //       appBar: buildSearchField(),
+// // //       body:
+// // //           searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
+// // //     );
+// // //   }
+// // // }
 
-// // class UserResult extends StatelessWidget {
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Text("User Result");
-// //   }
-// // }
+// // // class UserResult extends StatelessWidget {
+// // //   @override
+// // //   Widget build(BuildContext context) {
+// // //     return Text("User Result");
+// // //   }
+// // // }
 
-// // class _SearchState extends State<Search> {
-// //   DatabaseMethods databaseMethods = new DatabaseMethods();
-// //   TextEditingController searchEditingController = new TextEditingController();
-// //   List<DocumentSnapshot>searchResultSnapshot;
-// //   QuerySnapshot user;
-// //   String query = '';
-// //   bool isLoading = false;
-// //   bool haveUserSearched = false;
-// //       Future<QuerySnapshot>searchResultsFuture;
-// //   final CollectionReference useref =
-// //       FirebaseFirestore.instance.collection("users");
+// // // class _SearchState extends State<Search> {
+// // //   DatabaseMethods databaseMethods = new DatabaseMethods();
+// // //   TextEditingController searchEditingController = new TextEditingController();
+// // //   List<DocumentSnapshot>searchResultSnapshot;
+// // //   QuerySnapshot user;
+// // //   String query = '';
+// // //   bool isLoading = false;
+// // //   bool haveUserSearched = false;
+// // //       Future<QuerySnapshot>searchResultsFuture;
+// // //   final CollectionReference useref =
+// // //       FirebaseFirestore.instance.collection("users");
 
-// //   dynamic initiateSearch(String query) async {
-// //       Future<QuerySnapshot>users = FirebaseFirestore.instance
-// //         .collection("users")
-// //         .where("username", isEqualTo: query)
-// //         .get();
-// //     setState(() {
-// //       searchResultsFuture = users;
-// //     });
-// //   }
+// // //   dynamic initiateSearch(String query) async {
+// // //       Future<QuerySnapshot>users = FirebaseFirestore.instance
+// // //         .collection("users")
+// // //         .where("username", isEqualTo: query)
+// // //         .get();
+// // //     setState(() {
+// // //       searchResultsFuture = users;
+// // //     });
+// // //   }
 
-// //   // dynamic initiateSearch() async {
-// //   //   if (searchEditingController.text.isNotEmpty) {
-// //   //     setState(() {
-// //   //       isLoading = true;
-// //   //     });
-// //   //     await databaseMethods
-// //   //         .getByUserName(searchEditingController.text)
-// //   //         .then((user) {
-// //   //       searchResultSnapshot = user as Future<QuerySnapshot>;
-// //   //       print("$searchResultSnapshot");
-// //   //       //  searchResultSnapshot =  snapshot;
-// //   //       setState(() {
-// //   //         isLoading = false;
-// //   //         haveUserSearched = true;
-// //   //       });
-// //   //     });
-// //   //   }
-// //   // }
+// // //   // dynamic initiateSearch() async {
+// // //   //   if (searchEditingController.text.isNotEmpty) {
+// // //   //     setState(() {
+// // //   //       isLoading = true;
+// // //   //     });
+// // //   //     await databaseMethods
+// // //   //         .getByUserName(searchEditingController.text)
+// // //   //         .then((user) {
+// // //   //       searchResultSnapshot = user as Future<QuerySnapshot>;
+// // //   //       print("$searchResultSnapshot");
+// // //   //       //  searchResultSnapshot =  snapshot;
+// // //   //       setState(() {
+// // //   //         isLoading = false;
+// // //   //         haveUserSearched = true;
+// // //   //       });
+// // //   //     });
+// // //   //   }
+// // //   // }
 
-// //   Widget userList() {
-// //     return haveUserSearched
-// //         ? FutureBuilder(
-// //             // shrinkWrap: true,
-// //            future: searchResultsFuture,
-// //            builder: (context, snapshot) {
-// //               return userTile(
-// //                 username:
-// //                     ('${searchResultsFuture[].data()['username']}'),
-// //                 email:
-// //                     ('${searchResultsFuture[].data()['email']}'),
-// //               );
-// //             })
-// //         : Container();
-// //   }
+// // //   Widget userList() {
+// // //     return haveUserSearched
+// // //         ? FutureBuilder(
+// // //             // shrinkWrap: true,
+// // //            future: searchResultsFuture,
+// // //            builder: (context, snapshot) {
+// // //               return userTile(
+// // //                 username:
+// // //                     ('${searchResultsFuture[].data()['username']}'),
+// // //                 email:
+// // //                     ('${searchResultsFuture[].data()['email']}'),
+// // //               );
+// // //             })
+// // //         : Container();
+// // //   }
 
-// //   // 1.create a chatroom, send user to the chatroom, other userdetails
-// //   dynamic sendMessage(String username) {
-// //     List<String> users = [username, Constants.myName];
+// // //   // 1.create a chatroom, send user to the chatroom, other userdetails
+// // //   dynamic sendMessage(String username) {
+// // //     List<String> users = [username, Constants.myName];
 
-// //     String chatRoomid = getChatRoomid(username, Constants.myName).toString();
+// // //     String chatRoomid = getChatRoomid(username, Constants.myName).toString();
 
-// //     Map<String, dynamic> chatRoomMap = <String, dynamic>{
-// //       "users": users,
-// //       "chatRoomid": chatRoomid,
-// //     };
+// // //     Map<String, dynamic> chatRoomMap = <String, dynamic>{
+// // //       "users": users,
+// // //       "chatRoomid": chatRoomid,
+// // //     };
 
-// //     databaseMethods.createChatRoom(chatRoomMap, chatRoomid);
+// // //     databaseMethods.createChatRoom(chatRoomMap, chatRoomid);
 
-// //     Navigator.push(
-// //         context,
-// //         MaterialPageRoute<MaterialPageRoute>(
-// //             builder: (BuildContext context) => ConversationScreen(chatRoomid)));
-// //   }
+// // //     Navigator.push(
+// // //         context,
+// // //         MaterialPageRoute<MaterialPageRoute>(
+// // //             builder: (BuildContext context) => ConversationScreen(chatRoomid)));
+// // //   }
 
-// //   Widget userTile({String username, String email}) {
-// //     return Container(
-// //       padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-// //       child: Row(
-// //         children: [
-// //           Column(
-// //             crossAxisAlignment: CrossAxisAlignment.start,
-// //             children: [
-// //               Text(
-// //                 username,
-// //                 style: TextStyle(color: Colors.white, fontSize: 16),
-// //               ),
-// //               Text(
-// //                 email,
-// //                 style: TextStyle(color: Colors.white, fontSize: 16),
-// //               )
-// //             ],
-// //           ),
-// //           Spacer(),
-// //           GestureDetector(
-// //             onTap: () {
-// //               sendMessage(username);
-// //             },
-// //             child: Container(
-// //               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-// //               decoration: BoxDecoration(
-// //                   color: Colors.cyan, borderRadius: BorderRadius.circular(24)),
-// //               child: Text(
-// //                 "Message",
-// //                 style: TextStyle(color: Colors.white, fontSize: 16),
-// //               ),
-// //             ),
-// //           )
-// //         ],
-// //       ),
-// //     );
-// //   }
+// // //   Widget userTile({String username, String email}) {
+// // //     return Container(
+// // //       padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+// // //       child: Row(
+// // //         children: [
+// // //           Column(
+// // //             crossAxisAlignment: CrossAxisAlignment.start,
+// // //             children: [
+// // //               Text(
+// // //                 username,
+// // //                 style: TextStyle(color: Colors.white, fontSize: 16),
+// // //               ),
+// // //               Text(
+// // //                 email,
+// // //                 style: TextStyle(color: Colors.white, fontSize: 16),
+// // //               )
+// // //             ],
+// // //           ),
+// // //           Spacer(),
+// // //           GestureDetector(
+// // //             onTap: () {
+// // //               sendMessage(username);
+// // //             },
+// // //             child: Container(
+// // //               padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+// // //               decoration: BoxDecoration(
+// // //                   color: Colors.cyan, borderRadius: BorderRadius.circular(24)),
+// // //               child: Text(
+// // //                 "Message",
+// // //                 style: TextStyle(color: Colors.white, fontSize: 16),
+// // //               ),
+// // //             ),
+// // //           )
+// // //         ],
+// // //       ),
+// // //     );
+// // //   }
 
-// //   @override
-// //   void initState() {
-// //     super.initState();
-// //   }
+// // //   @override
+// // //   void initState() {
+// // //     super.initState();
+// // //   }
 
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       appBar: appBarMain(context),
-// //       body: isLoading
-// //           ? Container(
-// //               child: Center(
-// //                 child: CircularProgressIndicator(),
-// //               ),
-// //             )
-// //           : Container(
-// //               child: Column(
-// //                 children: [
-// //                   Container(
-// //                     padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-// //                     color: Colors.cyan,
-// //                     child: Row(
-// //                       children: [
-// //                         Expanded(
-// //                           child: TextField(
-// //                             controller: searchEditingController,
-// //                             style: TextStyle(
-// //                               fontSize: 16,
-// //                               letterSpacing: 1.0,
-// //                             ),
-// //                             decoration: InputDecoration(
-// //                                 hintText: "search username ...",
-// //                                 hintStyle: TextStyle(
-// //                                   color: Colors.black,
-// //                                   fontSize: 16,
-// //                                 ),
-// //                                 border: InputBorder.none),
-// //                           ),
-// //                         ),
-// //                         GestureDetector(
-// //                           onTap: () {
-// //                             initiateSearch(query);
-// //                           },
-// //                           child: Container(
-// //                               height: 40,
-// //                               width: 40,
-// //                               decoration: BoxDecoration(
-// //                                   gradient: LinearGradient(
-// //                                       colors: [
-// //                                         const Color(0x36FFFFFF),
-// //                                         const Color(0x0FFFFFFF)
-// //                                       ],
-// //                                       begin: FractionalOffset.topLeft,
-// //                                       end: FractionalOffset.bottomRight),
-// //                                   borderRadius: BorderRadius.circular(40)),
-// //                               padding: EdgeInsets.all(12),
-// //                               child: Image.asset(
-// //                                 "images/search_white.png",
-// //                                 height: 25,
-// //                                 width: 25,
-// //                               )),
-// //                         )
-// //                       ],
-// //                     ),
-// //                   ),
-// //                   userList(),
-// //                 ],
-// //               ),
-// //             ),
-// //     );
-// //   }
+// // //   @override
+// // //   Widget build(BuildContext context) {
+// // //     return Scaffold(
+// // //       appBar: appBarMain(context),
+// // //       body: isLoading
+// // //           ? Container(
+// // //               child: Center(
+// // //                 child: CircularProgressIndicator(),
+// // //               ),
+// // //             )
+// // //           : Container(
+// // //               child: Column(
+// // //                 children: [
+// // //                   Container(
+// // //                     padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+// // //                     color: Colors.cyan,
+// // //                     child: Row(
+// // //                       children: [
+// // //                         Expanded(
+// // //                           child: TextField(
+// // //                             controller: searchEditingController,
+// // //                             style: TextStyle(
+// // //                               fontSize: 16,
+// // //                               letterSpacing: 1.0,
+// // //                             ),
+// // //                             decoration: InputDecoration(
+// // //                                 hintText: "search username ...",
+// // //                                 hintStyle: TextStyle(
+// // //                                   color: Colors.black,
+// // //                                   fontSize: 16,
+// // //                                 ),
+// // //                                 border: InputBorder.none),
+// // //                           ),
+// // //                         ),
+// // //                         GestureDetector(
+// // //                           onTap: () {
+// // //                             initiateSearch(query);
+// // //                           },
+// // //                           child: Container(
+// // //                               height: 40,
+// // //                               width: 40,
+// // //                               decoration: BoxDecoration(
+// // //                                   gradient: LinearGradient(
+// // //                                       colors: [
+// // //                                         const Color(0x36FFFFFF),
+// // //                                         const Color(0x0FFFFFFF)
+// // //                                       ],
+// // //                                       begin: FractionalOffset.topLeft,
+// // //                                       end: FractionalOffset.bottomRight),
+// // //                                   borderRadius: BorderRadius.circular(40)),
+// // //                               padding: EdgeInsets.all(12),
+// // //                               child: Image.asset(
+// // //                                 "images/search_white.png",
+// // //                                 height: 25,
+// // //                                 width: 25,
+// // //                               )),
+// // //                         )
+// // //                       ],
+// // //                     ),
+// // //                   ),
+// // //                   userList(),
+// // //                 ],
+// // //               ),
+// // //             ),
+// // //     );
+// // //   }
 
-// //   dynamic getChatRoomid(String a, String b) {
-// //     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-// //       return "$b\_$a";
-// //     } else {
-// //       return "$a\_$b";
-// //     }
-// //   }
-// // }
+// // //   dynamic getChatRoomid(String a, String b) {
+// // //     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+// // //       return "$b\_$a";
+// // //     } else {
+// // //       return "$a\_$b";
+// // //     }
+// // //   }
+// // // }
 
-// //2nd method
+// // //2nd method
 
-// // class SearchScreen extends StatefulWidget {
-// //   @override
-// //   _SearchScreenState createState() => _SearchScreenState();
-// // }
+// // // class SearchScreen extends StatefulWidget {
+// // //   @override
+// // //   _SearchScreenState createState() => _SearchScreenState();
+// // // }
 
-// // String _myName;
+// // // String _myName;
 
-// // class _SearchScreenState extends State<SearchScreen> {
-// //   DatabaseMethods databaseMethods = DatabaseMethods();
-// //   TextEditingController searchTextEditingController = TextEditingController();
+// // // class _SearchScreenState extends State<SearchScreen> {
+// // //   DatabaseMethods databaseMethods = DatabaseMethods();
+// // //   TextEditingController searchTextEditingController = TextEditingController();
 
-// //   QuerySnapshot searchSnapshot;
-// //   bool isLoading = false;
-// //   bool haveUserSearched = false;
-// //   String username;
-// //   StreamSubscription<DocumentSnapshot> subscription;
-// //   final CollectionReference users =
-// //       FirebaseFirestore.instance.collection('users');
+// // //   QuerySnapshot searchSnapshot;
+// // //   bool isLoading = false;
+// // //   bool haveUserSearched = false;
+// // //   String username;
+// // //   StreamSubscription<DocumentSnapshot> subscription;
+// // //   final CollectionReference users =
+// // //       FirebaseFirestore.instance.collection('users');
 
-// //   List usernameList = List<dynamic>();
+// // //   List usernameList = List<dynamic>();
 
-// //   dynamic initiateSearch() async {
-// //     dynamic resultant =
-// //         // await DatabaseMethods().getByUserName(usernameList.toString());
-// //         await DatabaseMethods().getByUserName();
-// //     if (resultant == null) {
-// //       print('unable to retrieve');
-// //     } else {
-// //       setState(() {
-// //         usernameList = resultant as List;
-// //       });
-// //     }
-// //   }
+// // //   dynamic initiateSearch() async {
+// // //     dynamic resultant =
+// // //         // await DatabaseMethods().getByUserName(usernameList.toString());
+// // //         await DatabaseMethods().getByUserName();
+// // //     if (resultant == null) {
+// // //       print('unable to retrieve');
+// // //     } else {
+// // //       setState(() {
+// // //         usernameList = resultant as List;
+// // //       });
+// // //     }
+// // //   }
 
-// //   // dynamic initiateSearch() async {
-// //   //   if (searchTextEditingController.text.isNotEmpty) {
-// //   //     setState(() {
-// //   //       isLoading = true;
-// //   //     });
-// //   //     await databaseMethods
-// //   //         .getByUserName()
-// //   //         .then((snapshot) {
-// //   //       searchSnapshot = snapshot as QuerySnapshot;
-// //   //       // print('$searchSnapshot');
-// //   //       setState(() {
-// //   //         // searchSnapshot = snapshot as QuerySnapshot;
-// //   //         isLoading = false;
-// //   //         haveUserSearched = true;
-// //   //       });
-// //   //     });
-// //   //   }
-// //   // }
+// // //   // dynamic initiateSearch() async {
+// // //   //   if (searchTextEditingController.text.isNotEmpty) {
+// // //   //     setState(() {
+// // //   //       isLoading = true;
+// // //   //     });
+// // //   //     await databaseMethods
+// // //   //         .getByUserName()
+// // //   //         .then((snapshot) {
+// // //   //       searchSnapshot = snapshot as QuerySnapshot;
+// // //   //       // print('$searchSnapshot');
+// // //   //       setState(() {
+// // //   //         // searchSnapshot = snapshot as QuerySnapshot;
+// // //   //         isLoading = false;
+// // //   //         haveUserSearched = true;
+// // //   //       });
+// // //   //     });
+// // //   //   }
+// // //   // }
 
-// //   @override
-// //   void initState() {
-// //     super.initState();
-// //     // initiateSearch();
-// //   }
+// // //   @override
+// // //   void initState() {
+// // //     super.initState();
+// // //     // initiateSearch();
+// // //   }
 
-// //   Widget searchList() {
-// //     return haveUserSearched
-// //         ? ListView.builder(
-// //             shrinkWrap: true,
-// //             itemCount: searchSnapshot.docs.length,
-// //             itemBuilder: (BuildContext context, int index) {
-// //               return SearchTile(
-// //                 '${searchSnapshot.docs[index].data()['username']}',
-// //                 '${searchSnapshot.docs[index].data()['email']}',
-// //                 // ('${searchSnapshot.documents[0].data()['username']}'),
-// //                 // ('${searchSnapshot.documents[0].data()['email']}'),
-// //               );
-// //             })
-// //         : Container();
-// //   }
+// // //   Widget searchList() {
+// // //     return haveUserSearched
+// // //         ? ListView.builder(
+// // //             shrinkWrap: true,
+// // //             itemCount: searchSnapshot.docs.length,
+// // //             itemBuilder: (BuildContext context, int index) {
+// // //               return SearchTile(
+// // //                 '${searchSnapshot.docs[index].data()['username']}',
+// // //                 '${searchSnapshot.docs[index].data()['email']}',
+// // //                 // ('${searchSnapshot.documents[0].data()['username']}'),
+// // //                 // ('${searchSnapshot.documents[0].data()['email']}'),
+// // //               );
+// // //             })
+// // //         : Container();
+// // //   }
 
-// //   dynamic createChatroomAndStartConversation({String username}) {
-// //     // print('${Constants.myName}');
-// //     if (username != Constants.myName) {
-// //       final String chatRoomid =
-// //           getChatRoomid(username, Constants.myName).toString();
+// // //   dynamic createChatroomAndStartConversation({String username}) {
+// // //     // print('${Constants.myName}');
+// // //     if (username != Constants.myName) {
+// // //       final String chatRoomid =
+// // //           getChatRoomid(username, Constants.myName).toString();
 
-// //       final List<String> users = [username, Constants.myName];
-// //       final Map<String, dynamic> chatRoomMap = {
-// //         'users': users,
-// //         'chatroomid': chatRoomid,
-// //       }.cast<String, dynamic>();
-// //       databaseMethods.createChatRoom(chatRoomMap, chatRoomid);
-// //       Navigator.push(
-// //           context,
-// //           MaterialPageRoute<MaterialPageRoute>(
-// //               builder: (BuildContext context) =>
-// //                   ConversationScreen(chatRoomid)));
-// //     } else {
-// //       print('you cannot send message to yourself');
-// //     }
-// //   }
+// // //       final List<String> users = [username, Constants.myName];
+// // //       final Map<String, dynamic> chatRoomMap = {
+// // //         'users': users,
+// // //         'chatroomid': chatRoomid,
+// // //       }.cast<String, dynamic>();
+// // //       databaseMethods.createChatRoom(chatRoomMap, chatRoomid);
+// // //       Navigator.push(
+// // //           context,
+// // //           MaterialPageRoute<MaterialPageRoute>(
+// // //               builder: (BuildContext context) =>
+// // //                   ConversationScreen(chatRoomid)));
+// // //     } else {
+// // //       print('you cannot send message to yourself');
+// // //     }
+// // //   }
 
-// //   Widget SearchTile(String username, String email) {
-// //     return Container(
-// //       padding: EdgeInsets.all(16),
-// //       child: Row(
-// //         children: <Widget>[
-// //           Column(
-// //             crossAxisAlignment: CrossAxisAlignment.start,
-// //             children: <Widget>[
-// //               Text(
-// //                 username,
-// //                 style: TextStyle(
-// //                   fontSize: 17.0,
-// //                   letterSpacing: 1.0,
-// //                 ),
-// //               ),
-// //               Text(
-// //                 email,
-// //                 style: TextStyle(
-// //                   fontSize: 17.0,
-// //                   letterSpacing: 1.0,
-// //                 ),
-// //               )
-// //             ],
-// //           ),
-// //           Spacer(),
-// //           GestureDetector(
-// //             onTap: () {
-// //               createChatroomAndStartConversation(username: username);
-// //             },
-// //             child: Container(
-// //                 decoration: BoxDecoration(
-// //                   color: Colors.cyan,
-// //                   borderRadius: BorderRadius.circular(30),
-// //                 ),
-// //                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-// //                 child: Text(
-// //                   "Message",
-// //                   style: TextStyle(
-// //                     fontSize: 16.0,
-// //                     letterSpacing: 1.0,
-// //                     color: const Color(0xFF53E0BC),
-// //                   ),
-// //                 )),
-// //           )
-// //         ],
-// //       ),
-// //     );
-// //   }
+// // //   Widget SearchTile(String username, String email) {
+// // //     return Container(
+// // //       padding: EdgeInsets.all(16),
+// // //       child: Row(
+// // //         children: <Widget>[
+// // //           Column(
+// // //             crossAxisAlignment: CrossAxisAlignment.start,
+// // //             children: <Widget>[
+// // //               Text(
+// // //                 username,
+// // //                 style: TextStyle(
+// // //                   fontSize: 17.0,
+// // //                   letterSpacing: 1.0,
+// // //                 ),
+// // //               ),
+// // //               Text(
+// // //                 email,
+// // //                 style: TextStyle(
+// // //                   fontSize: 17.0,
+// // //                   letterSpacing: 1.0,
+// // //                 ),
+// // //               )
+// // //             ],
+// // //           ),
+// // //           Spacer(),
+// // //           GestureDetector(
+// // //             onTap: () {
+// // //               createChatroomAndStartConversation(username: username);
+// // //             },
+// // //             child: Container(
+// // //                 decoration: BoxDecoration(
+// // //                   color: Colors.cyan,
+// // //                   borderRadius: BorderRadius.circular(30),
+// // //                 ),
+// // //                 padding: EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+// // //                 child: Text(
+// // //                   "Message",
+// // //                   style: TextStyle(
+// // //                     fontSize: 16.0,
+// // //                     letterSpacing: 1.0,
+// // //                     color: const Color(0xFF53E0BC),
+// // //                   ),
+// // //                 )),
+// // //           )
+// // //         ],
+// // //       ),
+// // //     );
+// // //   }
 
-// //   @override
-// //   Widget build(BuildContext context) {
-// //     return Scaffold(
-// //       appBar: appBarMain(context),
-// //       body: Container(
-// //         child: Column(
-// //           children: <Widget>[
-// //             Container(
-// //               padding: EdgeInsets.symmetric(),
-// //               child: Row(
-// //                 children: [
-// //                   Expanded(
-// //                     child: GestureDetector(
-// //                       onTap: () {
-// //                         initiateSearch();
-// //                       },
-// //                       child: Container(
-// //                         padding: EdgeInsets.all(5),
-// //                         child: TextField(
-// //                           controller: searchTextEditingController,
-// //                           style: TextStyle(
-// //                               color: Colors.white,
-// //                               letterSpacing: 1.0,
-// //                               fontSize: 16),
-// //                           cursorColor: Colors.black54,
-// //                           decoration: InputDecoration(
-// //                             prefixIcon: Container(
-// //                               child: Icon(
-// //                                 Icons.person_pin,
-// //                                 color: Colors.black54,
-// //                               ),
-// //                             ),
-// //                             suffixIcon: IconButton(
-// //                               icon: Icon(
-// //                                 Icons.search,
-// //                                 color: Colors.black54,
-// //                               ),
-// //                               onPressed: () {
-// //                                 // initState();
-// //                               },
-// //                             ),
-// //                             fillColor: Color(0xfff99AAAB),
-// //                             border: const OutlineInputBorder(
-// //                               borderRadius:
-// //                                   BorderRadius.all(Radius.circular(20.0)),
-// //                               borderSide: BorderSide(color: Colors.black),
-// //                             ),
-// //                             focusedBorder: OutlineInputBorder(
-// //                               borderRadius:
-// //                                   BorderRadius.all(Radius.circular(20.0)),
-// //                               borderSide:
-// //                                   BorderSide(color: Colors.black54, width: 2),
-// //                             ),
-// //                             hintText: 'search Username...',
-// //                             hintStyle: TextStyle(
-// //                               color: Colors.black54,
-// //                             ),
-// //                             filled: true,
-// //                             labelStyle: const TextStyle(
-// //                                 color: Color(0xfff99AAAB), fontSize: 16.0),
-// //                           ),
-// //                         ),
-// //                       ),
-// //                     ),
-// //                   ),
-// //                 ],
-// //               ),
-// //             ),
-// //             searchList(),
-// //           ],
-// //         ),
-// //       ),
-// //     );
-// //   }
+// // //   @override
+// // //   Widget build(BuildContext context) {
+// // //     return Scaffold(
+// // //       appBar: appBarMain(context),
+// // //       body: Container(
+// // //         child: Column(
+// // //           children: <Widget>[
+// // //             Container(
+// // //               padding: EdgeInsets.symmetric(),
+// // //               child: Row(
+// // //                 children: [
+// // //                   Expanded(
+// // //                     child: GestureDetector(
+// // //                       onTap: () {
+// // //                         initiateSearch();
+// // //                       },
+// // //                       child: Container(
+// // //                         padding: EdgeInsets.all(5),
+// // //                         child: TextField(
+// // //                           controller: searchTextEditingController,
+// // //                           style: TextStyle(
+// // //                               color: Colors.white,
+// // //                               letterSpacing: 1.0,
+// // //                               fontSize: 16),
+// // //                           cursorColor: Colors.black54,
+// // //                           decoration: InputDecoration(
+// // //                             prefixIcon: Container(
+// // //                               child: Icon(
+// // //                                 Icons.person_pin,
+// // //                                 color: Colors.black54,
+// // //                               ),
+// // //                             ),
+// // //                             suffixIcon: IconButton(
+// // //                               icon: Icon(
+// // //                                 Icons.search,
+// // //                                 color: Colors.black54,
+// // //                               ),
+// // //                               onPressed: () {
+// // //                                 // initState();
+// // //                               },
+// // //                             ),
+// // //                             fillColor: Color(0xfff99AAAB),
+// // //                             border: const OutlineInputBorder(
+// // //                               borderRadius:
+// // //                                   BorderRadius.all(Radius.circular(20.0)),
+// // //                               borderSide: BorderSide(color: Colors.black),
+// // //                             ),
+// // //                             focusedBorder: OutlineInputBorder(
+// // //                               borderRadius:
+// // //                                   BorderRadius.all(Radius.circular(20.0)),
+// // //                               borderSide:
+// // //                                   BorderSide(color: Colors.black54, width: 2),
+// // //                             ),
+// // //                             hintText: 'search Username...',
+// // //                             hintStyle: TextStyle(
+// // //                               color: Colors.black54,
+// // //                             ),
+// // //                             filled: true,
+// // //                             labelStyle: const TextStyle(
+// // //                                 color: Color(0xfff99AAAB), fontSize: 16.0),
+// // //                           ),
+// // //                         ),
+// // //                       ),
+// // //                     ),
+// // //                   ),
+// // //                 ],
+// // //               ),
+// // //             ),
+// // //             searchList(),
+// // //           ],
+// // //         ),
+// // //       ),
+// // //     );
+// // //   }
 
-// //   dynamic getChatRoomid(String a, String b) {
-// //     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
-// //       return "$b\_$a";
-// //     } else {
-// //       return "$a\_$b";
-// //     }
-// //   }
-// // }
+// // //   dynamic getChatRoomid(String a, String b) {
+// // //     if (a.substring(0, 1).codeUnitAt(0) > b.substring(0, 1).codeUnitAt(0)) {
+// // //       return "$b\_$a";
+// // //     } else {
+// // //       return "$a\_$b";
+// // //     }
+// // //   }
+// // // }
