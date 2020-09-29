@@ -2,7 +2,7 @@ import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:shared_preferences/shared_preferences.dart';
 
 class SideDrawer extends StatefulWidget {
   @override
@@ -13,8 +13,8 @@ class _SideDrawerState extends State<SideDrawer> {
   bool isDarkTheme = false;
   @override
   Widget build(BuildContext context) {
-    double height = MediaQuery.of(context).size.height;
-    double width = MediaQuery.of(context).size.width;
+    // double height = MediaQuery.of(context).size.height;
+    // double width = MediaQuery.of(context).size.width;
     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
@@ -35,8 +35,8 @@ class _SideDrawerState extends State<SideDrawer> {
           padding: EdgeInsets.zero,
           children: [
             Consumer<ThemeNotifier>(
-              builder: (context, notifier, child) => SwitchListTile(
-                title: Text(
+              builder: (BuildContext context, ThemeNotifier notifier, Widget child) => SwitchListTile(
+                title: const Text(
                   'Switch DarkMode',
                   style: TextStyle(
                     fontSize: 17.0,
@@ -47,7 +47,7 @@ class _SideDrawerState extends State<SideDrawer> {
                 value: isDarkTheme,
                 activeTrackColor: Colors.blueGrey,
                 activeColor: Colors.cyan,
-                onChanged: (value) {
+                onChanged: (bool value) {
                   setState(() {
                     isDarkTheme = value;
                     if (!value) {

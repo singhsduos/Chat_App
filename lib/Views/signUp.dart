@@ -82,7 +82,7 @@ class _SignUpState extends State<SignUp> {
             isLoading = false;
             Fluttertoast.showToast(
               msg: 'Email already in use',
-              textColor: Color(0xFFFFFFFF),
+              textColor: const Color(0xFFFFFFFF),
               backgroundColor: Colors.cyan,
               fontSize: 16.0,
               timeInSecForIosWeb: 4,

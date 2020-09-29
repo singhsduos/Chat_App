@@ -11,6 +11,7 @@ import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoom extends StatefulWidget {
@@ -108,11 +109,13 @@ class _ChatRoomState extends State<ChatRoom> {
       body: chatRoomList(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.cyan,
+        
         onPressed: () {
-          // Navigator.push<MaterialPageRoute>(
-          //     context,
-          //     MaterialPageRoute(
-          //         builder: (BuildContext context) => Search()));
+          User user = FirebaseAuth.instance.currentUser;
+          Navigator.push<MaterialPageRoute>(
+              context,
+              MaterialPageRoute(
+                  builder: (BuildContext context) => Search(currentUserId: user.uid ,)));
         },
         child: Icon(
           Icons.search,

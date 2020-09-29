@@ -1,12 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 
 class Users {
-  final String userId;
-  final String username;
-  final String email;
-  final String photoUrl;
-  final String createdAt;
+  String userId;
+  String username;
+  String email;
+  String photoUrl;
+  String createdAt;
 
   Users({
     this.userId,
@@ -27,114 +26,24 @@ class Users {
       createdAt: getDocs['createdAt'].toString(),
     );
   }
+
+  Map toMap(Users users) {
+    var data = Map<String, dynamic>();
+    data['id'] = users.userId;
+
+    data['email'] = users.email;
+    data['username'] = users.username;
+
+    data['photoUrl'] = users.photoUrl;
+    data[' createdAt'] = users.createdAt;
+    return data;
+  }
+
+  Users.fromMap(Map<String, dynamic> mapData) {
+    this.userId = mapData['id'].toString();
+    this.email = mapData['email'].toString();
+    this.username = mapData['username'].toString();
+    this.photoUrl = mapData['photoUrl'].toString();
+    this.createdAt = mapData['createdAt'].toString();
+  }
 }
-
-// void main() => runApp(new MyApp());
-
-// class MyApp extends StatelessWidget {
-//   //This widget is the root of your application.
-//   @override
-//   Widget build(BuildContext context) {
-//     return new MaterialApp(
-//       title: 'Flutter Demo',
-//       theme: ThemeData(
-//         primarySwatch: Colors.blue,
-//       ),
-//       home: new MyHomePage(title: 'ListView with Search'),
-//     );
-//   }
-// }
-
-// class MyHomePage extends StatefulWidget {
-//   MyHomePage({Key key, this.title}) : super(key: key);
-//   final String title;
-//   @override
-//   _MyHomePageState createState() => new _MyHomePageState();
-// }
-
-// class _MyHomePageState extends State<MyHomePage> {
-//   TextEditingController editingController = TextEditingController();
-//    Future<QuerySnapshot> searchResultsFuture;
-//   final CollectionReference useref =
-//       FirebaseFirestore.instance.collection("users");
-//   final duplicateItems = List<String>.generate(10000, (i) => "Item $i");
-//   List<Text> searchResults = [];
-//   @override
-//   void initState() {
-//   //  searchResults.addAll()
-//     super.initState();
-//   }
-
-//   // void filterSearchResults(String query) {
-//   //   List<String> dummySearchList = List<String>();
-//   //   dummySearchList.addAll(duplicateItems);
-//   //   if (query.isNotEmpty) {
-//   //     List<String> dummyListData = List<String>();
-//   //     dummySearchList.forEach((item) {
-//   //       if (item.contains(query)) {
-//   //         dummyListData.add(item);
-//   //       }
-//   //     });
-//   //     setState(() {
-//   //       items.clear();
-//   //       items.addAll(dummyListData);
-//   //     });
-//   //     return;
-//   //   } else {
-//   //     setState(() {
-//   //       items.clear();
-//   //       items.addAll(duplicateItems);
-//   //     });
-//   //   }
-//   // }
-//    void filterSearchResults(String query) async {
-//     Future<QuerySnapshot> users = FirebaseFirestore.instance
-//         .collection("users")
-//         .where("username", isEqualTo: query)
-//         .get();
-//     setState(() {
-//       searchResultsFuture = users;
-//     });
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return new Scaffold(
-//       appBar: new AppBar(
-//         title: new Text(widget.title),
-//       ),
-//       body: Container(
-//         child: Column(
-//           children: <Widget>[
-//             Padding(
-//               padding: const EdgeInsets.all(8.0),
-//               child: TextField(
-//                 onChanged: (value) {
-//                   filterSearchResults(value);
-//                 },
-//                 controller: editingController,
-//                 decoration: InputDecoration(
-//                     labelText: "Search",
-//                     hintText: "Search",
-//                     prefixIcon: Icon(Icons.search),
-//                     border: OutlineInputBorder(
-//                         borderRadius: BorderRadius.all(Radius.circular(25.0)))),
-//               ),
-//             ),
-//             Expanded(
-//               child: ListView.builder(
-//                 shrinkWrap: true,
-//                 itemCount: items.length,
-//                 itemBuilder: (context, index) {
-//                   return ListTile(
-//                     title: Text('${items[index]}'),
-//                   );
-//                 },
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }

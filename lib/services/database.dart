@@ -1,12 +1,21 @@
 import 'dart:async';
 
+import 'package:ChatApp/modal/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class DatabaseMethods {
   final String username;
   DatabaseMethods({this.username});
 
   final CollectionReference users = Firestore.instance.collection("users");
+
+
+  Future<User> getCurrentUser() async {
+    User currentUser;
+    currentUser = await FirebaseAuth.instance.currentUser;
+    return currentUser;
+  }
 
   Future<QuerySnapshot> getByUserName(String username) async {
     QuerySnapshot user;
@@ -28,6 +37,18 @@ class DatabaseMethods {
     return email;
   }
 
+  Future<List<Users>> fetchAllUsers(FirebaseUser currentUser) async {
+    List<Users> userList = List<Users>();
+
+    QuerySnapshot querySnapshot =
+        await FirebaseFirestore.instance.collection('users').get();
+    for (var i = 0; i < querySnapshot.docs.length; i++) {
+      if (querySnapshot.docs[i].id != currentUser.uid) {
+        userList.add(Users.fromMap(querySnapshot.docs[i].data()));
+      }
+    }
+    return userList;
+  }
 
   Future<void> uploadUserInfo(dynamic userMap) async {
     Map<String, String> userMap;

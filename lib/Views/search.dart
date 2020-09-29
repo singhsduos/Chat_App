@@ -1,229 +1,229 @@
-// import 'dart:async';
+import 'dart:async';
+import 'package:intl/intl.dart';
 
-// import 'package:ChatApp/Views/conversationScreen.dart';
-// import 'package:ChatApp/Views/raw%20file.dart';
-// import 'package:ChatApp/Widget/widget.dart';
-// import 'package:ChatApp/helper/constants.dart';
-// import 'package:ChatApp/modal/user.dart';
-// import 'package:ChatApp/services/database.dart';
-// import 'package:cloud_firestore/cloud_firestore.dart';
-// import 'package:firebase_auth/firebase_auth.dart';
-// import 'package:flutter/material.dart';
+import 'package:ChatApp/Views/conversationScreen.dart';
+import 'package:ChatApp/Widget/widget.dart';
+import 'package:ChatApp/helper/constants.dart';
+import 'package:ChatApp/modal/user.dart';
+import 'package:ChatApp/services/database.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
-// class Search extends StatefulWidget {
-//   final String currentUserId;
-//   Search({Key key, @required this.currentUserId}) : super(key: key);
-//   @override
-//   State createState() => _SearchState(currentUserId: currentUserId);
-// }
+class Search extends StatefulWidget {
+  final String currentUserId;
+  Search({Key key, @required this.currentUserId}) : super(key: key);
+  @override
+  State createState() => _SearchState(currentUserId: currentUserId);
+}
 
-// class _SearchState extends State<Search> {
-//   final String currentUserId;
+class _SearchState extends State<Search> {
+  final String currentUserId;
 
-//   _SearchState({Key key, @required this.currentUserId});
-//   TextEditingController searchTextEditingController = TextEditingController();
-//   AppBar homepageHeader() {
-//     return AppBar(
-//       automaticallyImplyLeading: false,
-//       actions: <Widget>[
-//         IconButton(
-//           icon: Icon(
-//             Icons.settings,
-//             size: 30,
-//             color: Colors.white,
-//           ),
-//           onPressed: () {},
-//         ),
-//       ],
-//       backgroundColor: Colors.cyan,
-//       title: Container(
-//         margin: EdgeInsets.only(bottom: 4.0),
-//         child: TextFormField(
-//           style: TextStyle(fontSize: 18.0, color: Colors.white),
-//           controller: searchTextEditingController,
-//           decoration: InputDecoration(
-//             hintText: 'search Username...',
-//             hintStyle: TextStyle(color: Colors.white),
-//             enabledBorder: UnderlineInputBorder(
-//               borderSide: BorderSide(color: Colors.grey),
-//             ),
-//             focusedBorder: UnderlineInputBorder(
-//               borderSide: BorderSide(color: Colors.white),
-//             ),
-//             filled: true,
-//             prefixIcon: Icon(
-//               Icons.person_pin,
-//               size: 28.0,
-//               color: Colors.black54,
-//             ),
-//             suffixIcon: IconButton(
-//               icon: Icon(Icons.clear),
-//               color: Colors.black54,
-//               onPressed: emptyTextFormField,
-//             ),
-//           ),
-//           onFieldSubmitted: handleSearch,
-//         ),
-//       ),
-//     );
-//   }
+  _SearchState({Key key, @required this.currentUserId});
+  TextEditingController searchTextEditingController = TextEditingController();
+  AppBar homepageHeader() {
+    return AppBar(
+      automaticallyImplyLeading: false,
+      actions: <Widget>[
+        IconButton(
+          icon: Icon(
+            Icons.settings,
+            size: 30,
+            color: Colors.white,
+          ),
+          onPressed: () {},
+        ),
+      ],
+      backgroundColor: Colors.cyan,
+      title: Container(
+        margin: EdgeInsets.only(bottom: 4.0),
+        child: TextFormField(
+          style: TextStyle(fontSize: 18.0, color: Colors.white),
+          controller: searchTextEditingController,
+          decoration: InputDecoration(
+            hintText: 'search Username...',
+            hintStyle: TextStyle(color: Colors.white),
+            enabledBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.grey),
+            ),
+            focusedBorder: UnderlineInputBorder(
+              borderSide: BorderSide(color: Colors.white),
+            ),
+            filled: true,
+            prefixIcon: Icon(
+              Icons.person_pin,
+              size: 28.0,
+              color: Colors.black54,
+            ),
+            suffixIcon: IconButton(
+              icon: Icon(Icons.clear),
+              color: Colors.black54,
+              onPressed: emptyTextFormField,
+            ),
+          ),
+          onFieldSubmitted: handleSearch,
+        ),
+      ),
+    );
+  }
 
-//   Future<QuerySnapshot> searchResultsFuture;
-//   final CollectionReference useref =
-//       FirebaseFirestore.instance.collection("users");
+  Future<QuerySnapshot> searchResultsFuture;
+  final CollectionReference useref =
+      FirebaseFirestore.instance.collection("users");
 
-//   dynamic handleSearch(String query) async {
-//     Future<QuerySnapshot> users = FirebaseFirestore.instance
-//         .collection("users")
-//         .where("username", isEqualTo: query)
-//         .get();
-//     setState(() {
-//       searchResultsFuture = users;
-//     });
-//   }
+  dynamic handleSearch(String query) async {
+    Future<QuerySnapshot> users = FirebaseFirestore.instance
+        .collection("users")
+        .where("username", isEqualTo: query)
+        .get();
+    setState(() {
+      searchResultsFuture = users;
+    });
+  }
 
-//   dynamic emptyTextFormField() {
-//     searchTextEditingController.clear();
-//   }
+  dynamic emptyTextFormField() {
+    searchTextEditingController.clear();
+  }
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//       appBar: homepageHeader(),
-//       body:
-//           searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
-//     );
-//   }
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: homepageHeader(),
+      body:
+          searchResultsFuture == null ? buildNoContent() : buildSearchResults(),
+    );
+  }
 
-//   Widget buildSearchResults() {
-//     return FutureBuilder(
-//       future: searchResultsFuture,
-//       builder: (context, datasnapshot) {
-//         if (!datasnapshot.hasData) {
-//           return Center(
-//             child: CircularProgressIndicator(),
-//           );
-//         }
-//         List<Text> searchResults = [];
-//         datasnapshot.data.documents.forEach((DocumentSnapshot doc) {
-//           final Map getDocs = doc.data();
-//           Users user = Users.fromDocument(doc);
-//             User eachUser;
+  Widget buildSearchResults() {
+    return FutureBuilder(
+      future: searchResultsFuture,
+      builder: (context, datasnapshot) {
+        if (!datasnapshot.hasData) {
+          return Center(
+            child: CircularProgressIndicator(),
+          );
+        }
+        List<UserResult> searchResults = [];
+        datasnapshot.data.documents.forEach((DocumentSnapshot doc) {
+          final Map getDocs = doc.data();
+          Users user = Users.fromDocument(doc);
+           
   
-//                     UserResult userResult = UserResult(eachUser);
+                    UserResult userResult = UserResult(user);
 
-//           if (currentUserId != getDocs['id']) {
-//             searchResults.add(
-//             userResult
+          if (currentUserId != getDocs['id']) {
+            searchResults.add(
+            userResult
             
-//           );
-//           }
-//           // searchResults.add(Text(
-//           //   user.username,
-//           //   style: TextStyle(fontSize: 18),
-//           // ));
-//           // searchResults.add(Text(
-//           //   user.email,
-//           //   style: TextStyle(fontSize: 16),
-//           // ));
-//         });
-//         return ListView(
-//           children: searchResults,
-//         );
-//         // return Container(
-//         //   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-//         //   child: Row(
-//         //     children: [
-//         //       Column(
-//         //           crossAxisAlignment: CrossAxisAlignment.start,
-//         //           children: searchResults),
-//         //       Spacer(),
-//         //       // Container(
-//         //       //   decoration: BoxDecoration(
-//         //       //     color: Colors.cyan,
-//         //       //     borderRadius: BorderRadius.circular(30)
-//         //       //   ),
-//         //       //   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-//         //       //   child: Text('Message'),
-//         //       // )
-//         //     ],
-//         //   ),
-//         // );
-//       },
-//     );
-//   }
+          );
+          }
+          // searchResults.add(Text(
+          //   user.username,
+          //   style: TextStyle(fontSize: 18),
+          // ));
+          // searchResults.add(Text(
+          //   user.email,
+          //   style: TextStyle(fontSize: 16),
+          // ));
+        });
+        return ListView(
+          children: searchResults,
+        );
+        // return Container(
+        //   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+        //   child: Row(
+        //     children: [
+        //       Column(
+        //           crossAxisAlignment: CrossAxisAlignment.start,
+        //           children: searchResults),
+        //       Spacer(),
+        //       // Container(
+        //       //   decoration: BoxDecoration(
+        //       //     color: Colors.cyan,
+        //       //     borderRadius: BorderRadius.circular(30)
+        //       //   ),
+        //       //   padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+        //       //   child: Text('Message'),
+        //       // )
+        //     ],
+        //   ),
+        // );
+      },
+    );
+  }
 
-//   Container buildNoContent() {
-//     final Orientation orientation = MediaQuery.of(context).orientation;
-//     return Container(
-//       child: Center(
-//         child: ListView(
-//           shrinkWrap: true,
-//           children: <Widget>[
-//             Icon(
-//               Icons.group,
-//               color: Colors.cyan,
-//               size: 200.0,
-//             ),
-//             Text(
-//               "Search Users",
-//               textAlign: TextAlign.center,
-//               style: TextStyle(
-//                 color: Colors.cyan,
-//                 fontStyle: FontStyle.italic,
-//                 fontWeight: FontWeight.w500,
-//                 fontSize: 50.0,
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }
-// }
+  Container buildNoContent() {
+    final Orientation orientation = MediaQuery.of(context).orientation;
+    return Container(
+      child: Center(
+        child: ListView(
+          shrinkWrap: true,
+          children: <Widget>[
+            Icon(
+              Icons.group,
+              color: Colors.cyan,
+              size: 200.0,
+            ),
+            Text(
+              "Search Users",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: Colors.cyan,
+                fontStyle: FontStyle.italic,
+                fontWeight: FontWeight.w500,
+                fontSize: 50.0,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-// class UserResult extends StatelessWidget {
-//   final User eachUser;
-//   UserResult(this.eachUser);
-//   @override
-//   Widget build(BuildContext context) {
-//     return Padding(
-//       padding: EdgeInsets.all(4.0),
-//       child: Container(
-//         color: Colors.white,
-//         child: Column(
-//           children: <Widget>[
-//             GestureDetector(
-//               child: ListTile(
-//                 leading: CircleAvatar(
-//                   backgroundColor: Colors.black, // backgroundImage: CachedNetworkImageProvider(eachUser.photoURL),
+class UserResult extends StatelessWidget {
+  final Users users;
+  UserResult(this.users);
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: EdgeInsets.all(4.0),
+      child: Container(
+        color: Colors.white,
+        child: Column(
+          children: <Widget>[
+            GestureDetector(
+              child: ListTile(
+                leading: CircleAvatar(
+                  backgroundColor: Colors.black, // backgroundImage: CachedNetworkImageProvider(eachUser.photoURL),
                
-//                 ),
-//                  title: Text(
-//                  eachUser.username,
-//                  style: TextStyle(
-//                    color: Colors.black,
-//                    fontSize: 16.0,
-//                    fontWeight: FontWeight.bold,
+                ),
+                 title: Text(
+                 users.username,
+                 style: TextStyle(
+                   color: Colors.black,
+                   fontSize: 16.0,
+                   fontWeight: FontWeight.bold,
 
-//                  ), 
-//                 ),
-//                 subtitle: Text(
-//                    'Joined: ' + DateFormat('dd MMMM, yyyy - hh:mm:aa').format(DateTime.fromMillisecondsSinceEpoch(int.parse(eachUser.createdAt)
-//                 ),
-//               ).toString(),
-//               style: TextStyle(color: Colors.grey, fontSize: 14, fontStyle: FontStyle.italic),
-//             ),
-//               ),
-//             ),
+                 ), 
+                ),
+                subtitle: Text(
+                   'Joined: ' + DateFormat('dd MMMM, yyyy - hh:mm:aa').format(DateTime.fromMillisecondsSinceEpoch(int.parse(users.createdAt)
+                ),
+              ).toString(),
+              style: TextStyle(color: Colors.grey, fontSize: 14, fontStyle: FontStyle.italic),
+            ),
+              ),
+            ),
             
-//           ],
+          ],
           
-//         ),
-//       ),
-//     );
-//   }
-// }
+        ),
+      ),
+    );
+  }
+}
 
 
 
