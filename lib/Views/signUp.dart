@@ -29,7 +29,6 @@ class _SignUpState extends State<SignUp> {
   bool isLoading = false;
   bool isLoggedIn = false;
   User currentUser;
-  dynamic _error;
 
   final _firestore = Firestore.instance;
   AuthMethods authMethods = AuthMethods();
@@ -43,7 +42,6 @@ class _SignUpState extends State<SignUp> {
   TextEditingController passwordTextEditingController = TextEditingController();
   final TextEditingController _pass = TextEditingController();
   final TextEditingController _confirmPass = TextEditingController();
-
 
   // ignore: missing_return
   Future<Null> signMeUp() async {
@@ -81,7 +79,7 @@ class _SignUpState extends State<SignUp> {
         }).catchError((dynamic e) {
           print(e);
           setState(() {
-             isLoading = false;
+            isLoading = false;
             Fluttertoast.showToast(
               msg: 'Email already in use',
               textColor: Color(0xFFFFFFFF),
@@ -93,17 +91,16 @@ class _SignUpState extends State<SignUp> {
         });
       }).catchError((dynamic e) {
         print(e);
-         setState(() {
-            isLoading = false;
-            Fluttertoast.showToast(
-              msg: 'Email already in use',
-              textColor: Color(0xFFFFFFFF),
-              backgroundColor: Colors.cyan,
-              fontSize: 16.0,
-              timeInSecForIosWeb: 4,
-            );
-            
-          });
+        setState(() {
+          isLoading = false;
+          Fluttertoast.showToast(
+            msg: 'Email already in use',
+            textColor: Color(0xFFFFFFFF),
+            backgroundColor: Colors.cyan,
+            fontSize: 16.0,
+            timeInSecForIosWeb: 4,
+          );
+        });
       });
     }
   }
@@ -133,7 +130,7 @@ class _SignUpState extends State<SignUp> {
           .where('id', isEqualTo: user.uid)
           .get();
       final List<DocumentSnapshot> documents = result.docs;
-      if (documents.length == 0) {
+      if (documents.isEmpty) {
         // Update data to server if new user
         FirebaseFirestore.instance.collection('users').doc(user.uid)
             // ignore: always_specify_types
@@ -159,7 +156,7 @@ class _SignUpState extends State<SignUp> {
         await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
         await prefs.setString('email', '${documents[0].data()['email']}');
       }
-      Fluttertoast.showToast(msg: "SignUp successful");
+      Fluttertoast.showToast(msg: 'SignUp successful');
       this.setState(() {
         isLoading = false;
       });
@@ -169,7 +166,7 @@ class _SignUpState extends State<SignUp> {
           MaterialPageRoute<MaterialPageRoute>(
               builder: (BuildContext context) => ChatRoom(uid: user.uid)));
     } else {
-      Fluttertoast.showToast(msg: "SignUp fail");
+      Fluttertoast.showToast(msg: 'SignUp fail');
       this.setState(() {
         isLoading = false;
       });
@@ -183,43 +180,6 @@ class _SignUpState extends State<SignUp> {
     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
-     Widget showAlert() {
-    if (_error != null) {
-      return Container(
-        color: Colors.amberAccent,
-        width: double.infinity,
-        padding: EdgeInsets.all(8.0),
-        child: Row(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(right: 8.0),
-              child: Icon(Icons.error_outline),
-            ),
-            Expanded(
-              child: Text(
-                _error.toString(),
-                maxLines: 3,
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.only(left: 8.0),
-              child: IconButton(
-                icon: Icon(Icons.close),
-                onPressed: () {
-                  setState(() {
-                    _error = null;
-                  });
-                },
-              ),
-            )
-          ],
-        ),
-      );
-    }
-    return SizedBox(
-      height: 0,
-    );
-  }
 
     return Scaffold(
       appBar: appBarMain(context),
@@ -232,8 +192,6 @@ class _SignUpState extends State<SignUp> {
                   key: formKey,
                   child: Column(
                     children: <Widget>[
-                       const SizedBox(),
-                         showAlert(),
                       TextFormField(
                         validator: (String value) {
                           if (value.isEmpty) {

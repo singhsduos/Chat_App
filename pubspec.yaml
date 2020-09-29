@@ -45,10 +45,15 @@ dependencies:
   flutter_icons:
   fluttertoast:
   toast:
-  algolia:
+  hive:
+  hive_flutter:
+  path_provider:
+
     
 
 dev_dependencies:
+  hive_generator:
+  build_runner:
   flutter_test:
     sdk: flutter
 

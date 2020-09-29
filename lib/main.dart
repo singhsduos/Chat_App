@@ -10,8 +10,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:flutter/animation.dart';
 
 // ignore: avoid_void_async
 Future main() async {
@@ -35,6 +35,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     getLoggedInState();
+
     super.initState();
   }
 
@@ -49,18 +50,25 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     // User user = FirebaseAuth.instance.currentUser;
-    return MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'ChatooApp',
-        theme: CustomTheme.of(context),
-        home: Constants.prefs.getBool('userIsLoggedIn') == true
-            ? ChatRoom(
-                uid: null,
-              )
-            : Authenticate()
+    return ChangeNotifierProvider(
+      create: (_) => ThemeNotifier(),
+      child: Consumer<ThemeNotifier>(
+        builder: (context, ThemeNotifier notifier, child) {
+          return MaterialApp(
+              debugShowCheckedModeBanner: false,
+              title: 'ChatooApp',
+              theme: CustomTheme.of(context),
+              home: Constants.prefs.getBool('userIsLoggedIn') == true
+                  ? ChatRoom(
+                      uid: null,
+                    )
+                  : Authenticate()
 
-        // home: ConversationScreen(this.chatRoomid),
-        // home: ForgotPassword(),
-        );
+              // home: ConversationScreen(this.chatRoomid),
+              // home: ForgotPassword(),
+              );
+        },
+      ),
+    );
   }
 }

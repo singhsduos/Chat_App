@@ -11,6 +11,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -106,14 +107,15 @@ class _SignInState extends State<SignIn> {
     User user = authResult.user;
     print("signed in " + user.displayName);
 
-    if (user != null) {
+    // try{
+      if (user != null) {
       // Check is already sign up
       final QuerySnapshot result = await FirebaseFirestore.instance
           .collection('users')
           .where('id', isEqualTo: user.uid)
           .get();
       final List<DocumentSnapshot> documents = result.docs;
-      if (documents.length == 0) {
+      if (documents.isEmpty) {
         // Update data to server if new user
         FirebaseFirestore.instance.collection('users').doc(user.uid)
             // ignore: always_specify_types
@@ -148,12 +150,7 @@ class _SignInState extends State<SignIn> {
           context,
           MaterialPageRoute<MaterialPageRoute>(
               builder: (BuildContext context) => ChatRoom(uid: user.uid)));
-    } else {
-      Fluttertoast.showToast(msg: "SignIn fail");
-      this.setState(() {
-        isLoading = false;
-      });
-    }
+    };
   }
 
   bool _obscureText = true;
@@ -416,15 +413,3 @@ class _SignInState extends State<SignIn> {
   }
 }
 
-// alignment: Alignment.center,
-//                                   width: MediaQuery.of(context).size.width,
-//                                   padding: EdgeInsets.all(16),
-//                                   decoration: BoxDecoration(
-//                                     child: Image(image: AssetImage('images/signin.png'),)
-//                                     color: Color(0xfff99AAAB),
-//                                     borderRadius: BorderRadius.all(
-//                                         Radius.circular(30.0)),
-//                                   ),
-//                                   child: Text('Sign In with Google',
-//                                       style: TextStyle(
-//                                           color: Colors.white, fontSize: 17)),
