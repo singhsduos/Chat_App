@@ -48,6 +48,7 @@ dependencies:
   hive:
   hive_flutter:
   path_provider:
+  cached_network_image:
 
     
 

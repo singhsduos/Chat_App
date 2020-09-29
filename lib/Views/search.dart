@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:intl/intl.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 
 import 'package:ChatApp/Views/conversationScreen.dart';
 import 'package:ChatApp/Widget/widget.dart';
@@ -17,25 +18,28 @@ class Search extends StatefulWidget {
   State createState() => _SearchState(currentUserId: currentUserId);
 }
 
+String _myName;
+
 class _SearchState extends State<Search> {
-  final String currentUserId;
+  String currentUserId;
+  String username;
+  DatabaseMethods databaseMethods = DatabaseMethods();
 
   _SearchState({Key key, @required this.currentUserId});
   TextEditingController searchTextEditingController = TextEditingController();
+
   AppBar homepageHeader() {
     return AppBar(
       automaticallyImplyLeading: false,
-      actions: <Widget>[
-        IconButton(
-          icon: Icon(
-            Icons.settings,
-            size: 30,
-            color: Colors.white,
-          ),
-          onPressed: () {},
-        ),
-      ],
       backgroundColor: Colors.cyan,
+     leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+            size: 27,
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
       title: Container(
         margin: EdgeInsets.only(bottom: 4.0),
         child: TextFormField(
@@ -54,11 +58,11 @@ class _SearchState extends State<Search> {
             prefixIcon: Icon(
               Icons.person_pin,
               size: 28.0,
-              color: Colors.black54,
+              color: Colors.white,
             ),
             suffixIcon: IconButton(
               icon: Icon(Icons.clear),
-              color: Colors.black54,
+              color: Colors.white,
               onPressed: emptyTextFormField,
             ),
           ),
@@ -108,22 +112,16 @@ class _SearchState extends State<Search> {
         datasnapshot.data.documents.forEach((DocumentSnapshot doc) {
           final Map getDocs = doc.data();
           Users user = Users.fromDocument(doc);
-           
-  
-                    UserResult userResult = UserResult(user);
+
+          UserResult userResult = UserResult(user);
 
           if (currentUserId != getDocs['id']) {
-            searchResults.add(
-            userResult
-            
-          );
+            searchResults.add(userResult);
           }
-         
         });
         return ListView(
           children: searchResults,
         );
-        
       },
     );
   }
@@ -158,8 +156,21 @@ class _SearchState extends State<Search> {
 }
 
 class UserResult extends StatelessWidget {
-  final Users users;
+  Users users;
   UserResult(this.users);
+  DatabaseMethods databaseMethods = DatabaseMethods();
+
+  dynamic createChatroomAndStartConversation(BuildContext context) {
+    Navigator.pushReplacement(
+        context,
+        MaterialPageRoute<MaterialPageRoute>(
+            builder: (BuildContext context) => ConversationScreen(
+                  chatRoomid: users.userId,
+                  recevierAvatar: users.photoUrl,
+                  recevierName: users.username,
+                )));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -169,38 +180,43 @@ class UserResult extends StatelessWidget {
         child: Column(
           children: <Widget>[
             GestureDetector(
+              onTap: () {
+                createChatroomAndStartConversation(context);
+              },
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.black, // backgroundImage: CachedNetworkImageProvider(eachUser.photoURL),
-               
+                  backgroundColor: Colors.black,
+                  backgroundImage: CachedNetworkImageProvider(users.photoUrl),
                 ),
-                 title: Text(
-                 users.username,
-                 style: TextStyle(
-                   color: Colors.black,
-                   fontSize: 16.0,
-                   fontWeight: FontWeight.bold,
-
-                 ), 
+                title: Text(
+                  users.username,
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 subtitle: Text(
-                   'Joined: ' + DateFormat('dd MMMM, yyyy - hh:mm:aa').format(DateTime.fromMillisecondsSinceEpoch(int.parse(users.createdAt)
+                  'Joined: ' +
+                      DateFormat('dd MMMM, yyyy - hh:mm:aa')
+                          .format(
+                            DateTime.fromMillisecondsSinceEpoch(
+                                int.parse(users.createdAt)),
+                          )
+                          .toString(),
+                  style: TextStyle(
+                      color: Colors.grey,
+                      fontSize: 14,
+                      fontStyle: FontStyle.italic),
                 ),
-              ).toString(),
-              style: TextStyle(color: Colors.grey, fontSize: 14, fontStyle: FontStyle.italic),
-            ),
               ),
             ),
-            
           ],
-          
         ),
       ),
     );
   }
 }
-
-
 
 //2nd method
 
@@ -265,7 +281,7 @@ class UserResult extends StatelessWidget {
 
 //   Widget searchList() {
 //     return haveUserSearched
-//         ? ListView.builder(
+//          ListView.builder(
 //             shrinkWrap: true,
 //             itemCount: searchSnapshot.docs.length,
 //             itemBuilder: (BuildContext context, int index) {
@@ -279,27 +295,27 @@ class UserResult extends StatelessWidget {
 //         : Container();
 //   }
 
-//   dynamic createChatroomAndStartConversation({String username}) {
-//     // print('${Constants.myName}');
-//     if (username != Constants.myName) {
-//       final String chatRoomid =
-//           getChatRoomid(username, Constants.myName).toString();
+// dynamic createChatroomAndStartConversation({String username}) {
+//   // print('${Constants.myName}');
+//   if (username != Constants.myName) {
+//     final String chatRoomid =
+//         getChatRoomid(username, Constants.myName).toString();
 
-//       final List<String> users = [username, Constants.myName];
-//       final Map<String, dynamic> chatRoomMap = {
-//         'users': users,
-//         'chatroomid': chatRoomid,
-//       }.cast<String, dynamic>();
-//       databaseMethods.createChatRoom(chatRoomMap, chatRoomid);
-//       Navigator.push(
-//           context,
-//           MaterialPageRoute<MaterialPageRoute>(
-//               builder: (BuildContext context) =>
-//                   ConversationScreen(chatRoomid)));
-//     } else {
-//       print('you cannot send message to yourself');
-//     }
+//     final List<String> users = [username, Constants.myName];
+//     final Map<String, dynamic> chatRoomMap = {
+//       'users': users,
+//       'chatroomid': chatRoomid,
+//     }.cast<String, dynamic>();
+//     databaseMethods.createChatRoom(chatRoomMap, chatRoomid);
+//     Navigator.push(
+//         context,
+//         MaterialPageRoute<MaterialPageRoute>(
+//             builder: (BuildContext context) =>
+//                 ConversationScreen(chatRoomid)));
+//   } else {
+//     print('you cannot send message to yourself');
 //   }
+// }
 
 //   Widget SearchTile(String username, String email) {
 //     return Container(

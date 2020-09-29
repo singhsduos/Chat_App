@@ -64,7 +64,7 @@ class _MyAppState extends State<MyApp> {
                     )
                   : Authenticate()
 
-              // home: ConversationScreen(this.chatRoomid),
+              // home: ConversationScreen(),
               // home: ForgotPassword(),
               );
         },

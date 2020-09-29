@@ -1,21 +1,90 @@
+import 'package:ChatApp/Views/chatRoomsScreen.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
 import 'package:ChatApp/Widget/widget.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class ConversationScreen extends StatefulWidget {
+class ConversationScreen extends StatelessWidget {
   final String chatRoomid;
-  ConversationScreen(this.chatRoomid);
+  final String recevierAvatar;
+  final String recevierName;
+  const ConversationScreen(
+      {Key key, this.chatRoomid, this.recevierAvatar, this.recevierName});
 
   @override
-  _ConversationScreenState createState() => _ConversationScreenState();
+  Widget build(BuildContext context) {
+    User user = FirebaseAuth.instance.currentUser;
+    return Scaffold(
+      appBar: AppBar(
+        backgroundColor: Colors.cyan,
+        actions: <Widget>[
+          Padding(
+            padding: EdgeInsets.all(8.0),
+            child: CircleAvatar(
+              backgroundColor: Colors.black,
+              backgroundImage: CachedNetworkImageProvider(recevierAvatar),
+            ),
+          )
+        ],
+        leading: IconButton(
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+            size: 27,
+          ),
+          onPressed: () => Navigator.pushReplacement(
+              context,
+              MaterialPageRoute<MaterialPageRoute>(
+                  builder: (BuildContext context) => ChatRoom(
+                        uid: user.uid,
+                      ))),
+        ),
+        title: Align(
+          alignment: Alignment.center,
+          child: Container(
+            child: Text(
+              recevierName,
+              style: TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 21,
+                letterSpacing: 1.5,
+              ),
+              //  textAlign: TextAlign.right
+            ),
+          ),
+        ),
+      ),
+      body: ChatScreen(chatRoomid: chatRoomid, recevierAvatar: recevierAvatar),
+    );
+  }
 }
 
-class _ConversationScreenState extends State<ConversationScreen> {
+class ChatScreen extends StatefulWidget {
+  final String chatRoomid;
+  final String recevierAvatar;
+
+  ChatScreen(
+      {Key key, @required this.chatRoomid, @required this.recevierAvatar}): super(key:key);
+
+  @override
+  _ChatScreen createState() => _ChatScreen(chatRoomid: chatRoomid, recevierAvatar: recevierAvatar);
+}
+
+class _ChatScreen extends State<ChatScreen> {
+   final String chatRoomid;
+  final String recevierAvatar; 
+
+  _ChatScreen(
+      {Key key, @required this.chatRoomid, @required this.recevierAvatar});
+
   DatabaseMethods databaseMethods = DatabaseMethods();
   AuthMethods authMethods = AuthMethods();
   TextEditingController messageController = TextEditingController();
@@ -71,11 +140,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
-       void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
+    void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
+
     return Scaffold(
-      appBar: appBarMain(context),
       body: Container(
         child: Stack(
           children: <Widget>[

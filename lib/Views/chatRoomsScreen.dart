@@ -29,22 +29,23 @@ class _ChatRoomState extends State<ChatRoom> {
 
   Stream chatRoomsStream;
 
-  Widget chatRoomList() {
-    return StreamBuilder<dynamic>(
-      stream: chatRoomsStream,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        return snapshot.hasData
-            ? ListView.builder(
-                itemCount: (int.parse('${snapshot.data.documents.length}')),
-                itemBuilder: (context, index) {
-                  return ChatRoomTile(
-                      '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}',
-                      '${snapshot.data.documents[index].data['chatroomid']}');
-                })
-            : Container();
-      },
-    );
-  }
+  // Widget chatRoomList() {
+  //   return StreamBuilder<dynamic>(
+  //     stream: chatRoomsStream,
+  //     builder: (BuildContext context, AsyncSnapshot snapshot) {
+  //       return snapshot.hasData
+  //           ? ListView.builder(
+  //               itemCount: (int.parse('${snapshot.data.documents.length}')),
+  //               itemBuilder: (context, index) {
+  //                 return ChatRoomTile(
+  //                     '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}',
+  //                     '${snapshot.data.documents[index].data['chatroomid']}'
+  //                     );
+  //               })
+  //           : Container();
+  //     },
+  //   );
+  // }
 
   @override
   void initState() {
@@ -106,16 +107,17 @@ class _ChatRoomState extends State<ChatRoom> {
         backgroundColor: Colors.cyan,
       ),
       drawer: SideDrawer(),
-      body: chatRoomList(),
+      // body: chatRoomList(),
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.cyan,
-        
         onPressed: () {
           User user = FirebaseAuth.instance.currentUser;
           Navigator.push<MaterialPageRoute>(
               context,
               MaterialPageRoute(
-                  builder: (BuildContext context) => Search(currentUserId: user.uid ,)));
+                  builder: (BuildContext context) => Search(
+                        currentUserId: user.uid,
+                      )));
         },
         child: Icon(
           Icons.search,
@@ -129,7 +131,9 @@ class _ChatRoomState extends State<ChatRoom> {
 class ChatRoomTile extends StatelessWidget {
   final String userName;
   final String chatRoomid;
-  ChatRoomTile(this.userName, this.chatRoomid);
+  final String recevierAvatar;
+  final String recevierName;
+  ChatRoomTile(this.userName, this.chatRoomid, this.recevierAvatar, this.recevierName);
 
   @override
   Widget build(BuildContext context) {
@@ -138,8 +142,7 @@ class ChatRoomTile extends StatelessWidget {
         Navigator.push(
             context,
             MaterialPageRoute<MaterialPageRoute>(
-                builder: (BuildContext context) =>
-                    ConversationScreen(chatRoomid)));
+                builder: (BuildContext context) => ConversationScreen()));
       },
       child: Container(
         color: Color(0xfff99AAAB),
