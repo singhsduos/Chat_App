@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:emoji_picker/emoji_picker.dart';
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
 
@@ -11,6 +14,10 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:firebase_core/firebase_core.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -93,10 +100,16 @@ class _ChatScreen extends State<ChatScreen> {
   DatabaseMethods databaseMethods = DatabaseMethods();
   AuthMethods authMethods = AuthMethods();
   TextEditingController messageController = TextEditingController();
+  ScrollController listScrollController = ScrollController();
   FocusNode focusNode = FocusNode();
   bool isDisplaySticker = false;
   bool isLoading;
   bool isWriting = false;
+  File imageFile;
+  String imageUrl;
+  String chatId;
+  String id;
+  SharedPreferences preferences;
 
   Stream<QuerySnapshot> chatMessagesStream;
 
@@ -139,6 +152,8 @@ class _ChatScreen extends State<ChatScreen> {
   void initState() {
     // isDisplaySticker = false;
     isLoading = false;
+    chatId = "";
+    readLocal();
 
     databaseMethods
         .getConversationMessages(widget.chatRoomid)
@@ -148,6 +163,22 @@ class _ChatScreen extends State<ChatScreen> {
       });
     });
     super.initState();
+  }
+
+  void readLocal() async {
+    preferences = await SharedPreferences.getInstance();
+    id = preferences.getString('id') ?? "";
+    if (id.hashCode <= chatRoomid.hashCode) {
+      chatId = '$id-$chatRoomid';
+    } else {
+      chatId = '$chatRoomid-$id';
+    }
+    // ignore: always_specify_types
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .update(<String, dynamic>{'chattingWith': chatRoomid});
+    setState(() {});
   }
 
   void showKeyboard() => focusNode.requestFocus();
@@ -167,7 +198,6 @@ class _ChatScreen extends State<ChatScreen> {
   }
 
   @override
-  // TODO: implement widget
   Widget build(BuildContext context) {
     return Container(
       child: Stack(
@@ -185,12 +215,11 @@ class _ChatScreen extends State<ChatScreen> {
   }
 
   Widget emojiContainer() {
-   
     return EmojiPicker(
       bgColor: Colors.white,
       indicatorColor: Colors.cyan,
-      rows: 3,
-      columns: 7,
+      rows: 4,
+      columns: 8,
       onEmojiSelected: (emoji, category) {
         setState(() {
           isWriting = true;
@@ -203,7 +232,6 @@ class _ChatScreen extends State<ChatScreen> {
   }
 
   Widget createInput() {
-    
     return Container(
       padding: EdgeInsets.all(5),
 
@@ -217,9 +245,12 @@ class _ChatScreen extends State<ChatScreen> {
             child: Container(
               margin: EdgeInsets.symmetric(horizontal: 1.0),
               child: IconButton(
-                icon: Icon(Icons.image),
+                icon: Icon(
+                  Icons.image,
+                  size: 30,
+                ),
                 color: Color(0xfff99AAAB),
-                onPressed: () => print('clicked'),
+                onPressed: getImage,
               ),
             ),
             color: Colors.transparent,
@@ -286,7 +317,7 @@ class _ChatScreen extends State<ChatScreen> {
                 ),
                 fillColor: Colors.cyan,
                 splashColor: Colors.transparent,
-                onPressed: () => print('clicked'),
+                onPressed: () => onSendMessage(messageController.text, 0),
               ),
             ),
             // color: Colors.cyan,
@@ -294,6 +325,69 @@ class _ChatScreen extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  void onSendMessage(String contentMsg, int type) {
+    if (contentMsg != "") {
+      messageController.clear();
+      var docRef = Firestore.instance
+          .collection('message')
+          .doc(chatId)
+          .collection(chatId)
+          .doc(DateTime.now().millisecondsSinceEpoch.toString());
+      Firestore.instance.runTransaction((transaction) async {
+        await transaction.set(
+          docRef,
+          <String, dynamic>{
+            'idFrom': id,
+            'idTo': chatRoomid,
+            'timeStamp': DateTime.now().millisecondsSinceEpoch.toString(),
+            'content': contentMsg,
+            'type': type,
+          },
+        );
+      });
+      listScrollController.animateTo(0.0,
+          duration: Duration(microseconds: 300), curve: Curves.easeOut);
+    } else {
+      Fluttertoast.showToast(msg: 'Empty message cannot send.');
+    }
+  }
+
+  Future getImage() async {
+    imageFile = await ImagePicker.pickImage(source: ImageSource.gallery);
+    if (imageFile != null) {
+      isLoading = true;
+    }
+    uploadImageFile();
+  }
+
+  Future uploadImageFile() async {
+    String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+    StorageReference storageReference =
+        FirebaseStorage.instance.ref().child('Chat Images').child(fileName);
+    StorageUploadTask storageUploadTask = storageReference.putFile(imageFile);
+    StorageTaskSnapshot storageTaskSnapshot =
+        await storageUploadTask.onComplete;
+    storageTaskSnapshot.ref.getDownloadURL().then(
+        (dynamic value) => (dynamic downlodUrl) {
+              imageUrl = downlodUrl.toString();
+              setState(() {
+                isLoading = false;
+                // onSendMessage(imageUrl,1);
+              });
+            }, onError: (String error) {
+      setState(() {
+        Fluttertoast.showToast(
+          msg: "Error: " + error,
+          textColor: Color(0xFFFFFFFF),
+          backgroundColor: Colors.cyan,
+          fontSize: 16.0,
+          timeInSecForIosWeb: 3,
+        );
+        isLoading = false;
+      });
+    });
   }
 }
 
@@ -334,77 +428,3 @@ class MessageTile extends StatelessWidget {
     );
   }
 }
-
-// Widget build(BuildContext context) {
-//     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
-//       CustomTheme.instanceOf(buildContext).changeTheme(key);
-//     }
-
-//     return Scaffold(
-//       body: Container(
-//         child: Stack(
-//           children: <Widget>[
-//             ChatMessageList(),
-//             Container(
-//               alignment: Alignment.bottomCenter,
-//               child: Container(
-//                 padding: EdgeInsets.symmetric(),
-//                 child: Row(
-//                   children: [
-//                     Expanded(
-//                       child: GestureDetector(
-//                         onTap: () {
-//                           sendMessage();
-//                         },
-//                         child: Container(
-//                           padding: EdgeInsets.all(5),
-//                           child: TextField(
-//                             controller: messageController,
-//                             style: TextStyle(
-//                                 color: Colors.white,
-//                                 letterSpacing: 1.0,
-//                                 fontSize: 17),
-//                             cursorColor: Colors.cyan,
-//                             cursorWidth: 3,
-//                             // cursorHeight: 5,
-//                             decoration: InputDecoration(
-//                               suffixIcon: Container(
-//                                 child: Icon(
-//                                   Icons.send,
-//                                   color: Colors.white60,
-//                                 ),
-//                               ),
-//                               fillColor: Color(0xfff99AAAB),
-//                               border: const OutlineInputBorder(
-//                                 borderRadius:
-//                                     BorderRadius.all(Radius.circular(30.0)),
-//                                 borderSide:
-//                                     BorderSide(color: Colors.transparent),
-//                               ),
-//                               focusedBorder: OutlineInputBorder(
-//                                 borderRadius:
-//                                     BorderRadius.all(Radius.circular(30.0)),
-//                                 borderSide: BorderSide(
-//                                     color: Colors.transparent, width: 2),
-//                               ),
-//                               hintText: 'Type a message...',
-//                               hintStyle: TextStyle(
-//                                 color: Colors.white60,
-//                               ),
-//                               filled: true,
-//                               // labelStyle: new TextStyle(
-//                               // color: Color(0xfff99AAAB), fontSize: 16.0),
-//                             ),
-//                           ),
-//                         ),
-//                       ),
-//                     ),
-//                   ],
-//                 ),
-//               ),
-//             ),
-//           ],
-//         ),
-//       ),
-//     );
-//   }

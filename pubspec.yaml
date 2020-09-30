@@ -50,6 +50,8 @@ dependencies:
   path_provider:
   cached_network_image:
   emoji_picker:
+  image_picker:
+  firebase_storage:
 
     
 
