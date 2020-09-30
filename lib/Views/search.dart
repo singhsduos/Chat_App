@@ -185,7 +185,8 @@ class UserResult extends StatelessWidget {
               },
               child: ListTile(
                 leading: CircleAvatar(
-                  backgroundColor: Colors.black,
+                  // backgroundColor: Colors.black,
+                  
                   backgroundImage: CachedNetworkImageProvider(users.photoUrl),
                 ),
                 title: Text(
