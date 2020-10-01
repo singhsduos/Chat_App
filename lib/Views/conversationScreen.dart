@@ -109,29 +109,30 @@ class _ChatScreen extends State<ChatScreen> {
   String imageUrl;
   String chatId;
   String id;
+  dynamic listMessage;
   SharedPreferences preferences;
 
   Stream<QuerySnapshot> chatMessagesStream;
 
-  Widget ChatMessageList() {
-    return StreamBuilder(
-      stream: chatMessagesStream,
-      builder: (BuildContext context, AsyncSnapshot snapshot) {
-        return snapshot.hasData
-            ? ListView.builder(
-                // ignore: prefer_const_literals_to_create_immutables
-                itemCount: (int.parse('${snapshot.data.documents.length}')),
-                itemBuilder: (context, index) {
-                  return MessageTile(
-                    '${snapshot.data.documents[index].data["message"]}',
-                    Constants.myName ==
-                        snapshot.data.documents[index].data["sendBy"],
-                  );
-                })
-            : Container();
-      },
-    );
-  }
+  // Widget ChatMessageList() {
+  //   return StreamBuilder(
+  //     stream: chatMessagesStream,
+  //     builder: (BuildContext context, AsyncSnapshot snapshot) {
+  //       return snapshot.hasData
+  //           ? ListView.builder(
+  //               // ignore: prefer_const_literals_to_create_immutables
+  //               itemCount: (int.parse('${snapshot.data.documents.length}')),
+  //               itemBuilder: (context, index) {
+  //                 return MessageTile(
+  //                   '${snapshot.data.documents[index].data["message"]}',
+  //                   Constants.myName ==
+  //                       snapshot.data.documents[index].data["sendBy"],
+  //                 );
+  //               })
+  //           : Container();
+  //     },
+  //   );
+  // }
 
   dynamic sendMessage() {
     if (messageController.text.isNotEmpty) {
@@ -202,9 +203,9 @@ class _ChatScreen extends State<ChatScreen> {
     return Container(
       child: Stack(
         children: <Widget>[
-          //   Flexible(
-          //   child: createMessageList(),
-          // ),
+          Flexible(
+            child: createMessageList(),
+          ),
 
           isDisplaySticker ? emojiContainer() : Container(),
           // if (isDisplaySticker) Container(child: emojiContainer()) else Container(),
@@ -212,6 +213,62 @@ class _ChatScreen extends State<ChatScreen> {
         ],
       ),
     );
+  }
+
+  Widget createMessageList() {
+    return Expanded(
+      child: chatId == ""
+          ? Container()
+          : StreamBuilder(
+              stream: FirebaseFirestore.instance
+                  .collection('message')
+                  .doc(chatId)
+                  .collection(chatId)
+                  .orderBy('timestamp:', descending: true)
+                  .limit(20)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Container();
+                } else {
+                  listMessage = snapshot.data.documents;
+                  return ListView.builder(
+                    padding: EdgeInsets.all(10),
+                    // itemBuilder: (context,index) => createItem(index,snapshot.data.document[index]),
+                    itemCount: int.parse('${snapshot.data.documents.length}'),
+
+                    reverse: true,
+                    controller: listScrollController,
+                  );
+                }
+              },
+            ),
+    );
+  }
+
+
+    void displayBottomSheet(BuildContext context) {
+    showModalBottomSheet<dynamic>(
+        context: context,
+        backgroundColor: Colors.transparent,
+        isScrollControlled: true,
+        barrierColor: ThemeData.dark().primaryColor.withOpacity(0.9),
+        builder: (ctx) {
+           return EmojiPicker(
+      bgColor: Colors.white,
+      indicatorColor: Colors.cyan,
+      rows: 4,
+      columns: 8,
+      onEmojiSelected: (emoji, category) {
+        setState(() {
+          isWriting = true;
+        });
+        messageController.text = messageController.text + emoji.emoji;
+      },
+      recommendKeywords: ['face', 'happy', 'party', 'sad'],
+      numRecommended: 50,
+    );
+        });
   }
 
   Widget emojiContainer() {
@@ -288,19 +345,20 @@ class _ChatScreen extends State<ChatScreen> {
                   ),
                 ),
                 IconButton(
-                    splashColor: Colors.transparent,
-                    color: Colors.white60,
-                    highlightColor: Colors.transparent,
-                    icon: Icon(Icons.emoji_emotions),
-                    onPressed: () {
-                      if (!isDisplaySticker) {
-                        showEmojiContainer();
-                        hideKeyboard();
-                      } else {
-                        showKeyboard();
-                        hideEmojiContainer();
-                      }
-                    }),
+                  splashColor: Colors.transparent,
+                  color: Colors.white60,
+                  highlightColor: Colors.transparent,
+                  icon: Icon(Icons.emoji_emotions),
+                  onPressed: () {
+                    if (!isDisplaySticker) {
+                      showEmojiContainer();
+                      hideKeyboard();
+                    } else {
+                      showKeyboard();
+                      hideEmojiContainer();
+                    }
+                  },
+                ),
               ],
             ),
           ),
@@ -330,12 +388,12 @@ class _ChatScreen extends State<ChatScreen> {
   void onSendMessage(String contentMsg, int type) {
     if (contentMsg != "") {
       messageController.clear();
-      var docRef = Firestore.instance
+      var docRef = FirebaseFirestore.instance
           .collection('message')
           .doc(chatId)
           .collection(chatId)
           .doc(DateTime.now().millisecondsSinceEpoch.toString());
-      Firestore.instance.runTransaction((transaction) async {
+      FirebaseFirestore.instance.runTransaction((transaction) async {
         await transaction.set(
           docRef,
           <String, dynamic>{
@@ -350,7 +408,8 @@ class _ChatScreen extends State<ChatScreen> {
       listScrollController.animateTo(0.0,
           duration: Duration(microseconds: 300), curve: Curves.easeOut);
     } else {
-      Fluttertoast.showToast(msg: 'Empty message cannot send.');
+      Fluttertoast.showToast(
+          msg: 'Please type a message', gravity: ToastGravity.CENTER);
     }
   }
 
@@ -369,14 +428,13 @@ class _ChatScreen extends State<ChatScreen> {
     StorageUploadTask storageUploadTask = storageReference.putFile(imageFile);
     StorageTaskSnapshot storageTaskSnapshot =
         await storageUploadTask.onComplete;
-    storageTaskSnapshot.ref.getDownloadURL().then(
-        (dynamic value) => (dynamic downlodUrl) {
-              imageUrl = downlodUrl.toString();
-              setState(() {
-                isLoading = false;
-                // onSendMessage(imageUrl,1);
-              });
-            }, onError: (String error) {
+    storageTaskSnapshot.ref.getDownloadURL().then((dynamic downlodUrl) {
+      imageUrl = downlodUrl.toString();
+      setState(() {
+        isLoading = false;
+        onSendMessage(imageUrl, 1);
+      });
+    }, onError: (String error) {
       setState(() {
         Fluttertoast.showToast(
           msg: "Error: " + error,
