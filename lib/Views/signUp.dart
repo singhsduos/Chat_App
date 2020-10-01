@@ -64,6 +64,7 @@ class _SignUpState extends State<SignUp> {
           'email': emailTextEditingController.text.trim(),
           'id': FirebaseAuth.instance.currentUser.uid,
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+          'chattingWith': null,
         }).then((dynamic value) {
           if (signedInUser != null) {
             Fluttertoast.showToast(msg: "SignUp successful");

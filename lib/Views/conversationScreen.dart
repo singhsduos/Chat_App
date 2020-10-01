@@ -66,6 +66,7 @@ class ConversationScreen extends StatelessWidget {
               ),
               //  textAlign: TextAlign.right
             ),
+            
           ),
         ),
       ),
@@ -112,14 +113,14 @@ class _ChatScreen extends State<ChatScreen> {
   @override
   void initState() {
     // isDisplaySticker = false;
+
+    super.initState();
     isLoading = false;
     chatId = "";
     readLocal();
-
-    super.initState();
   }
 
-  void readLocal() async {
+  dynamic readLocal() async {
     preferences = await SharedPreferences.getInstance();
     id = preferences.getString('id') ?? "";
     if (id.hashCode <= chatRoomid.hashCode) {
@@ -154,50 +155,67 @@ class _ChatScreen extends State<ChatScreen> {
   @override
   Widget build(BuildContext context) {
     return Container(
-         child: Scaffold(
-           
-        body: Column(
-          children: <Widget>[
-            createMessageList(),
+      child: Stack(
+        children: <Widget>[
+          Column(
+            children: <Widget>[
+              //create list of message
+              createMessageList(),
 
-            createInput(),  
-          
-            isDisplaySticker  ? Container(child: emojiContainer()) : Container(),
-         
+              createInput(),
 
-            // if (isDisplaySticker) Container(child: emojiContainer()) else Container(),
-           
-          ],
-        ),
+              isDisplaySticker
+                  ? Container(child: emojiContainer())
+                  : Container(),
+
+              // if (isDisplaySticker) Container(child: emojiContainer()) else Container(),
+            ],
+          ),
+          // createLoading(),
+        ],
       ),
     );
   }
 
+  // Widget  createLoading(){
+  //  return Positioned(child: isloading != null? circularProgress(): Container()); 
+  // }
+
   Widget createMessageList() {
-    return Expanded(
+    return Flexible(
       child: chatId == ""
-          ? Container()
+          ? Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
+              ),
+            )
+          // Container()
           : StreamBuilder(
               stream: FirebaseFirestore.instance
                   .collection('message')
                   .doc(chatId)
                   .collection(chatId)
                   .orderBy('timestamp:', descending: true)
-                  .limit(20)
+                  .limit(1000)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
                 if (!snapshot.hasData) {
-                  return Container();
+                  return Center(
+                    child: CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
+                    ),
+                  );
+                  // return Container();
                 } else {
-                  listMessage = snapshot.data.documents;
+                  listMessage = snapshot.data.docs.length;
                   return ListView.builder(
                     padding: EdgeInsets.all(10),
-                    itemBuilder: (context, index) =>
-                        createItem(index, snapshot.data.docs[index]),
-                    itemCount: int.parse('${snapshot.data.docs.length}'),
+                    itemCount: snapshot.data.docs.length,
                     reverse: true,
                     controller: listScrollController,
+                    itemBuilder: (context, index) =>
+                        createItem(index, snapshot.data.docs[index]),
                   );
                 }
               },
@@ -232,8 +250,7 @@ class _ChatScreen extends State<ChatScreen> {
     if (document.data()['idFrom'] == id) {
       return Row(
         children: <Widget>[
-          document.data()["type"] == 0
-              ? Container(
+          if (document.data()['type'] == 0) Container(
                   child: Text(
                     document.data()['content'].toString(),
                     style: TextStyle(
@@ -248,10 +265,8 @@ class _ChatScreen extends State<ChatScreen> {
                       color: Colors.cyan,
                       borderRadius: BorderRadius.circular(8.0)),
                   margin: EdgeInsets.only(
-                      bottom: isLastMsgRight(index) ? 20 : 10, right: 10.0),
-                )
-              //Image msg
-              : Container(
+                      bottom: isLastMsgRight(index) ? 20.0 : 10.0 , right: 10.0),
+                ) else Container(
                   child: FlatButton(
                     child: Material(
                       child: CachedNetworkImage(
@@ -320,8 +335,8 @@ class _ChatScreen extends State<ChatScreen> {
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.cyan),
                             ),
-                            width: 35,
-                            height: 35,
+                            width: 35.0,
+                            height: 35.0,
                             padding: EdgeInsets.all(10.0),
                           ),
                           imageUrl: recevierAvatar,
@@ -348,7 +363,7 @@ class _ChatScreen extends State<ChatScreen> {
                               fontWeight: FontWeight.w400),
                         ),
                         padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                        width: 200,
+                        width: 200.0,
                         decoration: BoxDecoration(
                             color: Color(0xfff99AAAB),
                             borderRadius: BorderRadius.circular(8.0)),
@@ -435,24 +450,24 @@ class _ChatScreen extends State<ChatScreen> {
 
   Widget emojiContainer() {
     return EmojiPicker(
-        bgColor: Colors.white,
-        indicatorColor: Colors.cyan,
-        rows: 4,
-        columns: 8,
-        onEmojiSelected: (emoji, category) {
-    setState(() {
-      isWriting = true;
-    });
-    messageController.text = messageController.text + emoji.emoji;
-        },
-        recommendKeywords: ['face', 'happy', 'party', 'sad'],
-        numRecommended: 50,
-      );
+      bgColor: Colors.white,
+      indicatorColor: Colors.cyan,
+      rows: 4,
+      columns: 8,
+      onEmojiSelected: (emoji, category) {
+        setState(() {
+          isWriting = true;
+        });
+        messageController.text = messageController.text + emoji.emoji;
+      },
+      recommendKeywords: ['face', 'happy', 'party', 'sad'],
+      numRecommended: 50,
+    );
   }
 
   Widget createInput() {
     return Expanded(
-          child: Container(
+      child: Container(
         padding: EdgeInsets.all(5),
 
         alignment: Alignment.bottomCenter,
@@ -476,7 +491,7 @@ class _ChatScreen extends State<ChatScreen> {
               color: Colors.transparent,
             ),
 
-            Expanded(
+            Flexible(
               child: Stack(
                 alignment: Alignment.centerRight,
                 children: <Widget>[
@@ -489,11 +504,6 @@ class _ChatScreen extends State<ChatScreen> {
                         color: Colors.white, letterSpacing: 1.0, fontSize: 17),
                     cursorColor: Colors.cyan,
                     cursorWidth: 3,
-                    // onChanged: (val) {
-                    //   (val.length > 0 && val.trim() != "")
-                    //       ? setWritingTo(true)
-                    //       : setWritingTo(false);
-                    // },
                     decoration: InputDecoration(
                       hintText: "Type a message",
                       hintStyle: TextStyle(
@@ -510,6 +520,7 @@ class _ChatScreen extends State<ChatScreen> {
                       fillColor: Color(0xfff99AAAB),
                     ),
                   ),
+                  //emoji button
                   IconButton(
                     splashColor: Colors.transparent,
                     color: Colors.white60,
@@ -517,7 +528,7 @@ class _ChatScreen extends State<ChatScreen> {
                     icon: Icon(Icons.emoji_emotions),
                     onPressed: () {
                       if (!isDisplaySticker) {
-                          hideKeyboard();
+                        hideKeyboard();
                         showEmojiContainer();
                       } else {
                         showKeyboard();
