@@ -6,7 +6,6 @@ import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:emoji_picker/emoji_picker.dart';
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
 
-import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -110,43 +109,6 @@ class _ChatScreen extends State<ChatScreen> {
   dynamic listMessage;
   SharedPreferences preferences;
 
-  Stream<QuerySnapshot> chatMessagesStream;
-
-  // Widget ChatMessageList() {
-  //   return StreamBuilder(
-  //     stream: chatMessagesStream,
-  //     builder: (BuildContext context, AsyncSnapshot snapshot) {
-  //       return snapshot.hasData
-  //           ? ListView.builder(
-  //               // ignore: prefer_const_literals_to_create_immutables
-  //               itemCount: (int.parse('${snapshot.data.documents.length}')),
-  //               itemBuilder: (context, index) {
-  //                 return MessageTile(
-  //                   '${snapshot.data.documents[index].data["message"]}',
-  //                   Constants.myName ==
-  //                       snapshot.data.documents[index].data["sendBy"],
-  //                 );
-  //               })
-  //           : Container();
-  //     },
-  //   );
-  // }
-
-  dynamic sendMessage() {
-    if (messageController.text.isNotEmpty) {
-      // ignore: always_specify_types
-      final Map<String, dynamic> messageMap = <String, dynamic>{
-        'message': messageController.text,
-        'sendBy': Constants.myName,
-        'time': DateTime.now().millisecondsSinceEpoch,
-      };
-      databaseMethods.addConversationMessages(widget.chatRoomid, messageMap);
-      setState(() {
-        messageController.text = "";
-      });
-    }
-  }
-
   @override
   void initState() {
     // isDisplaySticker = false;
@@ -194,9 +156,7 @@ class _ChatScreen extends State<ChatScreen> {
     return Container(
       child: Stack(
         children: <Widget>[
-          Flexible(
-            child: createMessageList(),
-          ),
+          createMessageList(),
 
           isDisplaySticker ? emojiContainer() : Container(),
           // if (isDisplaySticker) Container(child: emojiContainer()) else Container(),
@@ -262,8 +222,6 @@ class _ChatScreen extends State<ChatScreen> {
 
   Widget createItem(int index, DocumentSnapshot document) {
     //sender messages display-right side
-    documentSnapshot:
-    document;
     if (document.data()['idFrom'] == id) {
       return Row(
         children: <Widget>[
@@ -435,7 +393,9 @@ class _ChatScreen extends State<ChatScreen> {
                                 MaterialPageRoute(
                                   builder: (BuildContext context) =>
                                       FullScreenImagePage(
-                                          url: document.data()['content'].toString()),
+                                          url: document
+                                              .data()['content']
+                                              .toString()),
                                 ));
                           },
                         ),
@@ -449,8 +409,8 @@ class _ChatScreen extends State<ChatScreen> {
                 ? Container(
                     child: Text(
                       DateFormat('dd MMMM,yyyy - hh:mm:aa').format(
-                          DateTime.fromMillisecondsSinceEpoch(
-                              int.parse(document.data()['timestamp'].toString()))),
+                          DateTime.fromMillisecondsSinceEpoch(int.parse(
+                              document.data()['timestamp'].toString()))),
                       style: const TextStyle(
                           color: Colors.grey,
                           fontSize: 12.0,
@@ -644,43 +604,5 @@ class _ChatScreen extends State<ChatScreen> {
         isLoading = false;
       });
     });
-  }
-}
-
-class MessageTile extends StatelessWidget {
-  final String message;
-  final bool isSendByMe;
-  MessageTile(this.message, this.isSendByMe);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.only(
-          left: isSendByMe ? 0 : 24, right: isSendByMe ? 24 : 0),
-      margin: EdgeInsets.symmetric(vertical: 6),
-      width: MediaQuery.of(context).size.width,
-      alignment: isSendByMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: isSendByMe ? [Colors.cyan] : [const Color(0xfff99AAAB)],
-            ),
-            borderRadius: isSendByMe
-                ? BorderRadius.only(
-                    topLeft: Radius.circular(23),
-                    topRight: Radius.circular(23),
-                    bottomLeft: Radius.circular(23))
-                : BorderRadius.only(
-                    topLeft: Radius.circular(23),
-                    topRight: Radius.circular(23),
-                    bottomRight: Radius.circular(23))),
-        child: Text(
-          message,
-          style:
-              TextStyle(color: Colors.white, letterSpacing: 1.0, fontSize: 17),
-        ),
-      ),
-    );
   }
 }
