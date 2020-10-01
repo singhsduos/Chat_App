@@ -18,7 +18,6 @@ class Search extends StatefulWidget {
   State createState() => _SearchState(currentUserId: currentUserId);
 }
 
-String _myName;
 
 class _SearchState extends State<Search> {
   String currentUserId;

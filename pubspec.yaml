@@ -52,6 +52,7 @@ dependencies:
   emoji_picker:
   image_picker:
   firebase_storage:
+  photo_view:
 
     
 
