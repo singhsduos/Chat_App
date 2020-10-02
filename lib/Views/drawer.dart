@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ChatApp/modal/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -17,6 +18,7 @@ class SideDrawer extends StatefulWidget {
 }
 
 class _SideDrawerState extends State<SideDrawer> {
+  // Users users;
   bool isDarkTheme = false;
   SharedPreferences preferences;
   String username = '';
@@ -49,6 +51,8 @@ class _SideDrawerState extends State<SideDrawer> {
     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
+
+    User user = FirebaseAuth.instance.currentUser;
 
     // void _initPrefs() async {
     //   if (prefs == null) prefs = await SharedPreferences.getInstance();
@@ -85,7 +89,11 @@ class _SideDrawerState extends State<SideDrawer> {
                 ),
               ),
               currentAccountPicture: CircleAvatar(
-                backgroundImage: CachedNetworkImageProvider(photoUrl),
+                backgroundColor: Colors.black,
+                backgroundImage:
+                    //  photoUrl==null
+                    // ? AssetImage('images/placeHolder.jpg'):
+                    CachedNetworkImageProvider(photoUrl),
               ),
               decoration: BoxDecoration(color: Colors.cyan),
             ),

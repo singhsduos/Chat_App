@@ -14,7 +14,7 @@ class Settings extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-         leading: IconButton(
+        leading: IconButton(
           icon: const Icon(
             Icons.arrow_back_ios,
             color: Colors.white,
@@ -31,7 +31,6 @@ class Settings extends StatelessWidget {
             letterSpacing: 1.0,
             color: Colors.white,
           ),
-
         ),
         centerTitle: true,
       ),
@@ -57,7 +56,10 @@ class _SettingScreenState extends State<SettingScreen> {
   String photoUrl = '';
   String aboutMe = '';
   File imageFileAvatar;
+  final FocusNode usernameFocusNode = FocusNode();
+  final FocusNode aboutMeFocusNode = FocusNode();
   bool isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -72,7 +74,9 @@ class _SettingScreenState extends State<SettingScreen> {
     aboutMe = preferences.getString('aboutMe');
     createdAt = preferences.getString('createdAt');
 
-    usernameTextEditingController = TextEditingController(text: username);
+    usernameTextEditingController = TextEditingController(
+      text: username,
+    );
     aboutMeTextEditingController = TextEditingController(text: aboutMe);
 
     setState(() {});
@@ -143,24 +147,127 @@ class _SettingScreenState extends State<SettingScreen> {
                                   BorderRadius.all(Radius.circular(125.0)),
                               clipBehavior: Clip.hardEdge,
                             ),
-                      IconButton(
-                        icon: Icon(
-                          Icons.camera_alt,
-                          size: 50.0,
-                          color: Color(0xfff99AAAB),
+                      RawMaterialButton(
+                        shape: CircleBorder(),
+                        padding: EdgeInsets.all(15.0),
+                        elevation: 2.0,
+                        child: Icon(
+                          Icons.add_a_photo,
+                          color: Colors.white,
                         ),
-                        onPressed: getImage,
-                        padding: EdgeInsets.all(0.0),
+                        fillColor: Colors.cyan,
                         splashColor: Colors.transparent,
-                        highlightColor: Colors.transparent,
-                        iconSize: 200.0,
+                        onPressed: getImage,
                       ),
                     ],
                   ),
                 ),
                 width: double.infinity,
                 margin: EdgeInsets.all(20.0),
-              )
+              ),
+              //Input fields
+              Column(
+                children: <Widget>[
+                  Padding(
+                    padding: EdgeInsets.all(1.0),
+                    child:
+                        isLoading ? CircularProgressIndicator() : Container(),
+                  ),
+                  //Username
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: ListTile(
+                      leading: Icon(Icons.person),
+                      trailing: Icon(
+                        Icons.edit,
+                        color: Colors.cyan,
+                      ),
+                      title: Text(
+                        'Profile Name: ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                            fontSize: 20),
+                      ),
+
+                      //username
+                      subtitle: TextField(
+                        decoration: InputDecoration(
+                          hintText: "Your Username",
+                          // contentPadding: EdgeInsets.all(5.0),
+                          hintStyle: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black87,
+                              fontSize: 17),
+                        ),
+                        controller: usernameTextEditingController,
+                        onChanged: (value) {
+                          username = value;
+                        },
+                        focusNode: usernameFocusNode,
+                      ),
+                    ),
+                    //  margin: EdgeInsets.only(right: 0.0),
+                  ),
+                  // aboutMe -userBio
+                  Container(
+                    alignment: Alignment.topLeft,
+                    child: ListTile(
+                      leading: Icon(Icons.error_outline_outlined),
+                      trailing: Icon(
+                        Icons.edit,
+                        color: Colors.cyan,
+                      ),
+                      title: Text(
+                        'My Bio: ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                            fontSize: 20),
+                      ),
+
+                      //username
+                      subtitle: TextField(
+                        decoration: InputDecoration(
+                          hintText: "Tell about yourself",
+                          // contentPadding: EdgeInsets.all(5.0),
+                          hintStyle: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              color: Colors.black87,
+                              fontSize: 17),
+                        ),
+                        controller: aboutMeTextEditingController,
+                        onChanged: (value) {
+                          aboutMe = value;
+                        },
+                        focusNode: aboutMeFocusNode,
+                      ),
+                    ),
+                    //  margin: EdgeInsets.only(right: 0.0),
+                  ),
+                ],
+                crossAxisAlignment: CrossAxisAlignment.start,
+              ),
+              //update Button
+              SizedBox(
+                height: 40,
+              ),
+              InkWell(
+                // splashColor: Colors.blue,
+                highlightColor: Colors.transparent,
+                onTap: () => print('clicked'),
+                child: Container(
+                  alignment: Alignment.center,
+                  width: MediaQuery.of(context).size.width/3.0,
+                  padding: EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: const Color(0xfff4BCFFA),
+                    borderRadius: BorderRadius.all(Radius.circular(80.0)),
+                  ),
+                  child: Text('Update',
+                      style: TextStyle(color: Colors.white, fontSize: 17)),
+                ),
+              ),
             ],
           ),
         )

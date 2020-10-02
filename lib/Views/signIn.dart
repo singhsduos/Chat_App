@@ -108,7 +108,7 @@ class _SignInState extends State<SignIn> {
     print("signed in " + user.displayName);
 
     // try{
-      if (user != null) {
+    if (user != null) {
       // Check is already sign up
       final QuerySnapshot result = await FirebaseFirestore.instance
           .collection('users')
@@ -126,6 +126,7 @@ class _SignInState extends State<SignIn> {
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
           'chattingWith': null,
           'email': user.email,
+          'aboutMe': 'Hey there! I am using ChaTooApp',
         });
 
         // Write data to local
@@ -140,6 +141,7 @@ class _SignInState extends State<SignIn> {
         await prefs.setString('username', '${documents[0].data()['username']}');
         await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
         await prefs.setString('email', '${documents[0].data()['email']}');
+        await prefs.setString('aboutMe', '${documents[0].data()['aboutMe']}');
       }
       Fluttertoast.showToast(msg: "SignIn successful");
       this.setState(() {
@@ -150,7 +152,8 @@ class _SignInState extends State<SignIn> {
           context,
           MaterialPageRoute<MaterialPageRoute>(
               builder: (BuildContext context) => ChatRoom(uid: user.uid)));
-    };
+    }
+    ;
   }
 
   bool _obscureText = true;
@@ -218,17 +221,17 @@ class _SignInState extends State<SignIn> {
                           ),
                           TextFormField(
                             validator: (value) {
-                          if (value.isEmpty) {
-                            return 'Enter correct Password';
-                          }
-                          if (value.length < 7) {
-                            return 'Enter correct Password';
-                          }
-                          if (value.length > 20) {
-                            return 'Enter correct Password';
-                          }
-                          return null;
-                        },
+                              if (value.isEmpty) {
+                                return 'Enter correct Password';
+                              }
+                              if (value.length < 7) {
+                                return 'Enter correct Password';
+                              }
+                              if (value.length > 20) {
+                                return 'Enter correct Password';
+                              }
+                              return null;
+                            },
                             controller: passwordTextEditingController,
                             obscureText: _obscureText,
                             style: TextStyle(color: Colors.cyan),
@@ -412,4 +415,3 @@ class _SignInState extends State<SignIn> {
     );
   }
 }
-
