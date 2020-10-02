@@ -146,7 +146,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       IconButton(
                         icon: Icon(
                           Icons.camera_alt,
-                          size: 100.0,
+                          size: 50.0,
                           color: Color(0xfff99AAAB),
                         ),
                         onPressed: getImage,
