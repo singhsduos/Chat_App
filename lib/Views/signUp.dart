@@ -13,7 +13,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'chatRoomsScreen.dart';
-import 'package:ChatApp/modal/user.dart';
 
 import '../Widget/widget.dart';
 
@@ -65,6 +64,8 @@ class _SignUpState extends State<SignUp> {
           'id': FirebaseAuth.instance.currentUser.uid,
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
           'chattingWith': null,
+          'photoUrl' : user.photoURL,
+          'aboutMe' : 'Hey there! I am using ChaTooApp',
         }).then((dynamic value) {
           if (signedInUser != null) {
             Fluttertoast.showToast(msg: "SignUp successful");
@@ -142,6 +143,7 @@ class _SignUpState extends State<SignUp> {
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
           'chattingWith': null,
           'email': user.email,
+          'aboutMe' : 'Hey there! I am using ChaTooApp'
         });
 
         // Write data to local
@@ -156,6 +158,8 @@ class _SignUpState extends State<SignUp> {
         await prefs.setString('username', '${documents[0].data()['username']}');
         await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
         await prefs.setString('email', '${documents[0].data()['email']}');
+        await prefs.setString('aboutMe', '${documents[0].data()['aboutMe']}');
+
       }
       Fluttertoast.showToast(msg: 'SignUp successful');
       this.setState(() {

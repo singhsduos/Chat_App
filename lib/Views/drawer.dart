@@ -1,3 +1,4 @@
+import 'package:ChatApp/Views/account_setting.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
 import 'package:flutter/material.dart';
@@ -34,31 +35,95 @@ class _SideDrawerState extends State<SideDrawer> {
         child: ListView(
           padding: EdgeInsets.zero,
           children: [
-            Consumer<ThemeNotifier>(
-              builder: (BuildContext context, ThemeNotifier notifier, Widget child) => SwitchListTile(
-                title: const Text(
-                  'Switch DarkMode',
-                  style: TextStyle(
-                    fontSize: 17.0,
-                    letterSpacing: 1.0,
-                    fontWeight: FontWeight.bold,
+            Container(
+              decoration: BoxDecoration(
+                  border:
+                      Border(bottom: BorderSide(color: Colors.grey.shade400))),
+              child: Consumer<ThemeNotifier>(
+                builder: (BuildContext context, ThemeNotifier notifier,
+                        Widget child) =>
+                    SwitchListTile(
+                      
+                  title: const Text(
+                    'Dark theme',
+                    style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        )
                   ),
+                   subtitle: Text('Reduce glare and improve night viewing',
+                        style: TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.normal,
+                          letterSpacing: 1.0,
+                        )),
+                  value: isDarkTheme,
+                  activeTrackColor: Colors.blueGrey,
+                  activeColor: Colors.cyan,
+                  onChanged: (bool value) {
+                    setState(() {
+                      isDarkTheme = value;
+                      if (!value) {
+                        _changeTheme(context, MyThemeKeys.LIGHT);
+                      } else {
+                        _changeTheme(context, MyThemeKeys.DARK);
+                      }
+                    });
+                  },
                 ),
-                value: isDarkTheme,
-                activeTrackColor: Colors.blueGrey,
-                activeColor: Colors.cyan,
-                onChanged: (bool value) {
-                  setState(() {
-                    isDarkTheme = value;
-                    if (!value) {
-                      _changeTheme(context, MyThemeKeys.LIGHT);
-                    } else {
-                      _changeTheme(context, MyThemeKeys.DARK);
-                    }
-                  });
-                },
               ),
             ),
+            Container(
+              child: InkWell(
+                splashColor: Colors.cyan,
+                onTap: () {
+                  Navigator.push<MaterialPageRoute>(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) => Settings()));
+                },
+                child: Container(
+                  child: ListTile(
+                    leading: Icon(Icons.person),
+                    trailing: Icon(Icons.edit),
+                    title: Text('Accounts Settings',
+                        style: TextStyle(
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        )),
+                    subtitle: Text('Personal',
+                        style: TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.normal,
+                          letterSpacing: 1.0,
+                        )),
+                  ),
+                ),
+              ),
+              decoration: BoxDecoration(
+                  border:
+                      Border(bottom: BorderSide(color: Colors.grey.shade400))),
+            ),
+            //     ListTile(
+            //   leading: Icon(Icons.person),
+            //   trailing: Icon(Icons.edit),
+            //   title: Text('Accounts Settings',
+            //       style: TextStyle(
+            //         fontSize: 20.0,
+            //         fontWeight: FontWeight.bold,
+            //         letterSpacing: 1.0,
+
+            //       )),
+            //   subtitle: Text('Personal',
+            //       style: TextStyle(
+            //         fontSize: 17.0,
+            //         fontWeight: FontWeight.normal,
+            //         letterSpacing: 1.0,
+
+            //       )),
+            // ),
           ],
         ),
       ),

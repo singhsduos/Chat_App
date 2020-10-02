@@ -66,7 +66,6 @@ class ConversationScreen extends StatelessWidget {
               ),
               //  textAlign: TextAlign.right
             ),
-            
           ),
         ),
       ),
@@ -120,7 +119,7 @@ class _ChatScreen extends State<ChatScreen> {
     readLocal();
   }
 
-  dynamic readLocal() async {
+  void readLocal() async {
     preferences = await SharedPreferences.getInstance();
     id = preferences.getString('id') ?? "";
     if (id.hashCode <= chatRoomid.hashCode) {
@@ -178,7 +177,7 @@ class _ChatScreen extends State<ChatScreen> {
   }
 
   // Widget  createLoading(){
-  //  return Positioned(child: isloading != null? circularProgress(): Container()); 
+  //  return Positioned(child: isLoading != null? CircularProgressIndicator(): Container());
   // }
 
   Widget createMessageList() {
@@ -196,7 +195,7 @@ class _ChatScreen extends State<ChatScreen> {
                   .doc(chatId)
                   .collection(chatId)
                   .orderBy('timestamp:', descending: true)
-                  .limit(1000)
+                  .limit(20)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -250,51 +249,43 @@ class _ChatScreen extends State<ChatScreen> {
     if (document.data()['idFrom'] == id) {
       return Row(
         children: <Widget>[
-          if (document.data()['type'] == 0) Container(
-                  child: Text(
-                    document.data()['content'].toString(),
-                    style: TextStyle(
-                        color: Colors.white,
-                        letterSpacing: 1.0,
-                        fontSize: 17,
-                        fontWeight: FontWeight.w500),
-                  ),
-                  padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                  width: 200,
-                  decoration: BoxDecoration(
-                      color: Colors.cyan,
-                      borderRadius: BorderRadius.circular(8.0)),
-                  margin: EdgeInsets.only(
-                      bottom: isLastMsgRight(index) ? 20.0 : 10.0 , right: 10.0),
-                ) else Container(
-                  child: FlatButton(
-                    child: Material(
-                      child: CachedNetworkImage(
-                        placeholder: (context, url) => Container(
-                          child: CircularProgressIndicator(
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.cyan),
-                          ),
-                          width: 200,
-                          height: 200,
-                          padding: EdgeInsets.all(70.0),
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(8.0)),
-                          ),
-                        ),
-                        errorWidget: (context, url, dynamic error) => Material(
-                          child: Image.asset(
-                            'images/no_image.jpg',
-                            width: 200.0,
-                            height: 200,
-                            fit: BoxFit.cover,
-                          ),
-                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                          clipBehavior: Clip.hardEdge,
-                        ),
-                        imageUrl: document.data()['content'].toString(),
+          if (document.data()['type'] == 0)
+            Container(
+              child: Text(
+                document.data()['content'].toString(),
+                style: TextStyle(
+                    color: Colors.white,
+                    letterSpacing: 1.0,
+                    fontSize: 17,
+                    fontWeight: FontWeight.w500),
+              ),
+              padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+              width: 200,
+              decoration: BoxDecoration(
+                  color: Colors.cyan, borderRadius: BorderRadius.circular(8.0)),
+              margin: EdgeInsets.only(
+                  bottom: isLastMsgRight(index) ? 20.0 : 10.0, right: 10.0),
+            )
+          else
+            Container(
+              child: FlatButton(
+                child: Material(
+                  child: CachedNetworkImage(
+                    placeholder: (context, url) => Container(
+                      child: CircularProgressIndicator(
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
+                      ),
+                      width: 200,
+                      height: 200,
+                      padding: EdgeInsets.all(70.0),
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                      ),
+                    ),
+                    errorWidget: (context, url, dynamic error) => Material(
+                      child: Image.asset(
+                        'images/no_image.jpg',
                         width: 200.0,
                         height: 200,
                         fit: BoxFit.cover,
@@ -302,19 +293,26 @@ class _ChatScreen extends State<ChatScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(8.0)),
                       clipBehavior: Clip.hardEdge,
                     ),
-                    onPressed: () {
-                      Navigator.push<MaterialPageRoute>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) =>
-                                FullScreenImagePage(
-                                    url: document.data()['content'].toString()),
-                          ));
-                    },
+                    imageUrl: document.data()['content'].toString(),
+                    width: 200.0,
+                    height: 200,
+                    fit: BoxFit.cover,
                   ),
-                  margin: EdgeInsets.only(
-                      bottom: isLastMsgRight(index) ? 20 : 10, right: 10.0),
+                  borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                  clipBehavior: Clip.hardEdge,
                 ),
+                onPressed: () {
+                  Navigator.push<MaterialPageRoute>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => FullScreenImagePage(
+                            url: document.data()['content'].toString()),
+                      ));
+                },
+              ),
+              margin: EdgeInsets.only(
+                  bottom: isLastMsgRight(index) ? 20 : 10, right: 10.0),
+            ),
         ],
         mainAxisAlignment: MainAxisAlignment.end,
       );
@@ -499,7 +497,6 @@ class _ChatScreen extends State<ChatScreen> {
                     controller: messageController,
                     focusNode: focusNode,
                     onTap: () => hideEmojiContainer(),
-
                     style: TextStyle(
                         color: Colors.white, letterSpacing: 1.0, fontSize: 17),
                     cursorColor: Colors.cyan,
@@ -614,15 +611,15 @@ class _ChatScreen extends State<ChatScreen> {
       });
     }, onError: (String error) {
       setState(() {
-        Fluttertoast.showToast(
+        isLoading = false;
+      });
+       Fluttertoast.showToast(
           msg: "Error: " + error,
           textColor: Color(0xFFFFFFFF),
           backgroundColor: Colors.cyan,
           fontSize: 16.0,
           timeInSecForIosWeb: 3,
         );
-        isLoading = false;
-      });
     });
   }
 }
