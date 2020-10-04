@@ -82,8 +82,8 @@ class AuthMethods {
   Future<void> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
-      await googleSignIn.signOut();
-      // await googleSignIn.disconnect();
+      // await googleSignIn.signOut();
+      await googleSignIn.disconnect();
     } catch (e) {
       print(e.toString());
     }

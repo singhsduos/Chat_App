@@ -1,14 +1,10 @@
 import 'dart:async';
 import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-
 import 'package:ChatApp/Views/conversationScreen.dart';
-import 'package:ChatApp/Widget/widget.dart';
-import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class Search extends StatefulWidget {
@@ -164,7 +160,7 @@ class UserResult extends StatelessWidget {
         context,
         MaterialPageRoute<MaterialPageRoute>(
             builder: (BuildContext context) => ConversationScreen(
-                  chatRoomid: users.userId,
+                  recevierId: users.userId,
                   recevierAvatar: users.photoUrl,
                   recevierName: users.username,
                 )));
@@ -184,7 +180,7 @@ class UserResult extends StatelessWidget {
               },
               child: ListTile(
                 leading: CircleAvatar(
-                  // backgroundColor: Colors.black,
+                  backgroundColor: Colors.black,
                   
                   backgroundImage: CachedNetworkImageProvider(users.photoUrl),
                 ),

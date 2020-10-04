@@ -1,11 +1,16 @@
+import 'dart:async';
 import 'dart:io';
-
+import 'dart:ui';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_sign_in/google_sign_in.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+import 'package:path/path.dart';
 
 class Settings extends StatelessWidget {
   const Settings({Key key}) : super(key: key);
@@ -55,6 +60,7 @@ class _SettingScreenState extends State<SettingScreen> {
   String createdAt = '';
   String photoUrl = '';
   String aboutMe = '';
+  String id = '';
   File imageFileAvatar;
   final FocusNode usernameFocusNode = FocusNode();
   final FocusNode aboutMeFocusNode = FocusNode();
@@ -73,6 +79,7 @@ class _SettingScreenState extends State<SettingScreen> {
     email = preferences.getString('email');
     aboutMe = preferences.getString('aboutMe');
     createdAt = preferences.getString('createdAt');
+    id = preferences.getString('id');
 
     usernameTextEditingController = TextEditingController(
       text: username,
@@ -82,21 +89,84 @@ class _SettingScreenState extends State<SettingScreen> {
     setState(() {});
   }
 
+  final picker = ImagePicker();
+
   Future getImage() async {
-    File newImagefile =
-        await ImagePicker.pickImage(source: ImageSource.gallery);
+    final newImagefile = await picker.getImage(source: ImageSource.gallery);
 
     if (newImagefile != null) {
       setState(() {
-        this.imageFileAvatar = newImagefile;
+        this.imageFileAvatar = File(newImagefile.path);
         isLoading = true;
       });
     }
-    // uploadImageToFirestoreAndStorage();
+    uploadImageToFirestoreAndStorage();
+  }
+
+  Future uploadImageToFirestoreAndStorage() async {
+    String mFileName = basename(imageFileAvatar.path);
+    StorageReference storageReference =
+        FirebaseStorage.instance.ref().child('uploadsImages/$mFileName');
+    StorageUploadTask storageUploadTask =
+        storageReference.putFile(imageFileAvatar);
+    StorageTaskSnapshot storageTaskSnapshot =
+        await storageUploadTask.onComplete;
+          print('File Uploaded'); 
+    storageTaskSnapshot.ref.getDownloadURL().then((dynamic value) {
+     
+        photoUrl = '$value';
+
+        // ignore: always_specify_types
+        FirebaseFirestore.instance
+            .collection('users')
+            .doc(id)
+            .update(<String, String>{
+          'photoUrl': photoUrl,
+          'aboutMe': aboutMe,
+          'username': username,
+        }).then((data) async {
+          await preferences.setString('photoUrl', photoUrl);
+          setState(() {
+            isLoading = false;
+          });
+          Fluttertoast.showToast(msg: 'Picture updated successfully.');
+        });
+      
+    }, onError: (Object errorMsg) {
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(msg: errorMsg.toString(), gravity: ToastGravity.CENTER);
+    });
+  }
+
+  void updateData() {
+    usernameFocusNode.unfocus();
+    aboutMeFocusNode.unfocus();
+    setState(() {
+      isLoading = false;
+    });
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .update(<String, String>{
+      'photoUrl': photoUrl,
+      'aboutMe': aboutMe,
+      'username': username,
+    }).then((data) async {
+      await preferences.setString('photoUrl', photoUrl);
+      await preferences.setString('aboutMe', aboutMe);
+      await preferences.setString('username', username);
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(msg: 'Profile updated successfully.');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    User user = FirebaseAuth.instance.currentUser;
     return Stack(
       children: <Widget>[
         SingleChildScrollView(
@@ -110,6 +180,7 @@ class _SettingScreenState extends State<SettingScreen> {
                       (imageFileAvatar == null)
                           ? (photoUrl != "")
                               ? Material(
+                                
                                   //displaying existing pic
                                   child: CachedNetworkImage(
                                     placeholder: (context, url) => Container(
@@ -137,6 +208,7 @@ class _SettingScreenState extends State<SettingScreen> {
                                   color: Color(0xfff99AAAB),
                                 )
                           : Material(
+                            
                               child: Image.file(
                                 imageFileAvatar,
                                 width: 200.0,
@@ -168,10 +240,12 @@ class _SettingScreenState extends State<SettingScreen> {
               //Input fields
               Column(
                 children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(1.0),
-                    child:
-                        isLoading ? CircularProgressIndicator() : Container(),
+                  Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(1.0),
+                      child:
+                          isLoading ? CircularProgressIndicator() : Container(),
+                    ),
                   ),
                   //Username
                   Container(
@@ -186,7 +260,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         'Profile Name: ',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            // color: Colors.black87,
                             fontSize: 20),
                       ),
 
@@ -197,7 +271,7 @@ class _SettingScreenState extends State<SettingScreen> {
                           // contentPadding: EdgeInsets.all(5.0),
                           hintStyle: TextStyle(
                               fontWeight: FontWeight.normal,
-                              color: Colors.black87,
+                              // color: Colors.black87,
                               fontSize: 17),
                         ),
                         controller: usernameTextEditingController,
@@ -213,7 +287,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   Container(
                     alignment: Alignment.topLeft,
                     child: ListTile(
-                      leading: Icon(Icons.error_outline_outlined),
+                      leading: Icon(Icons.info_outline),
                       trailing: Icon(
                         Icons.edit,
                         color: Colors.cyan,
@@ -222,7 +296,7 @@ class _SettingScreenState extends State<SettingScreen> {
                         'My Bio: ',
                         style: TextStyle(
                             fontWeight: FontWeight.bold,
-                            color: Colors.black87,
+                            // color: Colors.black87,
                             fontSize: 20),
                       ),
 
@@ -233,7 +307,7 @@ class _SettingScreenState extends State<SettingScreen> {
                           // contentPadding: EdgeInsets.all(5.0),
                           hintStyle: TextStyle(
                               fontWeight: FontWeight.normal,
-                              color: Colors.black87,
+                              // color: Colors.black87,
                               fontSize: 17),
                         ),
                         controller: aboutMeTextEditingController,
@@ -255,10 +329,10 @@ class _SettingScreenState extends State<SettingScreen> {
               InkWell(
                 // splashColor: Colors.blue,
                 highlightColor: Colors.transparent,
-                onTap: () => print('clicked'),
+                onTap: updateData,
                 child: Container(
                   alignment: Alignment.center,
-                  width: MediaQuery.of(context).size.width/3.0,
+                  width: MediaQuery.of(context).size.width / 3.0,
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
                     color: const Color(0xfff4BCFFA),

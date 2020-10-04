@@ -178,7 +178,7 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       if (emailTextEditingController.text.isEmpty == 0 ||
           !emailTextEditingController.text.contains('@')) {
         Fluttertoast.showToast(
-          msg: 'Enter valid email',
+          msg: 'Enter valid email/Internet broken',
           textColor: Color(0xFF53E0BC),
           backgroundColor: Color(0xFFFFFFFF),
           fontSize: 16,

@@ -3,6 +3,7 @@ import 'package:ChatApp/Views/drawer.dart';
 import 'package:ChatApp/Views/search.dart';
 import 'package:ChatApp/Views/search.dart';
 import 'package:ChatApp/Views/signIn.dart';
+import 'package:ChatApp/Widget/customTile.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
 import 'package:ChatApp/Widget/widget.dart';
@@ -15,17 +16,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChatRoom extends StatefulWidget {
-  final String uid;
+  String uid;
   ChatRoom({Key key, @required this.uid}) : super(key: key);
   @override
   _ChatRoomState createState() => _ChatRoomState(uid);
 }
 
+AuthMethods authMethods = AuthMethods();
+DatabaseMethods databaseMethods = DatabaseMethods();
+
 class _ChatRoomState extends State<ChatRoom> {
-  final String uid;
+  String uid;
   _ChatRoomState(this.uid);
-  AuthMethods authMethods = AuthMethods();
-  DatabaseMethods databaseMethods = DatabaseMethods();
 
   Stream chatRoomsStream;
 
@@ -49,20 +51,12 @@ class _ChatRoomState extends State<ChatRoom> {
 
   @override
   void initState() {
-    getUserInfo();
-
     super.initState();
-  }
-
-  dynamic getUserInfo() async {
-    Constants.myName = await HelperFunctions.getUserNameSharedPreference();
-    databaseMethods.getChatRooms(Constants.myName).then((dynamic value) {
+    databaseMethods.getCurrentUser().then((user) {
       setState(() {
-        chatRoomsStream = value as Stream<dynamic>;
+        uid = user.uid;
       });
     });
-
-    setState(() {});
   }
 
   @override
@@ -83,27 +77,6 @@ class _ChatRoomState extends State<ChatRoom> {
             color: Colors.white,
           ),
         ),
-        actions: <Widget>[
-          GestureDetector(
-            onTap: () {
-              Constants.prefs.setBool('userIsLoggedIn', false);
-              authMethods.signOut();
-              Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute<MaterialPageRoute>(
-                      builder: (BuildContext context) => Authenticate()));
-            },
-            child: Container(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.exit_to_app,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ],
         backgroundColor: Colors.cyan,
       ),
       drawer: SideDrawer(),
@@ -124,49 +97,69 @@ class _ChatRoomState extends State<ChatRoom> {
           color: Colors.white,
         ),
       ),
+      body: ChatRoomTile(uid),
     );
   }
 }
 
-class ChatRoomTile extends StatelessWidget {
-  final String userName;
-  final String chatRoomid;
-  final String recevierAvatar;
-  final String recevierName;
-  ChatRoomTile(this.userName, this.chatRoomid, this.recevierAvatar, this.recevierName);
+class ChatRoomTile extends StatefulWidget {
+  final String uid;
+  ChatRoomTile(this.uid);
 
   @override
+  _ChatRoomTileState createState() => _ChatRoomTileState();
+}
+
+class _ChatRoomTileState extends State<ChatRoomTile> {
+  @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-            context,
-            MaterialPageRoute<MaterialPageRoute>(
-                builder: (BuildContext context) => ConversationScreen()));
-      },
-      child: Container(
-        color: Color(0xfff99AAAB),
-        padding: EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-        child: Row(
-          children: <Widget>[
-            Container(
-              height: 40,
-              width: 40,
-              alignment: Alignment.center,
-              decoration: BoxDecoration(
-                  color: Colors.cyan, borderRadius: BorderRadius.circular(40)),
-              child: Text('${userName.substring(0, 1).toUpperCase()}'),
-            ),
-            SizedBox(
-              width: 8,
-            ),
-            Text(
-              userName,
+    return Container(
+      child: ListView.builder(
+        padding: EdgeInsets.all(10),
+        itemCount: 2,
+        itemBuilder: (context, index) {
+          return CustomTile(
+            mini: false,
+            onTap: () {},
+            title: Text(
+              'Neelesh Singh',
               style: TextStyle(
-                  color: Colors.white, letterSpacing: 1.0, fontSize: 16),
+                fontSize: 19,
+              ),
             ),
-          ],
-        ),
+            subtitle: Text(
+              'hello',
+              style: TextStyle(fontSize: 14),
+            ),
+            leading: Container(
+              constraints: BoxConstraints(maxHeight: 60, maxWidth: 60),
+              child: Stack(
+                children: <Widget>[
+                  CircleAvatar(
+                    maxRadius: 30,
+                    backgroundColor: Colors.black,
+                    backgroundImage: NetworkImage(
+                        'https://images.unsplash.com/photo-1565464027194-7957a2295fb7?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=80'),
+                  ),
+                  Align(
+                    alignment: Alignment.bottomRight,
+                    child: Container(
+                      height: 15,
+                      width: 15,
+                      decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: Colors.greenAccent,
+                          border: Border.all(
+                            color: Colors.black,
+                            width: 2,
+                          )),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
       ),
     );
   }

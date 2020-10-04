@@ -1,8 +1,8 @@
 import 'dart:io';
-
-import 'package:ChatApp/modal/user.dart';
+import 'package:ChatApp/helper/authenticate.dart';
+import 'package:ChatApp/helper/constants.dart';
+import 'package:ChatApp/services/auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Views/account_setting.dart';
@@ -18,6 +18,9 @@ class SideDrawer extends StatefulWidget {
 }
 
 class _SideDrawerState extends State<SideDrawer> {
+  AuthMethods authMethods = AuthMethods();
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
   // Users users;
   bool isDarkTheme = false;
   SharedPreferences preferences;
@@ -26,6 +29,7 @@ class _SideDrawerState extends State<SideDrawer> {
   String createdAt = '';
   String photoUrl = '';
   String aboutMe = '';
+  String id = '';
   File imageFileAvatar;
   @override
   void initState() {
@@ -33,13 +37,15 @@ class _SideDrawerState extends State<SideDrawer> {
     readDataFromLocal();
   }
 
-  void readDataFromLocal() async {
+  Future readDataFromLocal() async {
     preferences = await SharedPreferences.getInstance();
     photoUrl = preferences.getString('photoUrl');
     username = preferences.getString('username');
+
     email = preferences.getString('email');
     aboutMe = preferences.getString('aboutMe');
     createdAt = preferences.getString('createdAt');
+    id = preferences.getString('id');
 
     setState(() {});
   }
@@ -54,16 +60,6 @@ class _SideDrawerState extends State<SideDrawer> {
 
     User user = FirebaseAuth.instance.currentUser;
 
-    // void _initPrefs() async {
-    //   if (prefs == null) prefs = await SharedPreferences.getInstance();
-    // }
-
-    // void _loadfromPrefs() async {
-    //   await _initPrefs();
-    //   _darkTheme = prefs.getBool(key) ?? true;
-    //   notifyListeners();
-    // }
-
     return SafeArea(
       child: Drawer(
         child: ListView(
@@ -73,16 +69,16 @@ class _SideDrawerState extends State<SideDrawer> {
               accountName: Text(
                 username,
                 style: TextStyle(
-                  fontSize: 20.0,
+                  fontSize: 17.0,
                   fontWeight: FontWeight.bold,
                   letterSpacing: 1.0,
                   color: Colors.white,
                 ),
               ),
               accountEmail: Text(
-                email,
+                user.email,
                 style: TextStyle(
-                  fontSize: 17.0,
+                  fontSize: 15.0,
                   fontWeight: FontWeight.normal,
                   letterSpacing: 1.0,
                   color: Colors.white,
@@ -90,10 +86,38 @@ class _SideDrawerState extends State<SideDrawer> {
               ),
               currentAccountPicture: CircleAvatar(
                 backgroundColor: Colors.black,
-                backgroundImage:
-                    //  photoUrl==null
-                    // ? AssetImage('images/placeHolder.jpg'):
-                    CachedNetworkImageProvider(photoUrl),
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(45),
+                  child: Stack(
+                    children: <Widget>[
+                      (photoUrl == null)
+                          ? Icon(
+                            Icons.account_circle,
+                            size: 60,
+                            color: Colors.white,
+                          )
+                          : Material(
+                              //displaying existing pic
+                              child: CachedNetworkImage(
+                                placeholder: (context, url) => Container(
+                                  child: CircularProgressIndicator(
+                                      strokeWidth: 2.0,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                          Colors.cyan)),
+                                ),
+                                imageUrl: photoUrl,
+                                fit: BoxFit.cover,
+                                width: 80,
+                                height: 80,
+                              ),
+                            )
+                    ],
+                  ),
+                ),
+
+                //  (user.photoUrl==null)
+                // ? AssetImage('images/placeHolder.jpg'):
+                // CachedNetworkImageProvider(user.photoUrl),
               ),
               decoration: BoxDecoration(color: Colors.cyan),
             ),
@@ -162,6 +186,34 @@ class _SideDrawerState extends State<SideDrawer> {
                   },
                 ),
               ),
+            ),
+            Container(
+              child: InkWell(
+                splashColor: Colors.cyan,
+                onTap: () {
+                  Constants.prefs.setBool('userIsLoggedIn', false);
+                  authMethods.signOut();
+
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute<MaterialPageRoute>(
+                          builder: (BuildContext context) => Authenticate()));
+                },
+                child: Container(
+                  child: ListTile(
+                    leading: Icon(Icons.logout),
+                    title: Text('Logout',
+                        style: TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        )),
+                  ),
+                ),
+              ),
+              // decoration: BoxDecoration(
+              //     border:
+              //         Border(bottom: BorderSide(color: Colors.grey.shade400))),
             ),
           ],
         ),
