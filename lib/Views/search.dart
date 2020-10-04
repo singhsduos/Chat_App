@@ -122,7 +122,7 @@ class _SearchState extends State<Search> {
   }
 
   Container buildNoContent() {
-    final Orientation orientation = MediaQuery.of(context).orientation;
+    // final Orientation orientation = MediaQuery.of(context).orientation;
     return Container(
       child: Center(
         child: ListView(
@@ -187,21 +187,16 @@ class UserResult extends StatelessWidget {
                 title: Text(
                   users.username,
                   style: TextStyle(
-                    color: Colors.black,
-                    fontSize: 16.0,
+                   
+                    fontSize: 17.0,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
                 subtitle: Text(
-                  'Joined: ' +
-                      DateFormat('dd MMMM, yyyy - hh:mm:aa')
-                          .format(
-                            DateTime.fromMillisecondsSinceEpoch(
-                                int.parse(users.createdAt)),
-                          )
-                          .toString(),
+                  users.email,
+
                   style: TextStyle(
-                      color: Colors.grey,
+                     fontWeight: FontWeight.bold,
                       fontSize: 14,
                       fontStyle: FontStyle.italic),
                 ),

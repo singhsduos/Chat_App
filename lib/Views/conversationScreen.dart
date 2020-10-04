@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:core';
 import 'dart:io';
+import 'dart:ui';
 import 'package:intl/intl.dart';
 import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:emoji_picker/emoji_picker.dart';
@@ -106,33 +106,16 @@ class _ChatScreen extends State<ChatScreen> {
   String id;
   dynamic listMessage;
   SharedPreferences preferences;
-  StreamSubscription<QuerySnapshot> subscription;
-  List<DocumentSnapshot> messageList;
-  final CollectionReference collectionReference =
-      Firestore.instance.collection('message');
 
   @override
   void initState() {
     super.initState();
-      subscription = collectionReference.snapshots().listen((datasnapshot) {
-      setState(() {
-        messageList = datasnapshot.documents;
-      });
-    });
     isLoading = false;
     chatId = "";
     readLocal();
   }
 
-  @override
-  void dispose() {
-    // _bannerAd?.dispose();
-    // _interstitialAd?.dispose();
-    subscription?.cancel();
-    super.dispose();
-  }
-
-  void readLocal() async {
+  Future readLocal() async {
     preferences = await SharedPreferences.getInstance();
     id = preferences.getString('id') ?? '';
     if (id.hashCode <= recevierId.hashCode) {
@@ -203,7 +186,6 @@ class _ChatScreen extends State<ChatScreen> {
                   .doc(chatId)
                   .collection(chatId)
                   .orderBy('timestamp:', descending: true)
-                  .limit(20)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -217,13 +199,13 @@ class _ChatScreen extends State<ChatScreen> {
                 }
                 listMessage = snapshot.data.docs;
                 return ListView.builder(
-                    padding: EdgeInsets.all(10.0),
-                    itemCount: snapshot.data.docs.length,
-                    reverse: true,
-                    controller: listScrollController,
-                    itemBuilder: (context, index) {
-                      return createItem(index, snapshot.data.docs[index]);
-                    });
+                  padding: EdgeInsets.all(10.0),
+                  itemCount: snapshot.data.docs.length,
+                  reverse: true,
+                  controller: listScrollController,
+                  itemBuilder: (context, index) =>
+                      createItem(index, snapshot.data.docs[index]),
+                );
               },
             ),
     );
@@ -455,34 +437,6 @@ class _ChatScreen extends State<ChatScreen> {
     }
   }
 
-  // Future<http.Response> sendNotification(
-  //     String message, String sender, String receiver) {
-  //   print("Firebase Token: " + receiver);
-  //   return http.post(
-  //     'https://fcm.googleapis.com/fcm/send',
-  //     headers: <String, String>{
-  //       'Authorization': 'key=$SERVER_KEY',
-  //       'Content-Type': 'application/json; charset=UTF-8',
-  //     },
-  //     body: jsonEncode(<String, dynamic>{
-  //       // "message": {
-  //       "to": "$receiver",
-  //       "collapse_key": "type_a",
-  //       "priority": "high",
-  //       "notification": {
-  //         "title": "$sender",
-  //         "body": "$message",
-  //       },
-  //       "data": {
-  //         "title": "$sender",
-  //         "body": "$message",
-  //         "sound": "default",
-  //         "click_action": "FLUTTER_NOTIFICATION_CLICK",
-  //       }
-  //       // }
-  //     }),
-  //   );
-  // }
   Widget emojiContainer() {
     return EmojiPicker(
       bgColor: Colors.white,
@@ -501,96 +455,98 @@ class _ChatScreen extends State<ChatScreen> {
   }
 
   Widget createInput() {
-    return Container(
-      padding: EdgeInsets.all(5),
+    return Expanded(
+          child: Container(
+        padding: EdgeInsets.all(5),
 
-      alignment: Alignment.bottomCenter,
-      // height: MediaQuery.of(context).size.height,
+        alignment: Alignment.bottomCenter,
+        // height: MediaQuery.of(context).size.height,
 
-      child: Row(
-        children: <Widget>[
-          //image sender icon
-          Material(
-            child: Container(
-              margin: EdgeInsets.symmetric(horizontal: 1.0),
-              child: IconButton(
-                icon: Icon(
-                  Icons.image,
-                  size: 30,
-                ),
-                color: Color(0xfff99AAAB),
-                onPressed: getImage,
-              ),
-            ),
-            color: Colors.transparent,
-          ),
-
-          Flexible(
-            child: Stack(
-              alignment: Alignment.centerRight,
-              children: <Widget>[
-                TextField(
-                  controller: messageController,
-                  focusNode: focusNode,
-                  onTap: () => hideEmojiContainer(),
-                  style: TextStyle(
-                      color: Colors.white, letterSpacing: 1.0, fontSize: 17),
-                  cursorColor: Colors.cyan,
-                  cursorWidth: 3,
-                  decoration: InputDecoration(
-                    hintText: "Type a message...",
-                    hintStyle: TextStyle(
-                      color: Colors.white60,
-                    ),
-                    border: const OutlineInputBorder(
-                        borderRadius: const BorderRadius.all(
-                          const Radius.circular(50.0),
-                        ),
-                        borderSide: BorderSide.none),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                    filled: true,
-                    fillColor: Color(0xfff99AAAB),
+        child: Row(
+          children: <Widget>[
+            //image sender icon
+            Material(
+              child: Container(
+                margin: EdgeInsets.symmetric(horizontal: 1.0),
+                child: IconButton(
+                  icon: Icon(
+                    Icons.image,
+                    size: 30,
                   ),
+                  color: Color(0xfff99AAAB),
+                  onPressed: getImage,
                 ),
-                //emoji button
-                IconButton(
-                  splashColor: Colors.transparent,
-                  color: Colors.white60,
-                  highlightColor: Colors.transparent,
-                  icon: Icon(Icons.emoji_emotions),
-                  onPressed: () {
-                    if (!isDisplaySticker) {
-                      hideKeyboard();
-                      showEmojiContainer();
-                    } else {
-                      showKeyboard();
-                      hideEmojiContainer();
-                    }
-                  },
-                ),
-              ],
+              ),
+              color: Colors.transparent,
             ),
-          ),
-          Material(
-            child: Container(
-              // margin: EdgeInsets.symmetric(horizontal: 0.0),
-              child: RawMaterialButton(
-                shape: CircleBorder(),
-                padding: EdgeInsets.all(15.0),
-                elevation: 2.0,
-                child: Icon(
-                  Icons.send,
-                  color: Colors.white,
-                ),
-                fillColor: Colors.cyan,
-                splashColor: Colors.transparent,
-                onPressed: () => onSendMessage(messageController.text, 0),
+
+            Flexible(
+              child: Stack(
+                alignment: Alignment.centerRight,
+                children: <Widget>[
+                  TextField(
+                    controller: messageController,
+                    focusNode: focusNode,
+                    onTap: () => hideEmojiContainer(),
+                    style: TextStyle(
+                        color: Colors.white, letterSpacing: 1.0, fontSize: 17),
+                    cursorColor: Colors.cyan,
+                    cursorWidth: 3,
+                    decoration: InputDecoration(
+                      hintText: "Type a message",
+                      hintStyle: TextStyle(
+                        color: Colors.white60,
+                      ),
+                      border: const OutlineInputBorder(
+                          borderRadius: const BorderRadius.all(
+                            const Radius.circular(50.0),
+                          ),
+                          borderSide: BorderSide.none),
+                      contentPadding:
+                          EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                      filled: true,
+                      fillColor: Color(0xfff99AAAB),
+                    ),
+                  ),
+                  //emoji button
+                  IconButton(
+                    splashColor: Colors.transparent,
+                    color: Colors.white60,
+                    highlightColor: Colors.transparent,
+                    icon: Icon(Icons.emoji_emotions),
+                    onPressed: () {
+                      if (!isDisplaySticker) {
+                        hideKeyboard();
+                        showEmojiContainer();
+                      } else {
+                        showKeyboard();
+                        hideEmojiContainer();
+                      }
+                    },
+                  ),
+                ],
               ),
             ),
-            // color: Colors.cyan,
-          ),
-        ],
+            Material(
+              child: Container(
+                // margin: EdgeInsets.symmetric(horizontal: 0.0),
+                child: RawMaterialButton(
+                  shape: CircleBorder(),
+                  padding: EdgeInsets.all(15.0),
+                  elevation: 2.0,
+                  child: Icon(
+                    Icons.send,
+                    color: Colors.white,
+                  ),
+                  fillColor: Colors.cyan,
+                  splashColor: Colors.transparent,
+                  onPressed: () => onSendMessage(messageController.text, 0),
+                ),
+              ),
+              // color: Colors.cyan,
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -618,8 +574,6 @@ class _ChatScreen extends State<ChatScreen> {
       });
       listScrollController.animateTo(0.0,
           duration: Duration(microseconds: 300), curve: Curves.easeOut);
-          print('Message Sended');
-
     } else {
       Fluttertoast.showToast(
           msg: 'Please type a message', gravity: ToastGravity.CENTER);
