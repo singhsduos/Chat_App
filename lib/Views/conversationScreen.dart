@@ -1,20 +1,27 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:ui';
+
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/material.dart';
+
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:emoji_picker/emoji_picker.dart';
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:firebase_storage/firebase_storage.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+  
+
+
 
 class ConversationScreen extends StatelessWidget {
   final String recevierId;
@@ -104,14 +111,38 @@ class _ChatScreen extends State<ChatScreen> {
   String imageUrl;
   String chatId;
   String id;
-  dynamic listMessage;
+  List<QueryDocumentSnapshot> listMessage = new List.from(<dynamic>[]);
+  int _limit = 20;
+  final int _limitIncrement = 20;
   SharedPreferences preferences;
+
+  void _scrollListener() {
+    if (listScrollController.offset >=
+            listScrollController.position.maxScrollExtent &&
+        !listScrollController.position.outOfRange) {
+      print("reach the bottom");
+      setState(() {
+        print("reach the bottom");
+        _limit += _limitIncrement;
+      });
+    }
+    if (listScrollController.offset <=
+            listScrollController.position.minScrollExtent &&
+        !listScrollController.position.outOfRange) {
+      print("reach the top");
+      setState(() {
+        print("reach the top");
+      });
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+    listScrollController.addListener(_scrollListener);
     isLoading = false;
     chatId = "";
+    imageUrl = '';
     readLocal();
   }
 
@@ -186,6 +217,7 @@ class _ChatScreen extends State<ChatScreen> {
                   .doc(chatId)
                   .collection(chatId)
                   .orderBy('timestamp:', descending: true)
+                  .limit(_limit)
                   .snapshots(),
               builder: (BuildContext context,
                   AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -196,16 +228,17 @@ class _ChatScreen extends State<ChatScreen> {
                     ),
                   );
                   // return Container();
+                } else {
+                  listMessage.addAll(snapshot.data.docs);
+                  return ListView.builder(
+                    padding: EdgeInsets.all(10.0),
+                    itemBuilder: (context, index) =>
+                        createItem(index, snapshot.data.docs[index]),
+                    itemCount: snapshot.data.docs.length,
+                    reverse: true,
+                    controller: listScrollController,
+                  );
                 }
-                listMessage = snapshot.data.docs;
-                return ListView.builder(
-                  padding: EdgeInsets.all(10.0),
-                  itemCount: snapshot.data.docs.length,
-                  reverse: true,
-                  controller: listScrollController,
-                  itemBuilder: (context, index) =>
-                      createItem(index, snapshot.data.docs[index]),
-                );
               },
             ),
     );
@@ -214,7 +247,7 @@ class _ChatScreen extends State<ChatScreen> {
   bool isLastMsgLeft(int index) {
     if ((index > 0 &&
             listMessage != null &&
-            "${listMessage[index - 1]['idFrom']}" == id) ||
+            listMessage[index - 1].data()['idFrom'] == id) ||
         index == 0) {
       return true;
     } else {
@@ -225,7 +258,7 @@ class _ChatScreen extends State<ChatScreen> {
   bool isLastMsgRight(int index) {
     if ((index > 0 &&
             listMessage != null &&
-            "${listMessage[index - 1]['idFrom']}" != id) ||
+            listMessage[index - 1].data()['idFrom'] != id) ||
         index == 0) {
       return true;
     } else {
@@ -236,14 +269,14 @@ class _ChatScreen extends State<ChatScreen> {
   Widget createItem(int index, DocumentSnapshot document) {
     //sender messages display-right side
 
-    if ("${document.data()['idFrom']}" == id) {
+    if (document.data()['idFrom'] == id) {
       return Row(
         children: <Widget>[
           //Text and emoji msg type 0
-          if ("${document.data()['type']}" == 0)
+          if (document.data()['type'] == 0)
             Container(
               child: Text(
-                ("${document.data()['content']}"),
+                "${document.data()['content']}",
                 style: TextStyle(
                     color: Colors.white,
                     letterSpacing: 1.0,
@@ -284,7 +317,7 @@ class _ChatScreen extends State<ChatScreen> {
                       borderRadius: BorderRadius.all(Radius.circular(8.0)),
                       clipBehavior: Clip.hardEdge,
                     ),
-                    imageUrl: ("${document.data()['content']}"),
+                    imageUrl: "${document.data()['content']}",
                     width: 200.0,
                     height: 200,
                     fit: BoxFit.cover,
@@ -317,8 +350,7 @@ class _ChatScreen extends State<ChatScreen> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                isLastMsgLeft(index)
-                    ? Material(
+                if (isLastMsgLeft(index)) Material(
                         //display reciever profile image
                         child: CachedNetworkImage(
                           placeholder: (context, url) => Container(
@@ -337,17 +369,14 @@ class _ChatScreen extends State<ChatScreen> {
                         ),
                         borderRadius: BorderRadius.all(Radius.circular(18.0)),
                         clipBehavior: Clip.hardEdge,
-                      )
-                    : Container(
+                      ) else Container(
                         width: 35.0,
                       ),
                 //displayMsg
 
-                ("${document.data()['type']}" == 0)
-                    //text msg
-                    ? Container(
+                if (document.data()['type'] == 0) Container(
                         child: Text(
-                          ("${document.data()['content']}"),
+                          "${document.data()['content']}",
                           style: TextStyle(
                               color: Colors.white,
                               letterSpacing: 1.0,
@@ -360,9 +389,7 @@ class _ChatScreen extends State<ChatScreen> {
                             color: Color(0xfff99AAAB),
                             borderRadius: BorderRadius.circular(8.0)),
                         margin: EdgeInsets.only(left: 10.0),
-                      )
-                    //Image msg
-                    : Container(
+                      ) else Container(
                         child: FlatButton(
                           child: Material(
                             child: CachedNetworkImage(
@@ -456,7 +483,7 @@ class _ChatScreen extends State<ChatScreen> {
 
   Widget createInput() {
     return Expanded(
-          child: Container(
+      child: Container(
         padding: EdgeInsets.all(5),
 
         alignment: Alignment.bottomCenter,
@@ -552,7 +579,7 @@ class _ChatScreen extends State<ChatScreen> {
   }
 
   void onSendMessage(String contentMsg, int type) {
-    if (contentMsg != "") {
+    if (contentMsg.trim() != "") {
       messageController.clear();
       var docRef = FirebaseFirestore.instance
           .collection('message')
@@ -561,7 +588,7 @@ class _ChatScreen extends State<ChatScreen> {
           .doc(DateTime.now().millisecondsSinceEpoch.toString());
 
       FirebaseFirestore.instance.runTransaction((transaction) async {
-        await transaction.set(
+        transaction.set(
           docRef,
           <String, dynamic>{
             'idFrom': id,
@@ -574,6 +601,7 @@ class _ChatScreen extends State<ChatScreen> {
       });
       listScrollController.animateTo(0.0,
           duration: Duration(microseconds: 300), curve: Curves.easeOut);
+          print('message sended');
     } else {
       Fluttertoast.showToast(
           msg: 'Please type a message', gravity: ToastGravity.CENTER);
