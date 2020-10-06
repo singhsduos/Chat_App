@@ -52,8 +52,6 @@ class _SideDrawerState extends State<SideDrawer> {
                 color: Colors.cyan,
                 margin: EdgeInsets.all(0.0),
                 padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
-                // height: MediaQuery.of(context).size.height/5.5,
-
                 child: Column(
                   children: <Widget>[
                     Container(

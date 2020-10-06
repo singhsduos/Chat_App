@@ -12,6 +12,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
+import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
+import 'package:toast/toast.dart';
 
 class Settings extends StatelessWidget {
   const Settings({Key key}) : super(key: key);
@@ -66,6 +68,8 @@ class _SettingScreenState extends State<SettingScreen> {
   final FocusNode aboutMeFocusNode = FocusNode();
   bool isLoading = false;
 
+  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
+
   @override
   void initState() {
     super.initState();
@@ -93,11 +97,28 @@ class _SettingScreenState extends State<SettingScreen> {
 
   Future getImage() async {
     final newImagefile = await picker.getImage(source: ImageSource.gallery);
-
-    if (newImagefile != null) {
+    final ScaffoldState scaffold = _scaffoldKey.currentState;
+    try {
+      if (newImagefile != null) {
+        setState(() {
+          this.imageFileAvatar = File(newImagefile.path);
+          isLoading = true;
+        });
+      } else {
+        throw Exception('File is not available/not taken');
+      }
+    } catch (e) {
+      print(e);
       setState(() {
-        this.imageFileAvatar = File(newImagefile.path);
-        isLoading = true;
+        isLoading = false;
+        Fluttertoast.showToast(
+          msg: e.toString(),
+          textColor: Color(0xFFFFFFFF),
+          fontSize: 16.0,
+          // timeInSecForIosWeb: 4,
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.cyan,
+        );
       });
     }
     uploadImageToFirestoreAndStorage();
@@ -114,8 +135,97 @@ class _SettingScreenState extends State<SettingScreen> {
     }
     uploadImageToFirestoreAndStorage();
   }
+ 
 
-  
+  Future<void> _settingModalBottomSheet(BuildContext context) async {
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            color: Colors.cyan,
+            padding: EdgeInsets.only(bottom: 10.0, top: 16.0),
+            child: new Wrap(
+              children: <Widget>[
+                Container(
+                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    'Profile photo',
+                    style: TextStyle(
+                        fontSize: 25.0,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+                Container(
+                  height: MediaQuery.of(context).size.height / 5.0,
+                  child: Center(
+                    child: Row(
+                      children: <Widget>[
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 10.0),
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 10),
+                                  child: IconButton(
+                                    onPressed: getImage,
+                                    icon: Icon(
+                                      Icons.image,
+                                      size: 50.0,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  margin: EdgeInsets.only(right: 10.0),
+                                ),
+                                Text(
+                                  'Gallery',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                  ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 10.0),
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 10),
+                                  child: IconButton(
+                                    onPressed: cameraImage,
+                                    icon: Icon(
+                                      Icons.camera,
+                                      size: 50.0,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  margin: EdgeInsets.only(right: 10.0),
+                                ),
+                                Text(
+                                  'Camera',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        });
+  }
 
   Future uploadImageToFirestoreAndStorage() async {
     String mFileName = basename(imageFileAvatar.path);
@@ -271,7 +381,9 @@ class _SettingScreenState extends State<SettingScreen> {
                         ),
                         fillColor: Colors.cyan,
                         splashColor: Colors.transparent,
-                        onPressed: getImage,
+                        onPressed: () {
+                          _settingModalBottomSheet(context);
+                        },
                       ),
                     ],
                   ),

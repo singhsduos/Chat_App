@@ -147,6 +147,30 @@ class _ChatScreen extends State<ChatScreen> {
   final int _limitIncrement = 20;
   SharedPreferences preferences;
 
+
+  Future<void> _settingModalBottomSheet(BuildContext context) async {
+    showModalBottomSheet<void>(
+        context: context,
+        builder: (BuildContext bc) {
+          return Container(
+            child: new Wrap(
+              children: <Widget>[
+                new ListTile(
+                  leading: new Icon(Icons.image),
+                  title: new Text('Gallery'),
+                  onTap: getImage,
+                ),
+                new ListTile(
+                  leading: new Icon(Icons.camera),
+                  title: new Text('Camera'),
+                  onTap: cameraImage,
+                ),
+              ],
+            ),
+          );
+        });
+  }
+
   void _scrollListener() {
     if (listScrollController.offset >=
             listScrollController.position.maxScrollExtent &&
@@ -579,7 +603,9 @@ class _ChatScreen extends State<ChatScreen> {
                     size: 30,
                   ),
                   color: Color(0xfff99AAAB),
-                  onPressed: getImage,
+                  onPressed: () {
+                    _settingModalBottomSheet(context);
+                  },
                 ),
               ),
               color: Colors.transparent,
@@ -690,6 +716,36 @@ class _ChatScreen extends State<ChatScreen> {
 
   Future getImage() async {
     final imageFileUpload = await picker.getImage(source: ImageSource.gallery);
+
+    try {
+      if (imageFileUpload != null) {
+        setState(() {
+          this.imageFile = File(imageFileUpload.path);
+          isLoading = true;
+        });
+      } else {
+        throw Exception('File is not available/not taken');
+      }
+    } catch (e) {
+      print(e);
+      setState(() {
+        isLoading = false;
+        Fluttertoast.showToast(
+          msg:   e.toString(),
+          textColor: Color(0xFFFFFFFF),
+          fontSize: 16.0,
+          // timeInSecForIosWeb: 4,
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.cyan,
+        );
+      });
+    }
+    uploadImageFile();
+  }
+
+  Future cameraImage() async {
+    final imageFileUpload = await picker.getImage(source: ImageSource.camera);
+
     if (imageFileUpload != null) {
       setState(() {
         this.imageFile = File(imageFileUpload.path);
