@@ -29,7 +29,7 @@ class _SignUpState extends State<SignUp> {
   bool isLoggedIn = false;
   User currentUser;
 
-  final _firestore = Firestore.instance;
+  final _firestore = FirebaseFirestore.instance;
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -62,7 +62,7 @@ class _SignUpState extends State<SignUp> {
           'username': userNameTextEditingController.text,
           'email': emailTextEditingController.text.trim(),
           'id': FirebaseAuth.instance.currentUser.uid,
-          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+          'createdAt': DateTime.now(),
           'chattingWith': null,
           'photoUrl' : user.photoURL,
           'aboutMe' : 'Hey there! I am using ChaTooApp',
@@ -140,7 +140,7 @@ class _SignUpState extends State<SignUp> {
           'username': user.displayName,
           'photoUrl': user.photoURL,
           'id': user.uid,
-          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+          'createdAt': DateTime.now(),
           'chattingWith': null,
           'email': user.email,
           'aboutMe' : 'Hey there! I am using ChaTooApp'

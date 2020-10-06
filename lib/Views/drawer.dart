@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:io';
+import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:ChatApp/helper/authenticate.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/services/auth.dart';
@@ -31,17 +33,119 @@ class _SideDrawerState extends State<SideDrawer> {
   String aboutMe = '';
   String id = '';
   File imageFileAvatar;
+
   @override
   void initState() {
     super.initState();
     readDataFromLocal();
   }
 
+  Future<Null> openDialog() async {
+    switch (await showDialog<int>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            contentPadding:
+                EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
+            children: <Widget>[
+              Container(
+                color: Colors.cyan,
+                margin: EdgeInsets.all(0.0),
+                padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
+                // height: MediaQuery.of(context).size.height/5.5,
+
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.logout,
+                        size: 30.0,
+                        color: Colors.white,
+                      ),
+                      margin: EdgeInsets.only(bottom: 10.0),
+                    ),
+                    Text(
+                      'Log out',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    ),
+                    Text(
+                      'Are you sure you want to log out?',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 14.0,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Constants.prefs.setBool('userIsLoggedIn', false);
+                  authMethods.signOut();
+
+                  Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute<MaterialPageRoute>(
+                          builder: (BuildContext context) =>
+                              Authenticate())); // Navigator.pop(context, 1);
+                },
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.check_circle,
+                        color: Colors.cyan,
+                      ),
+                      margin: EdgeInsets.only(right: 10.0),
+                    ),
+                    Text(
+                      'LOG OUT',
+                      style: TextStyle(
+                          color: Colors.cyan, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, 0);
+                },
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.cancel,
+                        color: Colors.cyan,
+                      ),
+                      margin: EdgeInsets.only(right: 10.0),
+                    ),
+                    Text(
+                      'CANCEL',
+                      style: TextStyle(
+                          color: Colors.cyan, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          );
+        })) {
+      case 0:
+        break;
+      case 1:
+        exit(0);
+        break;
+    }
+  }
+
   Future readDataFromLocal() async {
     preferences = await SharedPreferences.getInstance();
     photoUrl = preferences.getString('photoUrl');
     username = preferences.getString('username');
-
     email = preferences.getString('email');
     aboutMe = preferences.getString('aboutMe');
     createdAt = preferences.getString('createdAt');
@@ -52,8 +156,6 @@ class _SideDrawerState extends State<SideDrawer> {
 
   @override
   Widget build(BuildContext context) {
-    // double height = MediaQuery.of(context).size.height;
-    // double width = MediaQuery.of(context).size.width;
     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
@@ -84,40 +186,51 @@ class _SideDrawerState extends State<SideDrawer> {
                   color: Colors.white,
                 ),
               ),
-              currentAccountPicture: CircleAvatar(
-                backgroundColor: Colors.black,
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(45),
-                  child: Stack(
-                    children: <Widget>[
-                      (photoUrl == null)
-                          ? Icon(
-                            Icons.account_circle,
-                            size: 60,
-                            color: Colors.white,
-                          )
-                          : Material(
-                              //displaying existing pic
-                              child: CachedNetworkImage(
-                                placeholder: (context, url) => Container(
-                                  child: CircularProgressIndicator(
-                                      strokeWidth: 2.0,
-                                      valueColor: AlwaysStoppedAnimation<Color>(
-                                          Colors.cyan)),
+              currentAccountPicture: GestureDetector(
+                onTap: () {
+                  {
+                    Navigator.push<MaterialPageRoute>(
+                      context,
+                      MaterialPageRoute(
+                        builder: (BuildContext context) => FullScreenImagePage(
+                          url: photoUrl,
+                        ),
+                      ),
+                    );
+                  }
+                },
+                child: CircleAvatar(
+                  backgroundColor: Colors.black,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(45),
+                    child: Stack(
+                      children: <Widget>[
+                        (photoUrl == null)
+                            ? Icon(
+                                Icons.account_circle,
+                                size: 60,
+                                color: Colors.white,
+                              )
+                            : Material(
+                                //displaying existing pic
+                                child: CachedNetworkImage(
+                                  placeholder: (context, url) => Container(
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2.0,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                                Colors.cyan)),
+                                  ),
+                                  imageUrl: photoUrl,
+                                  fit: BoxFit.cover,
+                                  width: 80,
+                                  height: 80,
                                 ),
-                                imageUrl: photoUrl,
-                                fit: BoxFit.cover,
-                                width: 80,
-                                height: 80,
-                              ),
-                            )
-                    ],
+                              )
+                      ],
+                    ),
                   ),
                 ),
-
-                //  (user.photoUrl==null)
-                // ? AssetImage('images/placeHolder.jpg'):
-                // CachedNetworkImageProvider(user.photoUrl),
               ),
               decoration: BoxDecoration(color: Colors.cyan),
             ),
@@ -149,41 +262,44 @@ class _SideDrawerState extends State<SideDrawer> {
                   ),
                 ),
               ),
-              // decoration: BoxDecoration(
-              //     border:
-              //         Border(bottom: BorderSide(color: Colors.grey.shade400))),
             ),
             Container(
               child: Consumer<ThemeNotifier>(
                 builder: (BuildContext context, ThemeNotifier notifier,
                         Widget child) =>
-                    SwitchListTile(
-                  secondary: const Icon(Icons.nights_stay),
-                  title: const Text('Dark theme',
-                      style: TextStyle(
-                        fontSize: 17.0,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0,
-                      )),
-                  subtitle: const Text('Reduce glare and improve night viewing',
-                      style: TextStyle(
-                        fontSize: 13.0,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.0,
-                      )),
-                  value: isDarkTheme,
-                  activeTrackColor: Colors.blueGrey,
-                  activeColor: Colors.cyan,
-                  onChanged: (bool value) {
-                    setState(() {
-                      isDarkTheme = value;
-                      if (!value) {
-                        _changeTheme(context, MyThemeKeys.LIGHT);
-                      } else {
-                        _changeTheme(context, MyThemeKeys.DARK);
-                      }
-                    });
-                  },
+                    InkWell(
+                  splashColor: Colors.cyan,
+                  child: SwitchListTile(
+                    secondary: const Icon(Icons.nights_stay),
+                    title: const Text('Dark theme',
+                        style: TextStyle(
+                          fontSize: 17.0,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                        )),
+                    subtitle:
+                        const Text('Reduce glare and improve night viewing',
+                            style: TextStyle(
+                              fontSize: 13.0,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.0,
+                            )),
+                    value: isDarkTheme,
+                    activeTrackColor: Colors.blueGrey,
+                    activeColor: Colors.cyan,
+                    onChanged: (bool value) {
+                      setState(
+                        () {
+                          isDarkTheme = value;
+                          if (!value) {
+                            _changeTheme(context, MyThemeKeys.LIGHT);
+                          } else {
+                            _changeTheme(context, MyThemeKeys.DARK);
+                          }
+                        },
+                      );
+                    },
+                  ),
                 ),
               ),
             ),
@@ -191,13 +307,7 @@ class _SideDrawerState extends State<SideDrawer> {
               child: InkWell(
                 splashColor: Colors.cyan,
                 onTap: () {
-                  Constants.prefs.setBool('userIsLoggedIn', false);
-                  authMethods.signOut();
-
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute<MaterialPageRoute>(
-                          builder: (BuildContext context) => Authenticate()));
+                  openDialog();
                 },
                 child: Container(
                   child: ListTile(
@@ -211,9 +321,6 @@ class _SideDrawerState extends State<SideDrawer> {
                   ),
                 ),
               ),
-              // decoration: BoxDecoration(
-              //     border:
-              //         Border(bottom: BorderSide(color: Colors.grey.shade400))),
             ),
           ],
         ),

@@ -1,27 +1,19 @@
 import 'dart:async';
 import 'dart:io';
-
+import 'package:ChatApp/Widget/fullScreenGalleryImage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:emoji_picker/emoji_picker.dart';
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
-
-  
-
-
 
 class ConversationScreen extends StatelessWidget {
   final String recevierId;
@@ -41,7 +33,32 @@ class ConversationScreen extends StatelessWidget {
             padding: EdgeInsets.all(8.0),
             child: CircleAvatar(
               backgroundColor: Colors.black,
-              backgroundImage: CachedNetworkImageProvider(recevierAvatar),
+              child: Material(
+                child: recevierAvatar != null
+                    ? CachedNetworkImage(
+                        placeholder: (context, url) => Container(
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                            image: AssetImage('images/placeHolder.jpg'),
+                          )),
+                          height: 40,
+                          width: 40,
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                        ),
+                        imageUrl: recevierAvatar,
+                        width: 50.0,
+                        height: 50.0,
+                        fit: BoxFit.cover,
+                      )
+                    : Icon(
+                        Icons.account_circle,
+                        size: 50.0,
+                        color: Colors.grey,
+                      ),
+                borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                clipBehavior: Clip.hardEdge,
+              ),
             ),
           )
         ],
@@ -74,7 +91,10 @@ class ConversationScreen extends StatelessWidget {
           ),
         ),
       ),
-      body: ChatScreen(recevierId: recevierId, recevierAvatar: recevierAvatar),
+      body: ChatScreen(
+          recevierId: recevierId,
+          recevierAvatar: recevierAvatar,
+          recevierName: recevierName),
     );
   }
 }
@@ -82,22 +102,33 @@ class ConversationScreen extends StatelessWidget {
 class ChatScreen extends StatefulWidget {
   final String recevierId;
   final String recevierAvatar;
+  final String recevierName;
 
-  ChatScreen(
-      {Key key, @required this.recevierId, @required this.recevierAvatar})
-      : super(key: key);
+  ChatScreen({
+    Key key,
+    @required this.recevierId,
+    @required this.recevierAvatar,
+    @required this.recevierName,
+  }) : super(key: key);
 
   @override
-  _ChatScreen createState() =>
-      _ChatScreen(recevierId: recevierId, recevierAvatar: recevierAvatar);
+  _ChatScreen createState() => _ChatScreen(
+      recevierId: recevierId,
+      recevierAvatar: recevierAvatar,
+      recevierName: recevierName);
 }
 
 class _ChatScreen extends State<ChatScreen> {
   final String recevierId;
   final String recevierAvatar;
+  final String recevierName;
 
-  _ChatScreen(
-      {Key key, @required this.recevierId, @required this.recevierAvatar});
+  _ChatScreen({
+    Key key,
+    @required this.recevierId,
+    @required this.recevierAvatar,
+    @required this.recevierName,
+  });
 
   DatabaseMethods databaseMethods = DatabaseMethods();
   AuthMethods authMethods = AuthMethods();
@@ -111,7 +142,7 @@ class _ChatScreen extends State<ChatScreen> {
   String imageUrl;
   String chatId;
   String id;
-  List<QueryDocumentSnapshot> listMessage = new List.from(<dynamic>[]);
+  List<QueryDocumentSnapshot> listMessage = new List.from(<String>[]);
   int _limit = 20;
   final int _limitIncrement = 20;
   SharedPreferences preferences;
@@ -139,6 +170,7 @@ class _ChatScreen extends State<ChatScreen> {
   @override
   void initState() {
     super.initState();
+
     listScrollController.addListener(_scrollListener);
     isLoading = false;
     chatId = "";
@@ -146,7 +178,7 @@ class _ChatScreen extends State<ChatScreen> {
     readLocal();
   }
 
-  Future readLocal() async {
+  void readLocal() async {
     preferences = await SharedPreferences.getInstance();
     id = preferences.getString('id') ?? '';
     if (id.hashCode <= recevierId.hashCode) {
@@ -178,29 +210,70 @@ class _ChatScreen extends State<ChatScreen> {
     });
   }
 
+  Future<bool> onBackPress() {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .update(<String, dynamic>{'chattingWith': null});
+    Navigator.pop(context);
+
+    return Future.value(false);
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        child: Stack(
-          children: <Widget>[
-            Column(
-              children: <Widget>[
-                //create list of message
-                createMessageList(),
+    return WillPopScope(
+      child: Stack(
+        children: <Widget>[
+          Column(
+            children: <Widget>[
+              // List of messages
+              createMessageList(),
 
-                createInput(),
+              createInput(),
 
-                isDisplaySticker
-                    ? Container(child: emojiContainer())
-                    : Container(),
-              ],
-            ),
-          ],
-        ),
+              isDisplaySticker
+                  ? Container(child: emojiContainer())
+                  : Container(),
+            ],
+          ),
+
+          // Loading
+          buildLoading()
+        ],
       ),
+      onWillPop: onBackPress,
     );
   }
+
+  Widget buildLoading() {
+    return Positioned(
+      child:
+          isLoading ? Center(child: CircularProgressIndicator()) : Container(),
+    );
+  }
+  // {
+  //   return Scaffold(
+  //     body: Container(
+  //       child: Stack(
+  //         children: <Widget>[
+  //           Column(
+  //             children: <Widget>[
+  //               //create list of message
+  //               createMessageList(),
+
+  //               createInput(),
+
+  //               isDisplaySticker
+  //                   ? Container(child: emojiContainer())
+  //                   : Container(),
+  //             ],
+  //           ),
+  //         ],
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget createMessageList() {
     return Flexible(
@@ -329,7 +402,7 @@ class _ChatScreen extends State<ChatScreen> {
                   Navigator.push<MaterialPageRoute>(
                     context,
                     MaterialPageRoute(
-                      builder: (BuildContext context) => FullScreenImagePage(
+                      builder: (BuildContext context) => FullScreenGalleryImage(
                         url: "${document.data()['content']}",
                       ),
                     ),
@@ -350,76 +423,73 @@ class _ChatScreen extends State<ChatScreen> {
           children: <Widget>[
             Row(
               children: <Widget>[
-                if (isLastMsgLeft(index)) Material(
-                        //display reciever profile image
+                if (isLastMsgLeft(index))
+                  Material(
+                    //display reciever profile image
+                    child: CachedNetworkImage(
+                      placeholder: (context, url) => Container(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.cyan),
+                        ),
+                        width: 35.0,
+                        height: 35.0,
+                        padding: EdgeInsets.all(10.0),
+                      ),
+                      imageUrl: recevierAvatar,
+                      width: 35.0,
+                      height: 35.0,
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(18.0)),
+                    clipBehavior: Clip.hardEdge,
+                  )
+                else
+                  Container(
+                    width: 35.0,
+                  ),
+                //displayMsg
+
+                if (document.data()['type'] == 0)
+                  Container(
+                    child: Text(
+                      "${document.data()['content']}",
+                      style: TextStyle(
+                          color: Colors.white,
+                          letterSpacing: 1.0,
+                          fontSize: 17,
+                          fontWeight: FontWeight.w400),
+                    ),
+                    padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
+                    width: 200.0,
+                    decoration: BoxDecoration(
+                        color: Color(0xfff99AAAB),
+                        borderRadius: BorderRadius.circular(8.0)),
+                    margin: EdgeInsets.only(left: 10.0),
+                  )
+                else
+                  Container(
+                    child: FlatButton(
+                      child: Material(
                         child: CachedNetworkImage(
                           placeholder: (context, url) => Container(
                             child: CircularProgressIndicator(
                               valueColor:
                                   AlwaysStoppedAnimation<Color>(Colors.cyan),
                             ),
-                            width: 35.0,
-                            height: 35.0,
-                            padding: EdgeInsets.all(10.0),
+                            width: 200,
+                            height: 200,
+                            padding: EdgeInsets.all(70.0),
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius:
+                                  BorderRadius.all(Radius.circular(8.0)),
+                            ),
                           ),
-                          imageUrl: recevierAvatar,
-                          width: 35.0,
-                          height: 35.0,
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.all(Radius.circular(18.0)),
-                        clipBehavior: Clip.hardEdge,
-                      ) else Container(
-                        width: 35.0,
-                      ),
-                //displayMsg
-
-                if (document.data()['type'] == 0) Container(
-                        child: Text(
-                          "${document.data()['content']}",
-                          style: TextStyle(
-                              color: Colors.white,
-                              letterSpacing: 1.0,
-                              fontSize: 17,
-                              fontWeight: FontWeight.w400),
-                        ),
-                        padding: EdgeInsets.fromLTRB(15.0, 10.0, 15.0, 10.0),
-                        width: 200.0,
-                        decoration: BoxDecoration(
-                            color: Color(0xfff99AAAB),
-                            borderRadius: BorderRadius.circular(8.0)),
-                        margin: EdgeInsets.only(left: 10.0),
-                      ) else Container(
-                        child: FlatButton(
-                          child: Material(
-                            child: CachedNetworkImage(
-                              placeholder: (context, url) => Container(
-                                child: CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.cyan),
-                                ),
-                                width: 200,
-                                height: 200,
-                                padding: EdgeInsets.all(70.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(8.0)),
-                                ),
-                              ),
-                              errorWidget: (context, url, dynamic error) =>
-                                  Material(
-                                child: Image.asset(
-                                  'images/no_image.jpg',
-                                  width: 200.0,
-                                  height: 200,
-                                  fit: BoxFit.cover,
-                                ),
-                                borderRadius:
-                                    BorderRadius.all(Radius.circular(8.0)),
-                                clipBehavior: Clip.hardEdge,
-                              ),
-                              imageUrl: "${document.data()['content']}",
+                          errorWidget: (context, url, dynamic error) =>
+                              Material(
+                            child: Image.asset(
+                              'images/no_image.jpg',
                               width: 200.0,
                               height: 200,
                               fit: BoxFit.cover,
@@ -428,19 +498,27 @@ class _ChatScreen extends State<ChatScreen> {
                                 BorderRadius.all(Radius.circular(8.0)),
                             clipBehavior: Clip.hardEdge,
                           ),
-                          onPressed: () {
-                            Navigator.push<MaterialPageRoute>(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (BuildContext context) =>
-                                      FullScreenImagePage(
-                                    url: "${document.data()['content']}",
-                                  ),
-                                ));
-                          },
+                          imageUrl: "${document.data()['content']}",
+                          width: 200.0,
+                          height: 200,
+                          fit: BoxFit.cover,
                         ),
-                        margin: EdgeInsets.only(left: 10.0),
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        clipBehavior: Clip.hardEdge,
                       ),
+                      onPressed: () {
+                        Navigator.push<MaterialPageRoute>(
+                            context,
+                            MaterialPageRoute(
+                              builder: (BuildContext context) =>
+                                  FullScreenGalleryImage(
+                                url: "${document.data()['content']}",
+                              ),
+                            ));
+                      },
+                    ),
+                    margin: EdgeInsets.only(left: 10.0),
+                  ),
               ],
             ),
 
@@ -601,7 +679,7 @@ class _ChatScreen extends State<ChatScreen> {
       });
       listScrollController.animateTo(0.0,
           duration: Duration(microseconds: 300), curve: Curves.easeOut);
-          print('message sended');
+      print('message sended');
     } else {
       Fluttertoast.showToast(
           msg: 'Please type a message', gravity: ToastGravity.CENTER);

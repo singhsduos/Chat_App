@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
+import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -27,7 +28,6 @@ class Settings extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        // iconTheme: IconThemeData(color: Colors.white),
         backgroundColor: Colors.cyan,
         title: Text(
           'Account Settings',
@@ -103,6 +103,20 @@ class _SettingScreenState extends State<SettingScreen> {
     uploadImageToFirestoreAndStorage();
   }
 
+  Future cameraImage() async {
+    final newImagefile = await picker.getImage(source: ImageSource.camera);
+
+    if (newImagefile != null) {
+      setState(() {
+        this.imageFileAvatar = File(newImagefile.path);
+        isLoading = true;
+      });
+    }
+    uploadImageToFirestoreAndStorage();
+  }
+
+  
+
   Future uploadImageToFirestoreAndStorage() async {
     String mFileName = basename(imageFileAvatar.path);
     StorageReference storageReference =
@@ -111,32 +125,31 @@ class _SettingScreenState extends State<SettingScreen> {
         storageReference.putFile(imageFileAvatar);
     StorageTaskSnapshot storageTaskSnapshot =
         await storageUploadTask.onComplete;
-          print('File Uploaded'); 
+    print('File Uploaded');
     storageTaskSnapshot.ref.getDownloadURL().then((dynamic value) {
-     
-        photoUrl = '$value';
+      photoUrl = '$value';
 
-        // ignore: always_specify_types
-        FirebaseFirestore.instance
-            .collection('users')
-            .doc(id)
-            .update(<String, String>{
-          'photoUrl': photoUrl,
-          'aboutMe': aboutMe,
-          'username': username,
-        }).then((data) async {
-          await preferences.setString('photoUrl', photoUrl);
-          setState(() {
-            isLoading = false;
-          });
-          Fluttertoast.showToast(msg: 'Picture updated successfully.');
+      // ignore: always_specify_types
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(id)
+          .update(<String, String>{
+        'photoUrl': photoUrl,
+        'aboutMe': aboutMe,
+        'username': username,
+      }).then((data) async {
+        await preferences.setString('photoUrl', photoUrl);
+        setState(() {
+          isLoading = false;
         });
-      
+        Fluttertoast.showToast(msg: 'Picture updated successfully.');
+      });
     }, onError: (Object errorMsg) {
       setState(() {
         isLoading = false;
       });
-      Fluttertoast.showToast(msg: errorMsg.toString(), gravity: ToastGravity.CENTER);
+      Fluttertoast.showToast(
+          msg: errorMsg.toString(), gravity: ToastGravity.CENTER);
     });
   }
 
@@ -177,10 +190,23 @@ class _SettingScreenState extends State<SettingScreen> {
                 child: Center(
                   child: Stack(
                     children: <Widget>[
-                      (imageFileAvatar == null)
-                          ? (photoUrl != "")
-                              ? Material(
-                                
+                      if (imageFileAvatar == null)
+                        (photoUrl != "")
+                            ? GestureDetector(
+                                onTap: () {
+                                  {
+                                    Navigator.push<MaterialPageRoute>(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (BuildContext context) =>
+                                            FullScreenImagePage(
+                                          url: photoUrl,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                },
+                                child: Material(
                                   //displaying existing pic
                                   child: CachedNetworkImage(
                                     placeholder: (context, url) => Container(
@@ -201,24 +227,40 @@ class _SettingScreenState extends State<SettingScreen> {
                                   borderRadius:
                                       BorderRadius.all(Radius.circular(125.0)),
                                   clipBehavior: Clip.hardEdge,
-                                )
-                              : Icon(
-                                  Icons.account_circle,
-                                  size: 90,
-                                  color: Color(0xfff99AAAB),
-                                )
-                          : Material(
-                            
-                              child: Image.file(
-                                imageFileAvatar,
-                                width: 200.0,
-                                height: 200.0,
-                                fit: BoxFit.cover,
-                              ),
-                              borderRadius:
-                                  BorderRadius.all(Radius.circular(125.0)),
-                              clipBehavior: Clip.hardEdge,
+                                ),
+                              )
+                            : Icon(
+                                Icons.account_circle,
+                                size: 90,
+                                color: Color(0xfff99AAAB),
+                              )
+                      else
+                        GestureDetector(
+                          onTap: () {
+                            {
+                              Navigator.push<MaterialPageRoute>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      FullScreenImagePage(
+                                    url: ('${imageFileAvatar}'),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
+                          child: Material(
+                            child: Image.file(
+                              imageFileAvatar,
+                              width: 200.0,
+                              height: 200.0,
+                              fit: BoxFit.cover,
                             ),
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(125.0)),
+                            clipBehavior: Clip.hardEdge,
+                          ),
+                        ),
                       RawMaterialButton(
                         shape: CircleBorder(),
                         padding: EdgeInsets.all(15.0),
@@ -283,7 +325,7 @@ class _SettingScreenState extends State<SettingScreen> {
                     ),
                     //  margin: EdgeInsets.only(right: 0.0),
                   ),
-                  // aboutMe -userBio
+                  // AboutMe -userBio
                   Container(
                     alignment: Alignment.topLeft,
                     child: ListTile(

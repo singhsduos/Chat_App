@@ -37,34 +37,32 @@ class _SignInState extends State<SignIn> {
   bool isLoading = false;
   bool isLoggedIn = false;
   User currentUser;
-  QuerySnapshot snapshotUserInfo;
-  void signIn() {
+  // QuerySnapshot snapshotUserInfo;
+  Future<Null> signIn() async {
+    prefs = await SharedPreferences.getInstance();
     if (formKey.currentState.validate()) {
-      HelperFunctions.saveUserEmailSharedPreference(
-          emailTextEditingController.text.trim());
-
-      databaseMethods
-          .getByUserEmail(emailTextEditingController.text.trim())
-          .then((val) {
-        snapshotUserInfo = val as QuerySnapshot;
-        HelperFunctions.saveUserNameSharedPreference(
-            "${snapshotUserInfo.docs[0].data()['name']}");
-
-        // print("${snapshotUserInfo.docs[0].data()['name']} this is not good");
-      });
-
-      setState(() {
+      this.setState(() {
         isLoading = true;
       });
 
       authMethods
           .signInWithEmailAndPassword(emailTextEditingController.text.trim(),
               passwordTextEditingController.text, context)
-          .then((dynamic val) {
+          .then((dynamic val) async {
         if (val != null) {
+          User user = FirebaseAuth.instance.currentUser;
+          final QuerySnapshot result = await FirebaseFirestore.instance
+              .collection('users')
+              .where('id', isEqualTo: user.uid)
+              .get();
+
+          databaseMethods
+              .getByUserEmail(emailTextEditingController.text.trim());
           Fluttertoast.showToast(msg: "SignIn successful");
           HelperFunctions.saveUserLoggedInSharedPreference(true);
-          User user = FirebaseAuth.instance.currentUser;
+          HelperFunctions.getUserNameSharedPreference();
+          HelperFunctions.getUserEmailPreference();
+          // print("signed in " + user.displayName);
           Navigator.pushReplacement(
               context,
               MaterialPageRoute<MaterialPageRoute>(
@@ -363,14 +361,15 @@ class _SignInState extends State<SignIn> {
                                           width: 10.0,
                                         ),
                                         Center(
-                                          child:
-                                              const Text('Sign In with Google',
+                                          child: const Text(
+                                            'Sign In with Google',
 
-                                                  // textDirection: ,
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 17,
-                                                  )),
+                                            // textDirection: ,
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 17,
+                                            ),
+                                          ),
                                         ),
                                       ],
                                     ),

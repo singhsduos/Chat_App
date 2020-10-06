@@ -8,7 +8,7 @@ class DatabaseMethods {
   final String username;
   DatabaseMethods({this.username});
 
-  final CollectionReference users = Firestore.instance.collection("users");
+  final CollectionReference users = FirebaseFirestore.instance.collection("users");
 
 
   Future<User> getCurrentUser() async {
@@ -19,25 +19,25 @@ class DatabaseMethods {
 
   Future<QuerySnapshot> getByUserName(String username) async {
     QuerySnapshot user;
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection('users')
         .where('username', isEqualTo: username)
-        .getDocuments();
+        .get();
 
     return user;
   }
 
   Future<String> getByUserEmail(String email) async {
     String email = '';
-    await Firestore.instance
+    await FirebaseFirestore.instance
         .collection('users')
         .where('email', isEqualTo: email)
-        .getDocuments();
+        .get();
 
     return email;
   }
 
-  Future<List<Users>> fetchAllUsers(FirebaseUser currentUser) async {
+  Future<List<Users>> fetchAllUsers(User currentUser) async {
     List<Users> userList = List<Users>();
 
     QuerySnapshot querySnapshot =
@@ -67,10 +67,10 @@ class DatabaseMethods {
 
   Future<void> createChatRoom(dynamic chatRoomMap, String chatRoomId) async {
     Map<String, dynamic> chatRoomMap;
-    return await Firestore.instance
+    return await FirebaseFirestore.instance
         .collection("chatRoom")
-        .document(chatRoomId)
-        .setData(chatRoomMap)
+        .doc(chatRoomId)
+        .set(chatRoomMap)
         .catchError((dynamic e) {
       print(e);
     });
@@ -79,24 +79,24 @@ class DatabaseMethods {
   Future<void> addConversationMessages(
       String chatRoomid, dynamic messageMap) async {
     Map<String, dynamic> messageMap;
-    return await Firestore.instance
+    return await FirebaseFirestore.instance
         .collection('ChatRoom')
-        .document(chatRoomid)
+        .doc(chatRoomid)
         .collection('chats')
         .add(messageMap);
   }
 
   dynamic getConversationMessages(String chatRoomid) async {
-    return await Firestore.instance
+    return await FirebaseFirestore.instance
         .collection('ChatRoom')
-        .document(chatRoomid)
+        .doc(chatRoomid)
         .collection('chats')
         .orderBy('time', descending: false)
         .snapshots();
   }
 
   dynamic getChatRooms(String username) async {
-    return await Firestore.instance
+    return await FirebaseFirestore.instance
         .collection('ChatRoom')
         .where('users', arrayContains: username)
         .snapshots();

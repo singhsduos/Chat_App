@@ -6,10 +6,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class AuthMethods {
-  static final FirebaseFirestore _firestore = Firestore.instance;
+  static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn googleSignIn = GoogleSignIn();
-  FirebaseUser currentUser;
+  User currentUser;
 
  Future showErrDialog(BuildContext context, String err) {
   // to hide the keyboard, if it is still p
@@ -40,6 +40,7 @@ class AuthMethods {
       final UserCredential result = await _auth.signInWithEmailAndPassword(
           email: email, password: password);
       User firebaseUser = result.user;
+      print("signed in " + firebaseUser.email);
       return _userFromFirebaseUser(firebaseUser);
     } catch (e) {
       switch (e.toString()) {
@@ -82,10 +83,12 @@ class AuthMethods {
   Future<void> signOut() async {
     try {
       await FirebaseAuth.instance.signOut();
-      // await googleSignIn.signOut();
-      await googleSignIn.disconnect();
+      await googleSignIn.signOut();
+      // await googleSignIn.disconnect();
     } catch (e) {
       print(e.toString());
     }
   }
+
+  
 }
