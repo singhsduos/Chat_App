@@ -163,6 +163,10 @@ class UserResult extends StatelessWidget {
                   recevierId: users.userId,
                   recevierAvatar: users.photoUrl,
                   recevierName: users.username,
+                  recevierMail: users.email,
+                  recevierAbout: users.aboutMe,
+                  recevierCreate: users.createdAt,
+
                 )));
   }
 

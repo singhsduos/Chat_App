@@ -62,7 +62,7 @@ class _SignUpState extends State<SignUp> {
           'username': userNameTextEditingController.text,
           'email': emailTextEditingController.text.trim(),
           'id': FirebaseAuth.instance.currentUser.uid,
-          'createdAt': DateTime.now(),
+          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
           'chattingWith': null,
           'photoUrl' : user.photoURL,
           'aboutMe' : 'Hey there! I am using ChaTooApp',
@@ -140,7 +140,7 @@ class _SignUpState extends State<SignUp> {
           'username': user.displayName,
           'photoUrl': user.photoURL,
           'id': user.uid,
-          'createdAt': DateTime.now(),
+          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
           'chattingWith': null,
           'email': user.email,
           'aboutMe' : 'Hey there! I am using ChaTooApp'

@@ -199,34 +199,31 @@ class _SideDrawerState extends State<SideDrawer> {
                 },
                 child: CircleAvatar(
                   backgroundColor: Colors.black,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(45),
-                    child: Stack(
-                      children: <Widget>[
-                        (photoUrl == null)
-                            ? Icon(
-                                Icons.account_circle,
-                                size: 60,
-                                color: Colors.white,
-                              )
-                            : Material(
-                                //displaying existing pic
-                                child: CachedNetworkImage(
-                                  placeholder: (context, url) => Container(
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2.0,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                                Colors.cyan)),
-                                  ),
-                                  imageUrl: photoUrl,
-                                  fit: BoxFit.cover,
-                                  width: 80,
-                                  height: 80,
-                                ),
-                              )
-                      ],
-                    ),
+                  child: Material(
+                    child: photoUrl.toString() != null
+                        ? CachedNetworkImage(
+                            placeholder: (context, url) => Container(
+                              decoration: BoxDecoration(
+                                  image: DecorationImage(
+                                image: AssetImage('images/placeHolder.jpg'),
+                              )),
+                              height: 80,
+                              width: 80,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 5, vertical: 5),
+                            ),
+                            imageUrl: photoUrl.toString(),
+                            width: 80.0,
+                            height: 80.0,
+                            fit: BoxFit.cover,
+                          )
+                        : Icon(
+                            Icons.account_circle,
+                            size: 60.0,
+                            color: Colors.white,
+                          ),
+                    borderRadius: BorderRadius.all(Radius.circular(125.0)),
+                    clipBehavior: Clip.hardEdge,
                   ),
                 ),
               ),

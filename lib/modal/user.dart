@@ -6,6 +6,7 @@ class Users {
   String email;
   String photoUrl;
   String createdAt;
+  String aboutMe;
 
   Users({
     this.userId,
@@ -13,6 +14,7 @@ class Users {
     this.email,
     this.photoUrl,
     this.createdAt,
+    this.aboutMe,
   });
 
   factory Users.fromDocument(DocumentSnapshot doc) {
@@ -24,6 +26,7 @@ class Users {
       username: getDocs['username'].toString(),
       photoUrl: getDocs['photoUrl'].toString(),
       createdAt: getDocs['createdAt'].toString(),
+      aboutMe: getDocs['aboutMe'].toString(),
     );
   }
 
@@ -36,6 +39,7 @@ class Users {
 
     data['photoUrl'] = users.photoUrl;
     data[' createdAt'] = users.createdAt;
+    data['aboutMe'] = users.aboutMe;
     return data;
   }
 
@@ -45,5 +49,6 @@ class Users {
     this.username = mapData['username'].toString();
     this.photoUrl = mapData['photoUrl'].toString();
     this.createdAt = mapData['createdAt'].toString();
+    this.aboutMe = mapData['aboutMe'].toString();
   }
 }

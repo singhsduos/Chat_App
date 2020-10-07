@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:ChatApp/Widget/fullScreenGalleryImage.dart';
+import 'package:ChatApp/Widget/fullScreenUserImage.dart';
+import 'package:ChatApp/modal/user.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -19,45 +21,69 @@ class ConversationScreen extends StatelessWidget {
   final String recevierId;
   final String recevierAvatar;
   final String recevierName;
+  final String recevierMail;
+  final String recevierAbout;
+  final String recevierCreate;
   const ConversationScreen(
-      {Key key, this.recevierId, this.recevierAvatar, this.recevierName});
+      {Key key,
+      this.recevierId,
+      this.recevierAvatar,
+      this.recevierName,
+      this.recevierMail,
+      this.recevierAbout,
+      this.recevierCreate});
 
   @override
   Widget build(BuildContext context) {
+    Users users;
     User user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.cyan,
         actions: <Widget>[
-          Padding(
-            padding: EdgeInsets.all(8.0),
-            child: CircleAvatar(
-              backgroundColor: Colors.black,
-              child: Material(
-                child: recevierAvatar != null
-                    ? CachedNetworkImage(
-                        placeholder: (context, url) => Container(
-                          decoration: BoxDecoration(
-                              image: DecorationImage(
-                            image: AssetImage('images/placeHolder.jpg'),
-                          )),
-                          height: 40,
-                          width: 40,
-                          padding:
-                              EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+          GestureDetector(
+            onTap: () {
+              Navigator.push<MaterialPageRoute>(
+                  context,
+                  MaterialPageRoute(
+                      builder: (BuildContext context) => UserDetails(
+                            recevierAvatar: recevierAvatar,
+                            recevierName: recevierName,
+                            recevierMail: recevierMail,
+                            recevierAbout: recevierAbout,
+                            recevierCreate: recevierCreate,
+                          )));
+            },
+            child: Padding(
+              padding: EdgeInsets.all(8.0),
+              child: CircleAvatar(
+                backgroundColor: Colors.black,
+                child: Material(
+                  child: recevierAvatar.toString() != null
+                      ? CachedNetworkImage(
+                          placeholder: (context, url) => Container(
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                              image: AssetImage('images/placeHolder.jpg'),
+                            )),
+                            height: 40,
+                            width: 40,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 5),
+                          ),
+                          imageUrl: recevierAvatar.toString(),
+                          width: 50.0,
+                          height: 50.0,
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.account_circle,
+                          size: 50.0,
+                          color: Colors.grey,
                         ),
-                        imageUrl: recevierAvatar,
-                        width: 50.0,
-                        height: 50.0,
-                        fit: BoxFit.cover,
-                      )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 50.0,
-                        color: Colors.grey,
-                      ),
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                clipBehavior: Clip.hardEdge,
+                  borderRadius: BorderRadius.all(Radius.circular(25.0)),
+                  clipBehavior: Clip.hardEdge,
+                ),
               ),
             ),
           )
@@ -75,26 +101,44 @@ class ConversationScreen extends StatelessWidget {
                         uid: user.uid,
                       ))),
         ),
-        title: Align(
-          alignment: Alignment.center,
-          child: Container(
-            child: Text(
-              recevierName,
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 21,
-                letterSpacing: 1.5,
+        title: GestureDetector(
+          onTap: () {
+            Navigator.push<MaterialPageRoute>(
+                context,
+                MaterialPageRoute(
+                    builder: (BuildContext context) => UserDetails(
+                          recevierAvatar: recevierAvatar,
+                          recevierName: recevierName,
+                          recevierMail: recevierMail,
+                          recevierAbout: recevierAbout,
+                          recevierCreate: recevierCreate,
+                        )));
+          },
+          child: Align(
+            alignment: Alignment.center,
+            child: Container(
+              child: Text(
+                recevierName,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 21,
+                  letterSpacing: 1.5,
+                ),
+                //  textAlign: TextAlign.right
               ),
-              //  textAlign: TextAlign.right
             ),
           ),
         ),
       ),
       body: ChatScreen(
-          recevierId: recevierId,
-          recevierAvatar: recevierAvatar,
-          recevierName: recevierName),
+        recevierId: recevierId,
+        recevierAvatar: recevierAvatar,
+        recevierName: recevierName,
+        recevierMail: recevierMail,
+        recevierAbout: recevierAbout,
+        recevierCreate: recevierCreate,
+      ),
     );
   }
 }
@@ -103,31 +147,47 @@ class ChatScreen extends StatefulWidget {
   final String recevierId;
   final String recevierAvatar;
   final String recevierName;
+  final String recevierMail;
+  final String recevierAbout;
+  final String recevierCreate;
 
   ChatScreen({
     Key key,
     @required this.recevierId,
     @required this.recevierAvatar,
     @required this.recevierName,
+    @required this.recevierMail,
+    @required this.recevierAbout,
+    @required this.recevierCreate,
   }) : super(key: key);
 
   @override
   _ChatScreen createState() => _ChatScreen(
-      recevierId: recevierId,
-      recevierAvatar: recevierAvatar,
-      recevierName: recevierName);
+        recevierId: recevierId,
+        recevierAvatar: recevierAvatar,
+        recevierName: recevierName,
+        recevierMail: recevierMail,
+        recevierAbout: recevierAbout,
+        recevierCreate: recevierCreate,
+      );
 }
 
 class _ChatScreen extends State<ChatScreen> {
   final String recevierId;
   final String recevierAvatar;
   final String recevierName;
+  final String recevierMail;
+  final String recevierAbout;
+  final String recevierCreate;
 
   _ChatScreen({
     Key key,
     @required this.recevierId,
     @required this.recevierAvatar,
     @required this.recevierName,
+    @required this.recevierMail,
+    @required this.recevierAbout,
+    @required this.recevierCreate,
   });
 
   DatabaseMethods databaseMethods = DatabaseMethods();
@@ -146,7 +206,6 @@ class _ChatScreen extends State<ChatScreen> {
   int _limit = 20;
   final int _limitIncrement = 20;
   SharedPreferences preferences;
-
 
   Future<void> _settingModalBottomSheet(BuildContext context) async {
     showModalBottomSheet<void>(
@@ -724,14 +783,14 @@ class _ChatScreen extends State<ChatScreen> {
           isLoading = true;
         });
       } else {
-        throw Exception('File is not available/not taken');
+        throw ('File is not available/not taken');
       }
     } catch (e) {
       print(e);
       setState(() {
         isLoading = false;
         Fluttertoast.showToast(
-          msg:   e.toString(),
+          msg: e.toString(),
           textColor: Color(0xFFFFFFFF),
           fontSize: 16.0,
           // timeInSecForIosWeb: 4,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
+import 'package:photo_view/photo_view_gallery.dart';
 
 class FullScreenImagePage extends StatelessWidget {
   String url;
@@ -28,15 +29,51 @@ class FullScreenImagePage extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: Container(
-        child: Center(
-          child: PhotoView(
+      body: FullImage(
+        url: url,
+      ),
+    );
+  }
+}
+
+class FullImage extends StatefulWidget {
+  final String url;
+  FullImage({Key key, @required this.url}) : super(key: key);
+
+  @override
+  _FullImageState createState() => _FullImageState(url: url);
+}
+
+class _FullImageState extends State<FullImage> {
+
+  final String url;
+  
+
+  _FullImageState({
+    Key key,
+    @required this.url,
+   
+  });
+  
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      color: Colors.black,
+      child: PhotoViewGallery(
+        pageOptions: <PhotoViewGalleryPageOptions>[
+          PhotoViewGalleryPageOptions(
+            imageProvider: NetworkImage(url.toString()),
             minScale: PhotoViewComputedScale.contained * 1,
-            // maxScale: PhotoViewComputedScale.covered * 1.5,
-            imageProvider: NetworkImage(url),
-            backgroundDecoration: BoxDecoration(color: Colors.black),
+            // maxScale: PhotoViewComputedScale.covered * 1.1,
+          ),
+        ],
+        loadingBuilder: (context, progress) => Center(
+          child: Container(
+           
+            child: CircularProgressIndicator(),
           ),
         ),
+        backgroundDecoration: BoxDecoration(color: Colors.black),
       ),
     );
   }

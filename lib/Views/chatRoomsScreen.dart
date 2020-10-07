@@ -195,10 +195,7 @@ class ChatRoomState extends State<ChatRoom> {
   final GoogleSignIn googleSignIn = GoogleSignIn();
 
   bool isLoading = false;
-  List<Choice> choices = const <Choice>[
-    const Choice(title: 'Settings', icon: Icons.settings),
-    const Choice(title: 'Log out', icon: Icons.exit_to_app),
-  ];
+ 
 
   @override
   void initState() {
@@ -244,16 +241,7 @@ class ChatRoomState extends State<ChatRoom> {
 //     flutterLocalNotificationsPlugin.initialize(initializationSettings);
 //   }
 
-  void onItemMenuPress(Choice choice) {
-    if (choice.title == 'Log out') {
-      // openDialog();
-    } else {
-      Navigator.push<MaterialPageRoute>(
-          context,
-          MaterialPageRoute(
-              builder: (BuildContext context) => SettingScreen()));
-    }
-  }
+ 
 
 //   void showNotification(message) async {
 //     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
@@ -437,6 +425,9 @@ class ChatRoomState extends State<ChatRoom> {
                           recevierId: document.id,
                           recevierAvatar: ('${document.data()['photoUrl']}'),
                           recevierName: '${document.data()['username']}',
+                          recevierAbout: '${document.data()['aboutMe']}',
+                          recevierCreate: '${document.data()['createdAt']}',
+                          recevierMail: '${document.data()['email']}',
                         )));
           },
           color: Colors.cyan,

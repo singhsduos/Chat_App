@@ -105,7 +105,7 @@ class _SettingScreenState extends State<SettingScreen> {
           isLoading = true;
         });
       } else {
-        throw Exception('File is not available/not taken');
+        throw('File is not available/not taken');
       }
     } catch (e) {
       print(e);
