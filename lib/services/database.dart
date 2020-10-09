@@ -8,13 +8,24 @@ class DatabaseMethods {
   final String username;
   DatabaseMethods({this.username});
 
-  final CollectionReference users = FirebaseFirestore.instance.collection("users");
-
+  final CollectionReference users =
+      FirebaseFirestore.instance.collection("users");
+  Users user = Users();
 
   Future<User> getCurrentUser() async {
     User currentUser;
     currentUser = await FirebaseAuth.instance.currentUser;
     return currentUser;
+  }
+
+  Future<Users> getUserDetails() async {
+    User currentUser;
+    currentUser = await FirebaseAuth.instance.currentUser;
+
+    DocumentSnapshot documentSnapshot =
+        await users.doc(currentUser.uid).get();
+
+    return Users.fromMap(documentSnapshot.data());
   }
 
   Future<QuerySnapshot> getByUserName(String username) async {

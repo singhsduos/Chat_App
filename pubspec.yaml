@@ -54,6 +54,8 @@ dependencies:
   firebase_storage:
   photo_view:
   modal_bottom_sheet:
+  agora_rtc_engine:
+  permission_handler: ^3.0.0
 
     
 

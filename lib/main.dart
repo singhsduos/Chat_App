@@ -4,6 +4,7 @@ import 'package:ChatApp/Views/forgetPassword.dart';
 import 'package:ChatApp/helper/authenticate.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
+import 'package:ChatApp/provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:firebase_core/firebase_core.dart';
@@ -50,8 +51,11 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     // User user = FirebaseAuth.instance.currentUser;
-    return ChangeNotifierProvider(
-      create: (_) => ThemeNotifier(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ThemeNotifier()),
+        ChangeNotifierProvider(create: (_) => UserProvider())
+      ],
       child: Consumer<ThemeNotifier>(
         builder: (context, ThemeNotifier notifier, child) {
           return MaterialApp(

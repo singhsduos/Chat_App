@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
 import 'package:ChatApp/Views/conversationScreen.dart';
 import 'package:ChatApp/Views/drawer.dart';
 import 'package:ChatApp/Views/search.dart';
@@ -17,6 +18,7 @@ import 'package:ChatApp/provider/provider.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Views/account_setting.dart';
 
@@ -191,7 +193,7 @@ class ChatRoomState extends State<ChatRoom> {
   AuthMethods authMethods = AuthMethods();
   final FirebaseAuth auth = FirebaseAuth.instance;
   UserProvider userProvider;
-    PageController pageController;
+  PageController pageController;
   int _page = 0;
 
   final String uid;
@@ -207,20 +209,21 @@ class ChatRoomState extends State<ChatRoom> {
     super.initState();
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
-       userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider.refreshUser(); 
+      userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.refreshUser();
     });
     pageController = PageController();
     // registerNotification();
     // configLocalNotification();
   }
-   void onPageChanged(int page) {
+
+  void onPageChanged(int page) {
     setState(() {
       _page = page;
     });
   }
 
-    void navigationTapped(int page) {
+  void navigationTapped(int page) {
     pageController.jumpToPage(page);
   }
 
@@ -299,7 +302,7 @@ class ChatRoomState extends State<ChatRoom> {
 
   @override
   Widget build(BuildContext context) {
-    
+    double _labelFontSize = 10;
     return Scaffold(
       appBar: AppBar(
         iconTheme: new IconThemeData(color: Colors.white),
@@ -332,42 +335,112 @@ class ChatRoomState extends State<ChatRoom> {
         ),
       ),
 
-      body: WillPopScope(
-        child: Stack(
-          children: <Widget>[
-            // List
-            Container(
-              child: StreamBuilder(
-                stream:
-                    FirebaseFirestore.instance.collection('users').snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
-                      ),
-                    );
-                  } else {
-                    return ListView.builder(
-                      padding: EdgeInsets.all(10.0),
-                      itemBuilder: (context, index) =>
-                          buildItem(context, snapshot.data.docs[index]),
-                      itemCount: snapshot.data.docs.length,
-                    );
-                  }
-                },
+      body: PickupLayout(
+        scaffold: Scaffold(
+          body: PageView(
+            children: <Widget>[
+              // List
+              Container(
+                child: StreamBuilder(
+                  stream: FirebaseFirestore.instance
+                      .collection('users')
+                      .snapshots(),
+                  builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    if (!snapshot.hasData) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          valueColor:
+                              AlwaysStoppedAnimation<Color>(Colors.cyan),
+                        ),
+                      );
+                    } else {
+                      return ListView.builder(
+                        padding: EdgeInsets.all(10.0),
+                        itemBuilder: (context, index) =>
+                            buildItem(context, snapshot.data.docs[index]),
+                        itemCount: snapshot.data.docs.length,
+                      );
+                    }
+                  },
+                ),
               ),
-            ),
 
-            // Loading
-            Positioned(
-              child: isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : Container(),
-            )
-          ],
+              // Loading
+              Center(
+                child: Text(
+                  'Call Logs',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              Positioned(
+                child: isLoading
+                    ? Center(child: CircularProgressIndicator())
+                    : Container(),
+              ),
+              
+            ],
+            controller: pageController,
+          onPageChanged: onPageChanged,
+          physics: NeverScrollableScrollPhysics(),
+          ),
+          bottomNavigationBar: Container(
+          child: Padding(
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: CupertinoTabBar(
+              backgroundColor: Colors.red,
+              items: <BottomNavigationBarItem>[
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.chat,
+                      color: (_page == 0)
+                          ? Colors.blueAccent
+                          : Colors.grey),
+                  title: Text(
+                    "Chats",
+                    style: TextStyle(
+                        fontSize: _labelFontSize,
+                        color: (_page == 0)
+                            ? Colors.blueAccent
+                            : Colors.grey),
+                  ),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.call,
+                      color: (_page == 1)
+                          ? Colors.blueAccent
+                          : Colors.grey),
+                  title: Text(
+                    "Calls",
+                    style: TextStyle(
+                        fontSize: _labelFontSize,
+                        color: (_page == 1)
+                            ? Colors.blueAccent
+                            : Colors.grey),
+                  ),
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.contact_phone,
+                      color: (_page == 2)
+                          ? Colors.blueAccent
+                          : Colors.grey),
+                  title: Text(
+                    "Contacts",
+                    style: TextStyle(
+                        fontSize: _labelFontSize,
+                        color: (_page == 2)
+                            ? Colors.blueAccent
+                            : Colors.grey),
+                  ),
+                ),
+              ],
+              onTap: navigationTapped,
+              currentIndex: _page,
+            ),
+          ),
         ),
-        onWillPop: onBackPress,
+      
+
+        ),
+        // onWillPop: onBackPress,
       ),
     );
   }
@@ -463,3 +536,36 @@ class Choice {
   final String title;
   final IconData icon;
 }
+
+
+
+
+// agora app
+// import io.agora.rtc.Constants;
+// import io.agora.rtc.IRtcEngineEventHandler;
+// import io.agora.rtc.RtcEngine;
+// ...
+// private void initializeAgoraEngine() {
+//     try {
+//         mRtcEngine = RtcEngine.create(getBaseContext(), getString(R.string.agora_app_id), mRtcEventHandler);
+//     } catch (Exception e) {
+//         Log.e(LOG_TAG, Log.getStackTraceString(e));
+//         throw new RuntimeException("NEED TO check rtc sdk init fatal error" + Log.getStackTraceString(e));
+//     }
+// }
+
+// enable video with agora
+// mRtcEngine.enableVideo();
+
+//join agora channel
+// private void joinChannel() {
+//   // if you do not specify the uid, Agora will assign one.
+//   mRtcEngine.joinChannel(null, "demoChannel1", "Extra Optional Data", 0);
+// }
+
+//leave channel
+
+        // private void leaveChannel() {
+        //   mRtcEngine.leaveChannel();
+        // }
+      

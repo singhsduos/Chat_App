@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:ChatApp/Widget/fullScreenGalleryImage.dart';
 import 'package:ChatApp/Widget/fullScreenUserImage.dart';
 import 'package:ChatApp/modal/user.dart';
+import 'package:ChatApp/utils/call_utilities.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -17,7 +18,7 @@ import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class ConversationScreen extends StatelessWidget {
+class ConversationScreen extends StatefulWidget {
   final String recevierId;
   final String recevierAvatar;
   final String recevierName;
@@ -34,24 +35,173 @@ class ConversationScreen extends StatelessWidget {
       this.recevierCreate});
 
   @override
+  _ConversationScreenState createState() => _ConversationScreenState();
+}
+
+class _ConversationScreenState extends State<ConversationScreen> {
+
+  Users sender;
+
+  Users recevier;
+  Future<Null> openDialog() async {
+    switch (await showDialog<int>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            contentPadding:
+                EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
+            children: <Widget>[
+              Container(
+                color: Colors.cyan,
+                margin: EdgeInsets.all(0.0),
+                padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.call,
+                        size: 30.0,
+                        color: Colors.white,
+                      ),
+                      margin: EdgeInsets.only(bottom: 10.0),
+                    ),
+                    Text(
+                      'Make calls to your friends',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {},
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.call,
+                        color: Colors.cyan,
+                      ),
+                      margin: EdgeInsets.only(right: 10.0),
+                    ),
+                    Text(
+                      'Internet Call',
+                      style: TextStyle(
+                          color: Colors.cyan, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  CallUtils.dial(
+                     from:sender ,
+                     to: recevier,
+                     context: context,
+                  );
+                },
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.video_call,
+                        color: Colors.cyan,
+                      ),
+                      margin: EdgeInsets.only(right: 10.0),
+                    ),
+                    Text(
+                      'Video Call',
+                      style: TextStyle(
+                          color: Colors.cyan, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.pop(context, 0);
+                },
+                child: Row(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.cancel,
+                        color: Colors.cyan,
+                      ),
+                      margin: EdgeInsets.only(right: 10.0),
+                    ),
+                    Text(
+                      'Cancel',
+                      style: TextStyle(
+                          color: Colors.cyan, fontWeight: FontWeight.bold),
+                    )
+                  ],
+                ),
+              ),
+            ],
+          );
+        })) {
+      case 0:
+        break;
+      case 1:
+        exit(0);
+        break;
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     Users users;
     User user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.cyan,
+        iconTheme: IconThemeData(color: Colors.white),
         actions: <Widget>[
+          Align(
+            alignment: Alignment.centerLeft,
+            child: GestureDetector(
+              onTap: () {
+                Navigator.push<MaterialPageRoute>(
+                    context,
+                    MaterialPageRoute(
+                        builder: (BuildContext context) => UserDetails(
+                              recevierAvatar: widget.recevierAvatar,
+                              recevierName: widget.recevierName,
+                              recevierMail: widget.recevierMail,
+                              recevierAbout: widget.recevierAbout,
+                              recevierCreate: widget.recevierCreate,
+                            )));
+              },
+              child: Container(
+                alignment: Alignment.centerLeft,
+                padding: EdgeInsets.only(right: 40),
+                child: Text(
+                  widget.recevierName,
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 21,
+                    letterSpacing: 1.5,
+                  ),
+                  // textAlign: TextAlign.left,
+                ),
+              ),
+            ),
+          ),
           GestureDetector(
             onTap: () {
               Navigator.push<MaterialPageRoute>(
                   context,
                   MaterialPageRoute(
                       builder: (BuildContext context) => UserDetails(
-                            recevierAvatar: recevierAvatar,
-                            recevierName: recevierName,
-                            recevierMail: recevierMail,
-                            recevierAbout: recevierAbout,
-                            recevierCreate: recevierCreate,
+                            recevierAvatar: widget.recevierAvatar,
+                            recevierName: widget.recevierName,
+                            recevierMail: widget.recevierMail,
+                            recevierAbout: widget.recevierAbout,
+                            recevierCreate: widget.recevierCreate,
                           )));
             },
             child: Padding(
@@ -59,7 +209,7 @@ class ConversationScreen extends StatelessWidget {
               child: CircleAvatar(
                 backgroundColor: Colors.black,
                 child: Material(
-                  child: recevierAvatar.toString() != null
+                  child: widget.recevierAvatar.toString() != null
                       ? CachedNetworkImage(
                           placeholder: (context, url) => Container(
                             decoration: BoxDecoration(
@@ -71,7 +221,7 @@ class ConversationScreen extends StatelessWidget {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 5, vertical: 5),
                           ),
-                          imageUrl: recevierAvatar.toString(),
+                          imageUrl: widget.recevierAvatar.toString(),
                           width: 50.0,
                           height: 50.0,
                           fit: BoxFit.cover,
@@ -86,7 +236,15 @@ class ConversationScreen extends StatelessWidget {
                 ),
               ),
             ),
-          )
+          ),
+          IconButton(
+            icon: const Icon(
+              Icons.call,
+              color: Colors.white,
+              size: 27,
+            ),
+            onPressed: openDialog,
+          ),
         ],
         leading: IconButton(
           icon: const Icon(
@@ -101,43 +259,15 @@ class ConversationScreen extends StatelessWidget {
                         uid: user.uid,
                       ))),
         ),
-        title: GestureDetector(
-          onTap: () {
-            Navigator.push<MaterialPageRoute>(
-                context,
-                MaterialPageRoute(
-                    builder: (BuildContext context) => UserDetails(
-                          recevierAvatar: recevierAvatar,
-                          recevierName: recevierName,
-                          recevierMail: recevierMail,
-                          recevierAbout: recevierAbout,
-                          recevierCreate: recevierCreate,
-                        )));
-          },
-          child: Align(
-            alignment: Alignment.center,
-            child: Container(
-              child: Text(
-                recevierName,
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 21,
-                  letterSpacing: 1.5,
-                ),
-                //  textAlign: TextAlign.right
-              ),
-            ),
-          ),
-        ),
+        centerTitle: true,
       ),
       body: ChatScreen(
-        recevierId: recevierId,
-        recevierAvatar: recevierAvatar,
-        recevierName: recevierName,
-        recevierMail: recevierMail,
-        recevierAbout: recevierAbout,
-        recevierCreate: recevierCreate,
+        recevierId: widget.recevierId,
+        recevierAvatar: widget.recevierAvatar,
+        recevierName: widget.recevierName,
+        recevierMail: widget.recevierMail,
+        recevierAbout: widget.recevierAbout,
+        recevierCreate: widget.recevierCreate,
       ),
     );
   }
