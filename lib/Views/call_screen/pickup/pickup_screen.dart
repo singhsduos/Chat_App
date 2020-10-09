@@ -1,5 +1,6 @@
 import 'package:ChatApp/Views/call_screen/call_screen.dart';
 import 'package:ChatApp/modal/call.dart';
+import 'package:ChatApp/utils/permissions.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/services/call_methods.dart';
@@ -57,12 +58,12 @@ class PickupScreen extends StatelessWidget {
                 IconButton(
                   icon: Icon(Icons.call),
                   color: Colors.greenAccent,
-                  onPressed: () => Navigator.push(
+                  onPressed: () async => await Permissions.cameraAndMicrophonePermissionsGranted() ? Navigator.push(
                     context,
                     MaterialPageRoute<MaterialPageRoute>(
                       builder: (context) => CallScreen(call:call, role: role,),
                     ),
-                  ),
+                  ): {dynamic},
                 ),
               ],
             )

@@ -57,7 +57,7 @@ class _CallScreenState extends State<CallScreen> {
     if (APP_ID.isEmpty) {
       setState(() {
         _infoStrings.add(
-          'APP_ID missing, please provide your APP_ID in settings.dart',
+          APP_ID,
         );
         _infoStrings.add('Agora Engine is not starting');
       });
@@ -66,6 +66,7 @@ class _CallScreenState extends State<CallScreen> {
 
     await _initAgoraRtcEngine();
     _addAgoraEventHandlers();
+    // ignore: deprecated_member_use
     await _engine.enableWebSdkInteroperability(true);
     VideoEncoderConfiguration configuration = VideoEncoderConfiguration();
     configuration.dimensions = VideoDimensions(1920, 1080);
@@ -88,11 +89,7 @@ class _CallScreenState extends State<CallScreen> {
         final info = 'onError: $code';
         _infoStrings.add(info);
       });
-    },
-         
-      
-
-     joinChannelSuccess: (channel, uid, elapsed) {
+    }, joinChannelSuccess: (channel, uid, elapsed) {
       setState(() {
         final info = 'onJoinChannel: $channel, uid: $uid';
         _infoStrings.add(info);
@@ -109,6 +106,7 @@ class _CallScreenState extends State<CallScreen> {
         _users.add(uid);
       });
     }, userOffline: (uid, elapsed) {
+      callMethods.endCall(call: widget.call);
       setState(() {
         final info = 'userOffline: $uid';
         _infoStrings.add(info);

@@ -4,6 +4,7 @@ import 'package:ChatApp/Widget/fullScreenGalleryImage.dart';
 import 'package:ChatApp/Widget/fullScreenUserImage.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/utils/call_utilities.dart';
+import 'package:ChatApp/utils/permissions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -39,7 +40,6 @@ class ConversationScreen extends StatefulWidget {
 }
 
 class _ConversationScreenState extends State<ConversationScreen> {
-
   Users sender;
 
   Users recevier;
@@ -95,13 +95,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 ),
               ),
               SimpleDialogOption(
-                onPressed: () {
+                onPressed: () async =>
+                  await Permissions.cameraAndMicrophonePermissionsGranted() ?
                   CallUtils.dial(
-                     from:sender ,
-                     to: recevier,
-                     context: context,
-                  );
-                },
+                    from: sender,
+                    to: recevier,
+                    context: context,
+                  ) : {dynamic},
+                
                 child: Row(
                   children: <Widget>[
                     Container(
