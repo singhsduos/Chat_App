@@ -324,7 +324,7 @@ class ChatRoomState extends State<ChatRoom> {
               context,
               MaterialPageRoute(
                   builder: (BuildContext context) =>
-                      Search(currentUserId: user.uid)));
+                      Search()));
         },
         child: Icon(
           Icons.search,

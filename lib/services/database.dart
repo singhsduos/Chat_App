@@ -61,9 +61,11 @@ class DatabaseMethods {
     return userList;
   }
 
+  
+
   Future<void> uploadUserInfo(dynamic userMap) async {
     Map<String, String> userMap;
-    return await Firestore.instance
+    return await FirebaseFirestore.instance
         .collection("users")
         .add(userMap)
         .catchError((dynamic e) {
