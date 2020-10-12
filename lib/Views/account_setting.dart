@@ -217,6 +217,33 @@ class _SettingScreenState extends State<SettingScreen> {
                             ),
                           ),
                         ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 10.0),
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                                children: <Widget>[
+                                  Container(
+                                    padding: EdgeInsets.only(bottom: 10),
+                                    child: IconButton(
+                                      onPressed: (){},
+                                      icon: Icon(
+                                        Icons.delete,
+                                        size: 50.0,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    margin: EdgeInsets.only(right: 10.0),
+                                  ),
+                                  Text(
+                                    'Delete',
+                                    style: TextStyle(
+                                        color: Colors.white, fontSize: 20),
+                                  )
+                                ],
+                              ),
+                          ),
+                        ),
                       ],
                     ),
                   ),

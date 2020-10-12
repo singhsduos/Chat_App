@@ -1,13 +1,10 @@
-import 'package:ChatApp/Widget/customTile.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
-import 'package:intl/intl.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:ChatApp/Views/conversationScreen.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/services/database.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:flutter/material.dart';
 
 class Search extends StatefulWidget {
@@ -61,48 +58,50 @@ class _SearchState extends State<Search> {
         Users searchedUser = Users(
           userId: suggestionList[index].userId,
           photoUrl: suggestionList[index].photoUrl,
+          aboutMe: suggestionList[index].aboutMe,
           email: suggestionList[index].email,
+          createdAt: suggestionList[index].createdAt,
           username: suggestionList[index].username,
         );
         // print("Role: " + searchedUser.role);
         return ListTile(
           onTap: () {
-            //  Navigator.push(
-            //     context,
-            //     MaterialPageRoute<MaterialPageRoute>(
-            //         builder: (context) => ChatScreen(
-            //               receiver: searchedUser,
-            //             )));
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute<MaterialPageRoute>(
+                    builder: (context) => ConversationScreen(
+                          recevier: searchedUser,
+                        )));
           },
           leading: CircleAvatar(
-                  backgroundColor: Colors.black,
-                  child: Material(
-                    child: searchedUser.photoUrl.toString() != null
-                        ? CachedNetworkImage(
-                            placeholder: (context, url) => Container(
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                image: AssetImage('images/placeHolder.jpg'),
-                              )),
-                              height: 80,
-                              width: 80,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 5),
-                            ),
-                            imageUrl: searchedUser.photoUrl.toString(),
-                            width: 80.0,
-                            height: 80.0,
-                            fit: BoxFit.cover,
-                          )
-                        : Icon(
-                            Icons.account_circle,
-                            size: 60.0,
-                            color: Colors.white,
-                          ),
-                    borderRadius: BorderRadius.all(Radius.circular(125.0)),
-                    clipBehavior: Clip.hardEdge,
-                  ),
-                ),
+            backgroundColor: Colors.black,
+            child: Material(
+              child: searchedUser.photoUrl.toString() != null
+                  ? CachedNetworkImage(
+                      placeholder: (context, url) => Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                          image: AssetImage('images/placeHolder.jpg'),
+                        )),
+                        height: 80,
+                        width: 80,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                      ),
+                      imageUrl: '${searchedUser.photoUrl}',
+                      width: 80.0,
+                      height: 80.0,
+                      fit: BoxFit.cover,
+                    )
+                  : Icon(
+                      Icons.account_circle,
+                      size: 60.0,
+                      color: Colors.white,
+                    ),
+              borderRadius: BorderRadius.all(Radius.circular(125.0)),
+              clipBehavior: Clip.hardEdge,
+            ),
+          ),
           title: Text(
             searchedUser.username,
             style: TextStyle(
@@ -195,90 +194,4 @@ class _SearchState extends State<Search> {
       ),
     );
   }
-
-  // Container buildNoContent() {
-  //   // final Orientation orientation = MediaQuery.of(context).orientation;
-  //   return Container(
-  //     child: Center(
-  //       child: ListView(
-  //         shrinkWrap: true,
-  //         children: <Widget>[
-  //           Icon(
-  //             Icons.group,
-  //             color: Colors.cyan,
-  //             size: 200.0,
-  //           ),
-  //           Text(
-  //             "Search Users",
-  //             textAlign: TextAlign.center,
-  //             style: TextStyle(
-  //               color: Colors.cyan,
-  //               fontStyle: FontStyle.italic,
-  //               fontWeight: FontWeight.w500,
-  //               fontSize: 50.0,
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
-
-// class UserResult extends StatelessWidget {
-//   Users users;
-//   UserResult(this.users);
-//   DatabaseMethods databaseMethods = DatabaseMethods();
-
-//   dynamic createChatroomAndStartConversation(BuildContext context) {
-//     Navigator.pushReplacement(
-//         context,
-//         MaterialPageRoute<MaterialPageRoute>(
-//             builder: (BuildContext context) => ConversationScreen(
-//                   recevierId: users.userId,
-//                   recevierAvatar: users.photoUrl,
-//                   recevierName: users.username,
-//                   recevierMail: users.email,
-//                   recevierAbout: users.aboutMe,
-//                   recevierCreate: users.createdAt,
-//                 )));
-//   }
-
-  // @override
-  // Widget build(BuildContext context) {
-  //   return Padding(
-  //     padding: EdgeInsets.all(4.0),
-  //     child: Container(
-  //       color: Colors.white,
-  //       child: Column(
-  //         children: <Widget>[
-  //           GestureDetector(
-  //             onTap: () {
-  //               createChatroomAndStartConversation(context);
-  //             },
-  //             child: ListTile(
-  //               leading: CircleAvatar(
-  //                 backgroundColor: Colors.black,
-  //                 backgroundImage: CachedNetworkImageProvider(users.photoUrl),
-  //               ),
-  //               title: Text(
-  //                 users.username,
-  //                 style: TextStyle(
-  //                   fontSize: 17.0,
-  //                   fontWeight: FontWeight.bold,
-  //                 ),
-  //               ),
-  //               subtitle: Text(
-  //                 users.email,
-  //                 style: TextStyle(
-  //                     fontWeight: FontWeight.bold,
-  //                     fontSize: 14,
-  //                     fontStyle: FontStyle.italic),
-  //               ),
-  //             ),
-  //           ),
-  //         ],
-  //       ),
-  //     ),
-  //   );
-  // }
 }

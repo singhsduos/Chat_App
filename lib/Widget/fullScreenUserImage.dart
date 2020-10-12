@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:ChatApp/Views/conversationScreen.dart';
 import 'package:ChatApp/Widget/fullscreenImage.dart';
+import 'package:ChatApp/modal/user.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,20 +9,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class UserDetails extends StatelessWidget {
-  final String recevierAvatar;
-  final String recevierName;
-  final String recevierId;
-  final String recevierMail;
-  final String recevierAbout;
-  final String recevierCreate;
-  const UserDetails(
-      {Key key,
-      this.recevierAvatar,
-      this.recevierName,
-      this.recevierId,
-      this.recevierMail,
-      this.recevierAbout,
-      this.recevierCreate});
+  final Users recevier;
+  const UserDetails({Key key, this.recevier});
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +24,7 @@ class UserDetails extends StatelessWidget {
           alignment: Alignment.centerLeft,
           child: Container(
             child: Text(
-              recevierName,
+              recevier.username,
               style: TextStyle(
                 color: Colors.cyan,
                 fontWeight: FontWeight.bold,
@@ -47,61 +36,31 @@ class UserDetails extends StatelessWidget {
         ),
       ),
       body: UsersDetailsScreen(
-        recevierId: recevierId,
-        recevierAvatar: recevierAvatar,
-        recevierName: recevierName,
-        recevierMail: recevierMail,
-        recevierAbout: recevierAbout,
-        recevierCreate: recevierCreate,
+        recevier: recevier,
       ),
     );
   }
 }
 
 class UsersDetailsScreen extends StatefulWidget {
-  final String recevierId;
-  final String recevierAvatar;
-  final String recevierName;
-  final String recevierMail;
-  final String recevierAbout;
-  final String recevierCreate;
+ final Users recevier;
   UsersDetailsScreen({
     Key key,
-    @required this.recevierId,
-    @required this.recevierAvatar,
-    @required this.recevierName,
-    @required this.recevierMail,
-    @required this.recevierAbout,
-    @required this.recevierCreate,
+    @required this.recevier,
   }) : super(key: key);
 
   @override
   _UsersDetailsScreenState createState() => _UsersDetailsScreenState(
-        recevierId: recevierId,
-        recevierAvatar: recevierAvatar,
-        recevierName: recevierName,
-        recevierMail: recevierMail,
-        recevierAbout: recevierAbout,
-        recevierCreate: recevierCreate,
+        recevier: recevier,
       );
 }
 
 class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
-  final String recevierId;
-  final String recevierAvatar;
-  final String recevierName;
-  final String recevierMail;
-  final String recevierAbout;
-  final String recevierCreate;
+final Users recevier;
 
   _UsersDetailsScreenState({
     Key key,
-    @required this.recevierId,
-    @required this.recevierAvatar,
-    @required this.recevierName,
-    @required this.recevierMail,
-    @required this.recevierAbout,
-    @required this.recevierCreate,
+    @required this.recevier,
   });
   TextEditingController usernameTextEditingController;
   TextEditingController aboutMeTextEditingController;
@@ -127,7 +86,7 @@ class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
                     child: Stack(
                       children: <Widget>[
                         Material(
-                          child: recevierAvatar.toString() != null
+                          child: widget.recevier.photoUrl.toString() != null
                               ? GestureDetector(
                                   onTap: () {
                                     {
@@ -136,7 +95,7 @@ class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
                                         MaterialPageRoute(
                                           builder: (BuildContext context) =>
                                               FullScreenImagePage(
-                                            url: '${recevierAvatar}',
+                                            url: '${widget.recevier.photoUrl}',
                                           ),
                                         ),
                                       );
@@ -154,7 +113,7 @@ class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
                                       padding: EdgeInsets.symmetric(
                                           horizontal: 5, vertical: 5),
                                     ),
-                                    imageUrl: '${recevierAvatar}',
+                                    imageUrl: '${widget.recevier.photoUrl}',
                                     // width: 50.0,
                                     // height: 50.0,
                                     width: MediaQuery.of(context).size.width,
@@ -208,7 +167,8 @@ class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
                           leading: Icon(Icons.info_outline,
                               color: Colors.cyan, size: 28),
                           title: Text(
-                            '${recevierAbout ?? 'Not available'}',
+                            // ignore: unnecessary_string_interpolations
+                            '${widget.recevier.aboutMe ?? 'Not available'}',
                             style: TextStyle(
                                 // fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -241,17 +201,12 @@ class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
                                   MaterialPageRoute<MaterialPageRoute>(
                                       builder: (BuildContext context) =>
                                           ConversationScreen(
-                                            recevierId: recevierId,
-                                            recevierAvatar: recevierAvatar,
-                                            recevierName: recevierName,
-                                            recevierMail: recevierMail,
-                                            recevierAbout: recevierAbout,
-                                            recevierCreate: recevierCreate,
-                                          )));
+                                              recevier: widget.recevier,
+                                              )));
                             },
                           ),
                           title: Text(
-                            '${recevierMail ?? 'Not available'}',
+                            '${widget.recevier.email ?? 'Not available'}',
                             style: TextStyle(
                                 // fontWeight: FontWeight.bold,
                                 color: Colors.black,
@@ -302,7 +257,7 @@ class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
                           title: Text(
                             DateFormat('dd MMMM, yyyy - hh:mm:aa').format(
                                 DateTime.fromMillisecondsSinceEpoch(
-                                    int.parse(recevierCreate))),
+                                    int.parse(widget.recevier.createdAt))),
                             style: TextStyle(color: Colors.black, fontSize: 17),
                           ),
                         ),

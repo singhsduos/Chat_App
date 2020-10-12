@@ -1,14 +1,20 @@
+import 'package:ChatApp/modal/message.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
 
 class FullScreenGalleryImage extends StatelessWidget {
   String url;
-   final String recevierName;
-  FullScreenGalleryImage({Key key, @required this.url,this.recevierName}) : super(key: key);
+  String iD;
+  User user;
+
+  FullScreenGalleryImage(
+      {Key key, @required this.url, this.iD})
+      : super(key: key);
 
   @override
-   Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         leading: IconButton(
@@ -21,7 +27,7 @@ class FullScreenGalleryImage extends StatelessWidget {
         ),
         backgroundColor: Colors.black,
         title: Text(
-          recevierName,
+         iD,
           style: TextStyle(
             fontWeight: FontWeight.bold,
             letterSpacing: 1.0,
@@ -36,6 +42,7 @@ class FullScreenGalleryImage extends StatelessWidget {
     );
   }
 }
+
 class FullImage extends StatefulWidget {
   final String url;
   FullImage({Key key, @required this.url}) : super(key: key);
@@ -45,34 +52,32 @@ class FullImage extends StatefulWidget {
 }
 
 class _FullImageState extends State<FullImage> {
-
   final String url;
-  
 
   _FullImageState({
     Key key,
     @required this.url,
-   
   });
-  
+
   @override
   Widget build(BuildContext context) {
-    return PhotoViewGallery(
-      pageOptions: <PhotoViewGalleryPageOptions>[
-        PhotoViewGalleryPageOptions(
-          imageProvider: NetworkImage(url.toString()),
-          minScale: PhotoViewComputedScale.contained * 1,
-          // maxScale: PhotoViewComputedScale.covered * 1.1,
+    return Container(
+      color: Colors.black,
+      child: PhotoViewGallery(
+        pageOptions: <PhotoViewGalleryPageOptions>[
+          PhotoViewGalleryPageOptions(
+            imageProvider: NetworkImage(url.toString()),
+            minScale: PhotoViewComputedScale.contained * 1,
+            // maxScale: PhotoViewComputedScale.covered * 1.1,
+          ),
+        ],
+        loadingBuilder: (context, progress) => Center(
+          child: Container(
+            child: CircularProgressIndicator(),
+          ),
         ),
-      ],
-      loadingBuilder: (context, progress) => Center(
-        child: Container(
-         
-          child: CircularProgressIndicator(),
-        ),
+        backgroundDecoration: BoxDecoration(color: Colors.black),
       ),
-      backgroundDecoration: BoxDecoration(color: Colors.black),
     );
   }
 }
-

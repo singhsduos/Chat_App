@@ -4,6 +4,7 @@ import 'package:ChatApp/Views/forgetPassword.dart';
 import 'package:ChatApp/helper/authenticate.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
+import 'package:ChatApp/provider/image_upload_provider.dart';
 import 'package:ChatApp/provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -54,7 +55,8 @@ class _MyAppState extends State<MyApp> {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (_) => ThemeNotifier()),
-        ChangeNotifierProvider(create: (_) => UserProvider())
+        ChangeNotifierProvider(create: (_) => UserProvider()),
+        ChangeNotifierProvider(create: (_) => ImageUploadProvider()),
       ],
       child: Consumer<ThemeNotifier>(
         builder: (context, ThemeNotifier notifier, child) {

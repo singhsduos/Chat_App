@@ -434,17 +434,17 @@ class ChatRoomState extends State<ChatRoom> {
             ],
           ),
           onPressed: () {
-            Navigator.push(
-                context,
-                MaterialPageRoute<MaterialPageRoute>(
-                    builder: (context) => ConversationScreen(
-                          recevierId: document.id,
-                          recevierAvatar: ('${document.data()['photoUrl']}'),
-                          recevierName: '${document.data()['username']}',
-                          recevierAbout: '${document.data()['aboutMe']}',
-                          recevierCreate: '${document.data()['createdAt']}',
-                          recevierMail: '${document.data()['email']}',
-                        )));
+            // Navigator.push(
+            //     context,
+            //     MaterialPageRoute<MaterialPageRoute>(
+            //         builder: (context) => ConversationScreen(
+            //               recevierId: document.id,
+            //               recevierAvatar: ('${document.data()['photoUrl']}'),
+            //               recevierName: '${document.data()['username']}',
+            //               recevierAbout: '${document.data()['aboutMe']}',
+            //               recevierCreate: '${document.data()['createdAt']}',
+            //               recevierMail: '${document.data()['email']}',
+            //             )));
           },
           color: Colors.cyan,
           padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),

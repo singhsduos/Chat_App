@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:ChatApp/modal/message.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -22,8 +23,7 @@ class DatabaseMethods {
     User currentUser;
     currentUser = await FirebaseAuth.instance.currentUser;
 
-    DocumentSnapshot documentSnapshot =
-        await users.doc(currentUser.uid).get();
+    DocumentSnapshot documentSnapshot = await users.doc(currentUser.uid).get();
 
     return Users.fromMap(documentSnapshot.data());
   }
@@ -61,8 +61,6 @@ class DatabaseMethods {
     return userList;
   }
 
-  
-
   Future<void> uploadUserInfo(dynamic userMap) async {
     Map<String, String> userMap;
     return await FirebaseFirestore.instance
@@ -90,13 +88,19 @@ class DatabaseMethods {
   }
 
   Future<void> addConversationMessages(
-      String chatRoomid, dynamic messageMap) async {
-    Map<String, dynamic> messageMap;
+      Message message, Users sender, Users receiver) async {
+    var map = message.toMap() as Map<String, dynamic>;
+    await FirebaseFirestore.instance
+        .collection('messages')
+        .doc(message.id)
+        .collection(message.recevierId)
+        .add(map);
+
     return await FirebaseFirestore.instance
-        .collection('ChatRoom')
-        .doc(chatRoomid)
-        .collection('chats')
-        .add(messageMap);
+        .collection('messages')
+        .doc(message.recevierId)
+        .collection(message.id)
+        .add(map);
   }
 
   dynamic getConversationMessages(String chatRoomid) async {
