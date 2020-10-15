@@ -1,3 +1,5 @@
+import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
+import 'package:ChatApp/Widget/quietbox.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -50,6 +52,10 @@ class _SearchState extends State<Search> {
                 return (matchesEmail || matchesUsername);
               }).toList()
             : [];
+
+    if (suggestionList.isEmpty) {
+      return SearchUserContainer();
+    }
 
     return ListView.builder(
       // shrinkWrap: true,
@@ -124,7 +130,7 @@ class _SearchState extends State<Search> {
   PreferredSizeWidget searchAppBar(BuildContext context) {
     return GradientAppBar(
       gradient: LinearGradient(
-        colors: [Colors.cyan, Colors.lightBlue],
+        colors: [Colors.cyan, Colors.cyan],
       ),
       leading: IconButton(
         icon: Icon(
@@ -133,6 +139,15 @@ class _SearchState extends State<Search> {
           size: 27,
         ),
         onPressed: () => Navigator.pop(context),
+      ),
+      title: Text(
+        'ChaTooApp',
+        style: TextStyle(
+          fontSize: 17.0,
+          fontFamily: 'UncialAntiqua',
+          letterSpacing: 1.0,
+          color: Colors.white,
+        ),
       ),
       elevation: 0,
       bottom: PreferredSize(
@@ -147,7 +162,7 @@ class _SearchState extends State<Search> {
               });
             },
             cursorColor: Colors.black,
-            autofocus: true,
+            autofocus: false,
             style: TextStyle(
               fontWeight: FontWeight.bold,
               color: Colors.white,
@@ -186,11 +201,54 @@ class _SearchState extends State<Search> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: searchAppBar(context),
-      body: Container(
-        padding: EdgeInsets.all(4.0),
-        child: buildSuggestions(query),
+    return PickupLayout(
+          scaffold: Scaffold(
+        appBar: searchAppBar(context),
+        body: Container(
+          padding: EdgeInsets.all(4.0),
+          child: buildSuggestions(query),
+        ),
+      ),
+    );
+  }
+}
+
+class SearchUserContainer extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: SingleChildScrollView(
+            child: Padding(
+              padding: EdgeInsets.symmetric(horizontal: 25),
+              child: Container(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16.0),
+                  color: Colors.cyan,
+                ),
+                padding: EdgeInsets.symmetric(vertical: 35, horizontal: 25),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Icon(
+                      Icons.people,
+                      color: Colors.white,
+                      size: 250,
+                    ),
+                    SizedBox(height: 25),
+                     Text(
+                      'Search users with their username or email.',
+                      style: TextStyle(
+                          letterSpacing: 1.2,
+                          fontWeight: FontWeight.normal,
+                          fontSize: 20,
+                          color: Colors.white),
+                          textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
+              ),
+            ),
       ),
     );
   }

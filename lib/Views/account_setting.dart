@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
+import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
 import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -12,36 +13,36 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:path/path.dart';
-import 'package:modal_bottom_sheet/modal_bottom_sheet.dart';
-import 'package:toast/toast.dart';
 
 class Settings extends StatelessWidget {
   const Settings({Key key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-            size: 27,
+    return PickupLayout(
+      scaffold: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+              size: 27,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        backgroundColor: Colors.cyan,
-        title: Text(
-          'Account Settings',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.0,
-            color: Colors.white,
+          backgroundColor: Colors.cyan,
+          title: Text(
+            'Account Settings',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+              color: Colors.white,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
+        body: SettingScreen(),
       ),
-      body: SettingScreen(),
     );
   }
 }
@@ -105,7 +106,7 @@ class _SettingScreenState extends State<SettingScreen> {
           isLoading = true;
         });
       } else {
-        throw('File is not available/not taken');
+        throw ('File is not available');
       }
     } catch (e) {
       print(e);
@@ -135,7 +136,6 @@ class _SettingScreenState extends State<SettingScreen> {
     }
     uploadImageToFirestoreAndStorage();
   }
- 
 
   Future<void> _settingModalBottomSheet(BuildContext context) async {
     showModalBottomSheet<void>(
@@ -161,6 +161,33 @@ class _SettingScreenState extends State<SettingScreen> {
                   child: Center(
                     child: Row(
                       children: <Widget>[
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 10.0),
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 10),
+                                  child: IconButton(
+                                    onPressed: cameraImage,
+                                    icon: Icon(
+                                      Icons.camera,
+                                      size: 50.0,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  margin: EdgeInsets.only(right: 10.0),
+                                ),
+                                Text(
+                                  'Camera',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
                         Center(
                           child: Container(
                             margin: EdgeInsets.only(bottom: 10.0),
@@ -199,9 +226,11 @@ class _SettingScreenState extends State<SettingScreen> {
                                 Container(
                                   padding: EdgeInsets.only(bottom: 10),
                                   child: IconButton(
-                                    onPressed: cameraImage,
+                                    onPressed: () {
+                                      openDialog(context);
+                                    },
                                     icon: Icon(
-                                      Icons.camera,
+                                      Icons.delete,
                                       size: 50.0,
                                       color: Colors.white,
                                     ),
@@ -209,39 +238,12 @@ class _SettingScreenState extends State<SettingScreen> {
                                   margin: EdgeInsets.only(right: 10.0),
                                 ),
                                 Text(
-                                  'Camera',
+                                  'Delete',
                                   style: TextStyle(
                                       color: Colors.white, fontSize: 20),
                                 )
                               ],
                             ),
-                          ),
-                        ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(bottom: 10.0),
-                            padding: EdgeInsets.all(16.0),
-                            child: Column(
-                                children: <Widget>[
-                                  Container(
-                                    padding: EdgeInsets.only(bottom: 10),
-                                    child: IconButton(
-                                      onPressed: (){},
-                                      icon: Icon(
-                                        Icons.delete,
-                                        size: 50.0,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                    margin: EdgeInsets.only(right: 10.0),
-                                  ),
-                                  Text(
-                                    'Delete',
-                                    style: TextStyle(
-                                        color: Colors.white, fontSize: 20),
-                                  )
-                                ],
-                              ),
                           ),
                         ),
                       ],
@@ -252,6 +254,111 @@ class _SettingScreenState extends State<SettingScreen> {
             ),
           );
         });
+  }
+
+  Future<Null> openDialog(BuildContext context) async {
+    switch (await showDialog<int>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog(
+            contentPadding:
+                EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
+            children: <Widget>[
+              Container(
+                color: Colors.cyan,
+                margin: EdgeInsets.all(0.0),
+                padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
+                child: Column(
+                  children: <Widget>[
+                    Container(
+                      child: Icon(
+                        Icons.delete,
+                        size: 30.0,
+                        color: Colors.white,
+                      ),
+                      margin: EdgeInsets.only(bottom: 10.0),
+                    ),
+                    Text(
+                      'Delete profile picture?',
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+              ),
+              Row(
+                children: <Widget>[
+                  SimpleDialogOption(
+                    onPressed: () {
+                      Navigator.pop(context, 0);
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          child: Icon(
+                            Icons.cancel,
+                            color: Colors.cyan,
+                          ),
+                          margin: EdgeInsets.only(right: 10.0),
+                        ),
+                        Text(
+                          'CANCEL',
+                          style: TextStyle(
+                              color: Colors.cyan, fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                  SimpleDialogOption(
+                    onPressed: () {
+                      deletePicture();
+                      context:
+                      context;
+                    },
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          child: Icon(
+                            Icons.check_circle,
+                            color: Colors.cyan,
+                          ),
+                          margin: EdgeInsets.only(right: 10.0),
+                        ),
+                        Text(
+                          'DELETE',
+                          style: TextStyle(
+                              color: Colors.cyan, fontWeight: FontWeight.bold),
+                        )
+                      ],
+                    ),
+                  ),
+                ],
+              )
+            ],
+          );
+        })) {
+      case 0:
+        break;
+      case 1:
+        exit(0);
+        break;
+    }
+  }
+
+  Future<void> deletePicture() async {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(id)
+        .update(<String, dynamic>{'photoUrl': null}).then((data) async {
+      await preferences.setString('photoUrl', null);
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(
+          msg: 'Picture deleted successfully.', gravity: ToastGravity.CENTER);
+    });
   }
 
   Future uploadImageToFirestoreAndStorage() async {
@@ -279,7 +386,8 @@ class _SettingScreenState extends State<SettingScreen> {
         setState(() {
           isLoading = false;
         });
-        Fluttertoast.showToast(msg: 'Picture updated successfully.');
+        Fluttertoast.showToast(
+            msg: 'Picture updated successfully.', gravity: ToastGravity.CENTER);
       });
     }, onError: (Object errorMsg) {
       setState(() {
@@ -328,49 +436,51 @@ class _SettingScreenState extends State<SettingScreen> {
                   child: Stack(
                     children: <Widget>[
                       if (imageFileAvatar == null)
-                        (photoUrl != "")
-                            ? GestureDetector(
-                                onTap: () {
-                                  {
-                                    Navigator.push<MaterialPageRoute>(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (BuildContext context) =>
-                                            FullScreenImagePage(
-                                          url: photoUrl,
-                                        ),
-                                      ),
-                                    );
-                                  }
-                                },
-                                child: Material(
-                                  //displaying existing pic
-                                  child: CachedNetworkImage(
+                        GestureDetector(
+                          onTap: () {
+                            {
+                              Navigator.push<MaterialPageRoute>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      FullScreenImagePage(
+                                          url: photoUrl != null
+                                              ? photoUrl
+                                              : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'),
+                                ),
+                              );
+                            }
+                          },
+                          child: Material(
+                            //displaying existing pic
+                            child: photoUrl.toString() != null
+                                ? CachedNetworkImage(
                                     placeholder: (context, url) => Container(
-                                      child: CircularProgressIndicator(
-                                          strokeWidth: 2.0,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                  Colors.cyan)),
-                                      width: 200.0,
-                                      height: 200.0,
-                                      padding: EdgeInsets.all(20.0),
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                        image: AssetImage(
+                                            'images/placeHolder.jpg'),
+                                      )),
+                                      height: 200,
+                                      width: 200,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 5),
                                     ),
-                                    imageUrl: photoUrl,
+                                    imageUrl: photoUrl.toString(),
                                     width: 200.0,
                                     height: 200.0,
                                     fit: BoxFit.cover,
+                                  )
+                                : Icon(
+                                    Icons.account_circle,
+                                    size: 200.0,
+                                    color: Colors.white,
                                   ),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(125.0)),
-                                  clipBehavior: Clip.hardEdge,
-                                ),
-                              )
-                            : Icon(
-                                Icons.account_circle,
-                                size: 90,
-                                color: Color(0xfff99AAAB),
-                              )
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(125.0)),
+                            clipBehavior: Clip.hardEdge,
+                          ),
+                        )
                       else
                         GestureDetector(
                           onTap: () {
@@ -516,7 +626,7 @@ class _SettingScreenState extends State<SettingScreen> {
                   width: MediaQuery.of(context).size.width / 3.0,
                   padding: EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: const Color(0xfff4BCFFA),
+                    color: Colors.cyan,
                     borderRadius: BorderRadius.all(Radius.circular(80.0)),
                   ),
                   child: Text('Update',

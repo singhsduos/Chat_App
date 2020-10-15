@@ -1,13 +1,9 @@
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
-import 'package:ChatApp/Views/conversationScreen.dart';
-import 'package:ChatApp/Views/forgetPassword.dart';
 import 'package:ChatApp/helper/authenticate.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/provider/image_upload_provider.dart';
 import 'package:ChatApp/provider/provider.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
@@ -66,13 +62,9 @@ class _MyAppState extends State<MyApp> {
               theme: CustomTheme.of(context),
               home: Constants.prefs.getBool('userIsLoggedIn') == true
                   ? ChatRoom(
-                      uid: null,
+                      uid: null
                     )
-                  : Authenticate()
-
-              // home: ConversationScreen(),
-              // home: ForgotPassword(),
-              );
+                  : Authenticate());
         },
       ),
     );

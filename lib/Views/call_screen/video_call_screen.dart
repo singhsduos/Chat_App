@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:ChatApp/configs/agora_configs.dart';
 import 'package:ChatApp/modal/call.dart';
 import 'package:ChatApp/provider/provider.dart';
@@ -31,6 +30,7 @@ class _CallScreenState extends State<CallScreen> {
   final _infoStrings = <String>[];
   bool muted = false;
   RtcEngine _engine;
+  bool disableVideo = false;
 
   @override
   void initState() {
@@ -40,24 +40,11 @@ class _CallScreenState extends State<CallScreen> {
     initializeAgora();
   }
 
-  void addPostFrameCallback() {
-    SchedulerBinding.instance.addPostFrameCallback((_) {
-      userProvider = Provider.of<UserProvider>(context, listen: false);
-      callStreamSubscription = callMethods
-          .callStream(userId: userProvider.getUser.userId)
-          .listen((DocumentSnapshot ds) {
-        if (ds.data() == null) {
-          Navigator.pop(context);
-        }
-      });
-    });
-  }
-
   Future<void> initializeAgora() async {
     if (APP_ID.isEmpty) {
       setState(() {
         _infoStrings.add(
-          APP_ID,
+          'APP_ID missing, please provide your APP_ID in settings.dart',
         );
         _infoStrings.add('Agora Engine is not starting');
       });
@@ -72,6 +59,19 @@ class _CallScreenState extends State<CallScreen> {
     configuration.dimensions = VideoDimensions(1920, 1080);
     await _engine.setVideoEncoderConfiguration(configuration);
     await _engine.joinChannel(null, widget.call.channelId, null, 0);
+  }
+
+  void addPostFrameCallback() {
+    SchedulerBinding.instance.addPostFrameCallback((_) {
+      userProvider = Provider.of<UserProvider>(context, listen: false);
+      callStreamSubscription = callMethods
+          .callStream(userId: userProvider.getUser.userId)
+          .listen((DocumentSnapshot ds) {
+        if (ds.data() == null) {
+          Navigator.pop(context);
+        }
+      });
+    });
   }
 
   /// Create agora sdk instance and initialize
@@ -244,8 +244,43 @@ class _CallScreenState extends State<CallScreen> {
     _engine.switchCamera();
   }
 
+  void _onDisableVideo() {
+    setState(() {
+      disableVideo = !disableVideo;
+    });
+    if (disableVideo == false) {
+      _engine.enableVideo();
+    } else {
+      _engine.disableVideo();
+    }
+  }
+
+  Widget _topToolbar() {
+    return Container(
+      alignment: Alignment.topCenter,
+      padding: const EdgeInsets.symmetric(vertical: 48),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          RawMaterialButton(
+            onPressed: _onDisableVideo,
+            child: Icon(
+              disableVideo ? Icons.videocam_off : Icons.videocam,
+              color: disableVideo ? Colors.white : Colors.blueAccent,
+              size: 22.0,
+            ),
+            shape: CircleBorder(),
+            elevation: 2.0,
+            fillColor: disableVideo ? Colors.blueAccent : Colors.white,
+            padding: const EdgeInsets.all(12.0),
+          ),
+        ],
+      ),
+    );
+  }
+
   /// Toolbar layout
-  Widget _toolbar() {
+  Widget _bottomToolbar() {
     if (widget.role == ClientRole.Audience) return Container();
     return Container(
       alignment: Alignment.bottomCenter,
@@ -270,7 +305,7 @@ class _CallScreenState extends State<CallScreen> {
             child: Icon(
               Icons.call_end,
               color: Colors.white,
-              size: 35.0,
+              size: 40.0,
             ),
             shape: CircleBorder(),
             elevation: 2.0,
@@ -288,7 +323,7 @@ class _CallScreenState extends State<CallScreen> {
             elevation: 2.0,
             fillColor: Colors.white,
             padding: const EdgeInsets.all(12.0),
-          )
+          ),
         ],
       ),
     );
@@ -296,13 +331,13 @@ class _CallScreenState extends State<CallScreen> {
 
   @override
   void dispose() {
-    super.dispose();
     // clear users
     _users.clear();
     // destroy sdk
     _engine.leaveChannel();
     _engine.destroy();
     callStreamSubscription.cancel();
+    super.dispose();
   }
 
   @override
@@ -314,7 +349,8 @@ class _CallScreenState extends State<CallScreen> {
           children: <Widget>[
             _viewRows(),
             _panel(),
-            _toolbar(),
+            _topToolbar(),
+            _bottomToolbar(),
           ],
         ),
       ),

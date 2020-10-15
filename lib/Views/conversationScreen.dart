@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
 import 'package:ChatApp/Widget/fullScreenGalleryImage.dart';
 import 'package:ChatApp/Widget/fullScreenUserImage.dart';
 import 'package:ChatApp/enum/view_state.dart';
@@ -14,7 +15,6 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emoji_picker/emoji_picker.dart';
@@ -36,21 +36,82 @@ class ConversationScreen extends StatefulWidget {
 class _ConversationScreenState extends State<ConversationScreen> {
   Users sender;
   final Users recevier;
+  DatabaseMethods databaseMethods = DatabaseMethods();
+  AuthMethods authMethods = AuthMethods();
 
+  String iD;
+  String _currentUserId;
+
+  SharedPreferences preferences;
   _ConversationScreenState({
     Key key,
     @required this.recevier,
   });
+  Users _users;
+
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  // Users users;
+  bool isDarkTheme = false;
+
+  String username = '';
+  String email = '';
+  String createdAt = '';
+  String photoUrl = '';
+  String aboutMe = '';
+  String id = '';
+  File imageFileAvatar;
+
+  Future readDataFromLocal() async {
+    preferences = await SharedPreferences.getInstance();
+    photoUrl = preferences.getString('photoUrl');
+    username = preferences.getString('username');
+    email = preferences.getString('email');
+    aboutMe = preferences.getString('aboutMe');
+    createdAt = preferences.getString('createdAt');
+    id = preferences.getString('id');
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    readDataFromLocal();
+
+    databaseMethods.getCurrentUser().then((user) {
+      _currentUserId = user.uid;
+      setState(() {
+        sender =
+            Users(userId: user.uid, username: username, photoUrl: photoUrl);
+      });
+    });
+  }
+
+  // @override
+  // Future<void> dispose() async {
+
+  //   databaseMethods.getCurrentUser().then((user) {
+  //     _currentUserId = user.uid;
+  //     setState(() {
+  //       sender =
+  //           Users(userId: user.uid, username: username, photoUrl: photoUrl);
+  //     });
+  //   });
+  //   super.dispose();
+  // }
 
   Future<Null> openDialog() async {
     switch (await showDialog<int>(
         context: context,
         builder: (BuildContext context) {
           return SimpleDialog(
-            contentPadding:
-                EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.all(Radius.circular(20.0))),
+            contentPadding: EdgeInsets.all(16),
             children: <Widget>[
               Container(
+                
                 color: Colors.cyan,
                 margin: EdgeInsets.all(0.0),
                 padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
@@ -75,7 +136,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
                 ),
               ),
               SimpleDialogOption(
-                onPressed: () {},
+                onPressed: () async =>
+              await Permissions.microphonePermissionsGranted()
+                  ? CallUtils.dialVoice(
+                       from: sender,
+                            to: widget.recevier,
+                            context: context,
+                      callis: "audio")
+                  : {dynamic},
                 child: Row(
                   children: <Widget>[
                     Container(
@@ -100,6 +168,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             from: sender,
                             to: widget.recevier,
                             context: context,
+                            callis: "video"
                           )
                         : {dynamic},
                 child: Row(
@@ -153,10 +222,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: homepageHeader(context),
-      body: ChatScreen(
-        recevier: recevier,
+    return PickupLayout(
+          scaffold: Scaffold(
+        appBar: homepageHeader(context),
+        body: ChatScreen(
+          recevier: recevier,
+        ),
       ),
     );
   }
@@ -286,7 +357,7 @@ class _ChatScreen extends State<ChatScreen> {
   File imageFile;
   String imageUrl;
   String id;
-   String iD;
+  String iD;
   Users sender;
   String _currentUserId;
   List<QueryDocumentSnapshot> listMessage = new List.from(<String>[]);
@@ -356,7 +427,7 @@ class _ChatScreen extends State<ChatScreen> {
     FirebaseFirestore.instance
         .collection('users')
         .doc(id)
-        .update(<String, dynamic>{'chattingWith': null});
+        .update(<String, dynamic>{'chattingWith': widget.recevier.userId});
     Navigator.pop(context);
 
     return Future.value(false);
@@ -366,27 +437,27 @@ class _ChatScreen extends State<ChatScreen> {
   Widget build(BuildContext context) {
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          // List of messages
-          Flexible(child: messageList()),
+        body: Column(
+          children: <Widget>[
+            // List of messages
+            Flexible(child: messageList()),
 
-          _imageUploadProvider.getViewState == ViewState.LOADING
-              ? Container(
-                  child: CircularProgressIndicator(),
-                  margin: EdgeInsets.only(right: 15),
-                  alignment: Alignment.centerRight,
-                )
-              : Container(),
+            _imageUploadProvider.getViewState == ViewState.LOADING
+                ? Container(
+                    child: CircularProgressIndicator(),
+                    margin: EdgeInsets.only(right: 15),
+                    alignment: Alignment.centerRight,
+                  )
+                : Container(),
 
-          createInput(),
+            createInput(),
 
-          isDisplaySticker ? Container(child: emojiContainer()) : Container(),
-        ],
-      ),
+            isDisplaySticker ? Container(child: emojiContainer()) : Container(),
+          ],
+        ),
 
-      // Loading
-    );
+        // Loading
+      );
   }
 
   Widget messageList() {
@@ -443,7 +514,9 @@ class _ChatScreen extends State<ChatScreen> {
         ),
       ),
       child: Padding(
-        padding: EdgeInsets.all(10),
+        padding: message.type != 'image'
+            ? EdgeInsets.all(10)
+            : EdgeInsets.symmetric(horizontal: 1, vertical: 5),
         child: getMessage(message),
       ),
     );
@@ -463,11 +536,15 @@ class _ChatScreen extends State<ChatScreen> {
           bottomLeft: messageRadius,
         ),
       ),
-      child: Padding(padding: EdgeInsets.all(10), child: getMessage(message)),
+      child: Padding(
+          padding: message.type != 'image'
+              ? EdgeInsets.all(10)
+              : EdgeInsets.symmetric(horizontal: 1, vertical: 5),
+          child: getMessage(message)),
     );
   }
-    Widget getMessage(Message message) {
-   
+
+  Widget getMessage(Message message) {
     return message.type != 'image'
         ? Text(
             message.message,
@@ -483,13 +560,17 @@ class _ChatScreen extends State<ChatScreen> {
                 child: CachedNetworkImage(
                   placeholder: (context, url) => Container(
                     child: CircularProgressIndicator(
-                      valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        Colors.white,
+                      ),
                     ),
-                    width: 200,
-                    height: 200,
-                    padding: EdgeInsets.all(70.0),
+                    width: 50,
+                    height: 50,
+                    padding: EdgeInsets.symmetric(vertical: 50, horizontal: 75),
                     decoration: BoxDecoration(
-                      color: Colors.grey,
+                      color: message.id == _currentUserId
+                          ? Colors.cyan
+                          : Color(0xFFF99AAAB),
                       borderRadius: BorderRadius.all(Radius.circular(8.0)),
                     ),
                   ),
@@ -516,9 +597,10 @@ class _ChatScreen extends State<ChatScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (BuildContext context) => FullScreenGalleryImage(
-                        iD: message.id ==_currentUserId ? 'You' : widget.recevier.username,
+                        iD: message.id == _currentUserId
+                            ? 'You'
+                            : widget.recevier.username,
                         url: message.photoUrl,
-                        // recevierName: widget.recevier.username,
                       ),
                     ));
               },

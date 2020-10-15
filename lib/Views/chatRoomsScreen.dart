@@ -1,24 +1,11 @@
-import 'dart:io';
-
-import 'package:ChatApp/Views/conversationScreen.dart';
+import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
+import 'package:ChatApp/Views/chatView/chatList.dart';
 import 'package:ChatApp/Views/drawer.dart';
-import 'package:ChatApp/Views/search.dart';
-import 'package:ChatApp/Views/search.dart';
-import 'package:ChatApp/Views/signIn.dart';
-import 'package:ChatApp/Widget/customTile.dart';
-import 'package:ChatApp/Widget/customtheme.dart';
-import 'package:ChatApp/Widget/theme.dart';
-import 'package:ChatApp/Widget/widget.dart';
-import 'package:ChatApp/helper/authenticate.dart';
-import 'package:ChatApp/helper/constants.dart';
-import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/provider/provider.dart';
 import 'package:ChatApp/services/auth.dart';
-import 'package:ChatApp/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:ChatApp/Views/account_setting.dart';
 
 // class ChatRoom extends StatefulWidget {
 //   String uid;
@@ -36,23 +23,23 @@ import 'package:ChatApp/Views/account_setting.dart';
 
 //   Stream chatRoomsStream;
 
-//   // Widget chatRoomList() {
-//   //   return StreamBuilder<dynamic>(
-//   //     stream: chatRoomsStream,
-//   //     builder: (BuildContext context, AsyncSnapshot snapshot) {
-//   //       return snapshot.hasData
-//   //           ? ListView.builder(
-//   //               itemCount: (int.parse('${snapshot.data.documents.length}')),
-//   //               itemBuilder: (context, index) {
-//   //                 return ChatRoomTile(
-//   //                     '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}',
-//   //                     '${snapshot.data.documents[index].data['chatroomid']}'
-//   //                     );
-//   //               })
-//   //           : Container();
-//   //     },
-//   //   );
-//   // }
+// Widget chatRoomList() {
+//   return StreamBuilder<dynamic>(
+//     stream: chatRoomsStream,
+//     builder: (BuildContext context, AsyncSnapshot snapshot) {
+//       return snapshot.hasData
+//           ? ListView.builder(
+//               itemCount: (int.parse('${snapshot.data.documents.length}')),
+//               itemBuilder: (context, index) {
+//                 return ChatRoomTile(
+//                     '${snapshot.data.documents[index].data['chatroomid'].toString().replaceAll('_', "").replaceAll(Constants.myName, "")}',
+//                     '${snapshot.data.documents[index].data['chatroomid']}'
+//                     );
+//               })
+//           : Container();
+//     },
+//   );
+// }
 
 //   @override
 //   void initState() {
@@ -63,49 +50,6 @@ import 'package:ChatApp/Views/account_setting.dart';
 //       });
 //     });
 //   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
-//       CustomTheme.instanceOf(buildContext).changeTheme(key);
-//     }
-
-//     return Scaffold(
-//       appBar: AppBar(
-//         iconTheme: new IconThemeData(color: Colors.white),
-//         title: Text(
-//           'ChaTooApp',
-//           style: TextStyle(
-//             fontSize: 17.0,
-//             fontFamily: 'UncialAntiqua',
-//             letterSpacing: 1.0,
-//             color: Colors.white,
-//           ),
-//         ),
-//         backgroundColor: Colors.cyan,
-//       ),
-//       drawer: SideDrawer(),
-//       // body: chatRoomList(),
-//       floatingActionButton: FloatingActionButton(
-//         backgroundColor: Colors.cyan,
-//         onPressed: () {
-//           User user = FirebaseAuth.instance.currentUser;
-//           Navigator.push<MaterialPageRoute>(
-//               context,
-//               MaterialPageRoute(
-//                   builder: (BuildContext context) => Search(
-//                         uid: user.uid,
-//                       )));
-//         },
-//         child: Icon(
-//           Icons.search,
-//           color: Colors.white,
-//         ),
-//       ),
-//       body: ChatRoomTile(uid),
-//     );
-//   }
-// }
 
 // class ChatRoomTile extends StatefulWidget {
 //   final String uid;
@@ -170,8 +114,6 @@ import 'package:ChatApp/Views/account_setting.dart';
 //   }
 // }
 
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/scheduler.dart';
 
 import 'package:google_sign_in/google_sign_in.dart';
@@ -191,7 +133,7 @@ class ChatRoomState extends State<ChatRoom> {
   AuthMethods authMethods = AuthMethods();
   final FirebaseAuth auth = FirebaseAuth.instance;
   UserProvider userProvider;
-    PageController pageController;
+  PageController pageController;
   int _page = 0;
 
   final String uid;
@@ -207,20 +149,21 @@ class ChatRoomState extends State<ChatRoom> {
     super.initState();
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
-       userProvider = Provider.of<UserProvider>(context, listen: false);
-    userProvider.refreshUser(); 
+      userProvider = Provider.of<UserProvider>(context, listen: false);
+      userProvider.refreshUser();
     });
     pageController = PageController();
     // registerNotification();
     // configLocalNotification();
   }
-   void onPageChanged(int page) {
+
+  void onPageChanged(int page) {
     setState(() {
       _page = page;
     });
   }
 
-    void navigationTapped(int page) {
+  void navigationTapped(int page) {
     pageController.jumpToPage(page);
   }
 
@@ -278,188 +221,171 @@ class ChatRoomState extends State<ChatRoom> {
 //         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
 
 //     print(message);
-// //    print(message['body'].toString());
-// //    print(json.encode(message));
+  //  print(message['body'].toString());
+  //  print(json.encode(message));
 
 //     await flutterLocalNotificationsPlugin.show(0, message['title'].toString(),
 //         message['body'].toString(), platformChannelSpecifics,
 //         payload: json.encode(message));
 
-// //    await flutterLocalNotificationsPlugin.show(
-// //        0, 'plain title', 'plain body', platformChannelSpecifics,
-// //        payload: 'item x');
+//    await flutterLocalNotificationsPlugin.show(
+//        0, 'plain title', 'plain body', platformChannelSpecifics,
+//        payload: 'item x');
 //   }
 
   Future<bool> onBackPress() {
-    // openDialog();
-    return Future.value(false);
+    return Future.value(true);
   }
 
   Users users;
 
   @override
   Widget build(BuildContext context) {
-    
-    return Scaffold(
-      appBar: AppBar(
-        iconTheme: new IconThemeData(color: Colors.white),
-        title: Text(
-          'ChaTooApp',
-          style: TextStyle(
-            fontSize: 17.0,
-            fontFamily: 'UncialAntiqua',
-            letterSpacing: 1.0,
-            color: Colors.white,
-          ),
-        ),
-        backgroundColor: Colors.cyan,
-      ),
-      drawer: SideDrawer(),
-      // body: chatRoomList(),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: Colors.white,
-        onPressed: () {
-          User user = FirebaseAuth.instance.currentUser;
-          Navigator.push<MaterialPageRoute>(
-              context,
-              MaterialPageRoute(
-                  builder: (BuildContext context) =>
-                      Search()));
-        },
-        child: Icon(
-          Icons.search,
-          color: Colors.cyan,
-        ),
-      ),
-
-      body: WillPopScope(
-        child: Stack(
-          children: <Widget>[
-            // List
-            Container(
-              child: StreamBuilder(
-                stream:
-                    FirebaseFirestore.instance.collection('users').snapshots(),
-                builder: (context, AsyncSnapshot<QuerySnapshot> snapshot) {
-                  if (!snapshot.hasData) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.cyan),
-                      ),
-                    );
-                  } else {
-                    return ListView.builder(
-                      padding: EdgeInsets.all(10.0),
-                      itemBuilder: (context, index) =>
-                          buildItem(context, snapshot.data.docs[index]),
-                      itemCount: snapshot.data.docs.length,
-                    );
-                  }
-                },
+    return DefaultTabController(
+      length: 2,
+      initialIndex: 0,
+      child: PickupLayout(
+        scaffold: Scaffold(
+          appBar: AppBar(
+            iconTheme: new IconThemeData(color: Colors.white),
+            title: Text(
+              'ChaTooApp',
+              style: TextStyle(
+                fontSize: 17.0,
+                fontFamily: 'UncialAntiqua',
+                letterSpacing: 1.0,
+                color: Colors.white,
               ),
             ),
-
-            // Loading
-            Positioned(
-              child: isLoading
-                  ? Center(child: CircularProgressIndicator())
-                  : Container(),
-            )
-          ],
+            backgroundColor: Colors.cyan,
+            bottom: TabBar(
+              indicatorColor: Colors.white,
+              indicatorWeight: 3.0,
+              tabs: <Widget>[
+                Tab(
+                  child: Text(
+                    "CHATS",
+                    style: TextStyle(
+                      letterSpacing: 1.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+                Tab(
+                  child: Text(
+                    "CALLS",
+                    style: TextStyle(
+                      letterSpacing: 1.0,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          drawer: SideDrawer(),
+          body: TabBarView(
+            children: <Widget>[
+              ChatListScreen(),
+              Calls(),
+            ],
+          ),
         ),
-        onWillPop: onBackPress,
       ),
     );
   }
-
-  Widget buildItem(BuildContext context, DocumentSnapshot document) {
-    if (document.data()['id'] == uid) {
-      return Container();
-    } else {
-      return Container(
-        child: FlatButton(
-          child: Row(
-            children: <Widget>[
-              Material(
-                child: document.data()['photoUrl'] != null
-                    ? CachedNetworkImage(
-                        placeholder: (context, url) => Container(
-                          child: CircularProgressIndicator(
-                            strokeWidth: 1.0,
-                            valueColor:
-                                AlwaysStoppedAnimation<Color>(Colors.cyan),
-                          ),
-                          width: 50.0,
-                          height: 50.0,
-                          padding: EdgeInsets.all(15.0),
-                        ),
-                        imageUrl: ('${document.data()['photoUrl']}'),
-                        width: 50.0,
-                        height: 50.0,
-                        fit: BoxFit.cover,
-                      )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 50.0,
-                        color: Colors.cyan,
-                      ),
-                borderRadius: BorderRadius.all(Radius.circular(25.0)),
-                clipBehavior: Clip.hardEdge,
-              ),
-              Flexible(
-                child: Container(
-                  child: Column(
-                    children: <Widget>[
-                      Container(
-                        child: Text(
-                          '${document.data()['username']}',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 5.0),
-                      ),
-                      Container(
-                        child: Text(
-                          '${document.data()['aboutMe'] ?? 'Not available'}',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        alignment: Alignment.centerLeft,
-                        margin: EdgeInsets.fromLTRB(10.0, 0.0, 0.0, 0.0),
-                      )
-                    ],
-                  ),
-                  margin: EdgeInsets.only(left: 20.0),
-                ),
-              ),
-            ],
-          ),
-          onPressed: () {
-            // Navigator.push(
-            //     context,
-            //     MaterialPageRoute<MaterialPageRoute>(
-            //         builder: (context) => ConversationScreen(
-            //               recevierId: document.id,
-            //               recevierAvatar: ('${document.data()['photoUrl']}'),
-            //               recevierName: '${document.data()['username']}',
-            //               recevierAbout: '${document.data()['aboutMe']}',
-            //               recevierCreate: '${document.data()['createdAt']}',
-            //               recevierMail: '${document.data()['email']}',
-            //             )));
-          },
-          color: Colors.cyan,
-          padding: EdgeInsets.fromLTRB(25.0, 10.0, 25.0, 10.0),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10.0)),
-        ),
-        margin: EdgeInsets.only(bottom: 10.0, left: 5.0, right: 5.0),
-      );
-    }
-  }
 }
 
-class Choice {
-  const Choice({this.title, this.icon});
+class Calls extends StatefulWidget {
+  CallsState createState() => CallsState();
+}
 
-  final String title;
-  final IconData icon;
+class CallsState extends State<Calls> {
+  @override
+  Widget build(BuildContext context) {
+    return ListView(
+      children: <Widget>[
+        ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(
+                'https://www.wwe.com/f/styles/og_image/public/all/2016/07/John_Cena_bio--b51ea9d0b6f475af953923ac7791391b.jpg'),
+          ),
+          title: Text('Bhavya'),
+          subtitle: Row(
+            children: <Widget>[
+              Icon(
+                Icons.arrow_downward,
+                color: Colors.red,
+              ),
+              Text('Today 1:25 pm'),
+            ],
+          ),
+          trailing: Icon(
+            Icons.phone,
+            color: Color(0xFF075e54),
+          ),
+        ),
+        ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(
+                'https://www.wwe.com/f/styles/og_image/public/all/2016/07/John_Cena_bio--b51ea9d0b6f475af953923ac7791391b.jpg'),
+          ),
+          title: Text('Bhavya'),
+          subtitle: Row(
+            children: <Widget>[
+              Icon(
+                Icons.arrow_downward,
+                color: Colors.red,
+              ),
+              Text('Today 1:25 pm'),
+            ],
+          ),
+          trailing: Icon(
+            Icons.phone,
+            color: Color(0xFF075e54),
+          ),
+        ),
+        ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(
+                'https://www.wwe.com/f/styles/og_image/public/all/2016/07/John_Cena_bio--b51ea9d0b6f475af953923ac7791391b.jpg'),
+          ),
+          title: Text('Bhavya'),
+          subtitle: Row(
+            children: <Widget>[
+              Icon(
+                Icons.arrow_downward,
+                color: Colors.red,
+              ),
+              Text('Today 1:25 pm'),
+            ],
+          ),
+          trailing: Icon(
+            Icons.phone,
+            color: Color(0xFF075e54),
+          ),
+        ),
+        ListTile(
+          leading: CircleAvatar(
+            backgroundImage: NetworkImage(
+                'https://www.wwe.com/f/styles/og_image/public/all/2016/07/John_Cena_bio--b51ea9d0b6f475af953923ac7791391b.jpg'),
+          ),
+          title: Text('Bhavya'),
+          subtitle: Row(
+            children: <Widget>[
+              Icon(
+                Icons.arrow_downward,
+                color: Colors.red,
+              ),
+              Text('Today 1:25 pm'),
+            ],
+          ),
+          trailing: Icon(
+            Icons.video_call,
+            color: Color(0xFF075e54),
+          ),
+        ),
+      ],
+    );
+  }
 }

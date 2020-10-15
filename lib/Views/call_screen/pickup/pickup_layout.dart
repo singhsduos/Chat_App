@@ -11,6 +11,7 @@ class PickupLayout extends StatelessWidget {
   final Widget scaffold;
   final CallMethods callMethods = CallMethods();
 
+
   PickupLayout({@required this.scaffold});
 
   @override
@@ -38,7 +39,7 @@ class PickupLayout extends StatelessWidget {
             },
           )
         : Scaffold(
-            body: CircularProgressIndicator(),
+            body: Center(child: CircularProgressIndicator()),
           );
   }
 }

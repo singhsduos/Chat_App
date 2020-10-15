@@ -1,3 +1,4 @@
+import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
 import 'package:flutter/material.dart';
 import 'package:photo_view/photo_view.dart';
 import 'package:photo_view/photo_view_gallery.dart';
@@ -8,29 +9,31 @@ class FullScreenImagePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-            size: 23,
+    return PickupLayout(
+          scaffold: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+              size: 23,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        backgroundColor: Colors.black,
-        title: Text(
-          'Profile photo',
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.0,
-            color: Colors.white,
+          backgroundColor: Colors.black,
+          title: Text(
+            'Profile photo',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+              color: Colors.white,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: FullImage(
-        url: url,
+        body: FullImage(
+          url: url,
+        ),
       ),
     );
   }

@@ -1,9 +1,11 @@
 import 'dart:async';
 
+import 'package:ChatApp/modal/contacts.dart';
 import 'package:ChatApp/modal/message.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 class DatabaseMethods {
   final String username;
@@ -20,8 +22,7 @@ class DatabaseMethods {
   }
 
   Future<Users> getUserDetails() async {
-    User currentUser;
-    currentUser = await FirebaseAuth.instance.currentUser;
+    User currentUser= await FirebaseAuth.instance.currentUser;
 
     DocumentSnapshot documentSnapshot = await users.doc(currentUser.uid).get();
 
@@ -36,6 +37,18 @@ class DatabaseMethods {
         .get();
 
     return user;
+  }
+
+  
+  Future<Users> getUserDetailsById(String id) async {
+    try {
+      DocumentSnapshot documentSnapshot =
+          await users.doc(id).get();
+      return Users.fromMap(documentSnapshot.data());
+    } catch (e) {
+      print(e);
+      return null;
+    }
   }
 
   Future<String> getByUserEmail(String email) async {
@@ -71,20 +84,81 @@ class DatabaseMethods {
     });
   }
 
+  DocumentReference getContactsDocument({String of, String forContact}) =>
+      FirebaseFirestore.instance.collection('users').doc(of).collection('contacts').doc(forContact);
+
+   Future<void> addToContacts({String senderId, String receiverId}) async {
+    String currentTime = Timestamp.now().toString();
+
+    await addToSenderContacts(senderId, receiverId, currentTime);
+    await addToReceiverContacts(senderId, receiverId, currentTime);
+  }
+
+
+  
+  Future<void> addToSenderContacts(
+    String senderId,
+    String receiverId,
+   String currentTime,
+  ) async {
+    DocumentSnapshot senderSnapshot =
+        await getContactsDocument(of: senderId, forContact: receiverId).get();
+
+    if (!senderSnapshot.exists) {
+      //does not exists
+      Contact receiverContact = Contact(
+        uid: receiverId,
+        addedOn: currentTime,
+      );
+
+      var receiverMap = receiverContact.toMap(receiverContact)as Map<String, dynamic>;
+
+      await getContactsDocument(of: senderId, forContact: receiverId)
+          .set(receiverMap);
+    }
+  }
+
+  Future<void> addToReceiverContacts(
+    String senderId,
+    String receiverId,
+    String currentTime,
+  ) async {
+    DocumentSnapshot receiverSnapshot =
+        await getContactsDocument(of: receiverId, forContact: senderId).get();
+
+    if (!receiverSnapshot.exists) {
+      //does not exists
+      Contact senderContact = Contact(
+        uid: senderId,
+        addedOn: currentTime,
+      );
+
+      var senderMap = senderContact.toMap(senderContact) as Map<String,dynamic>;
+
+      await getContactsDocument(of: receiverId, forContact: senderId)
+          .set(senderMap);
+    }
+  }
+  
+User _user = FirebaseAuth.instance.currentUser;
+
+  Stream<QuerySnapshot> fetchContacts({String userId}) =>  users
+      .doc(_user.uid)
+      .collection('contacts')
+      .snapshots();
+
+  Stream<QuerySnapshot> fetchLastMessageBetween({
+    @required String senderId,
+    @required String receiverId,
+  }) =>
+     FirebaseFirestore.instance.collection('messages')
+          .doc(senderId)
+          .collection(receiverId)
+          .orderBy("timestamp")
+          .snapshots();
   // user data from snapshot
   Stream<QuerySnapshot> get userInfo {
     return users.snapshots();
-  }
-
-  Future<void> createChatRoom(dynamic chatRoomMap, String chatRoomId) async {
-    Map<String, dynamic> chatRoomMap;
-    return await FirebaseFirestore.instance
-        .collection("chatRoom")
-        .doc(chatRoomId)
-        .set(chatRoomMap)
-        .catchError((dynamic e) {
-      print(e);
-    });
   }
 
   Future<void> addConversationMessages(
@@ -102,20 +176,7 @@ class DatabaseMethods {
         .collection(message.id)
         .add(map);
   }
-
-  dynamic getConversationMessages(String chatRoomid) async {
-    return await FirebaseFirestore.instance
-        .collection('ChatRoom')
-        .doc(chatRoomid)
-        .collection('chats')
-        .orderBy('time', descending: false)
-        .snapshots();
-  }
-
-  dynamic getChatRooms(String username) async {
-    return await FirebaseFirestore.instance
-        .collection('ChatRoom')
-        .where('users', arrayContains: username)
-        .snapshots();
-  }
 }
+
+
+

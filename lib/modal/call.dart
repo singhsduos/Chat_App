@@ -7,6 +7,7 @@ class Call {
   String receiverPic;
   String channelId;
   bool hasDialled;
+  String isCall;
 
   Call({
      this.callerId,
@@ -17,6 +18,7 @@ class Call {
   this.receiverPic,
   this.channelId,
   this.hasDialled,
+   this.isCall
   });
 
   //to map
@@ -31,6 +33,7 @@ class Call {
     callMap["receiver_pic"] = call.receiverPic;
     callMap["channel_id"] = call.channelId;
     callMap["has_dialled"] = call.hasDialled;
+    callMap["is_Call"] = call.isCall;
     return callMap;
   }
    Call.fromMap(Map callMap) {
@@ -42,5 +45,6 @@ class Call {
     this.receiverPic = callMap["receiver_pic"].toString();
     this.channelId = callMap["channel_id"].toString();
     this.hasDialled = callMap['has_dialled'] as bool;
+    this.isCall = callMap["is_Call"].toString();
   }
 }

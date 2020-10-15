@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
 import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:ChatApp/helper/authenticate.dart';
 import 'package:ChatApp/helper/constants.dart';
@@ -160,164 +161,168 @@ class _SideDrawerState extends State<SideDrawer> {
 
     User user = FirebaseAuth.instance.currentUser;
 
-    return SafeArea(
-      child: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            UserAccountsDrawerHeader(
-              accountName: Text(
-                username,
-                style: TextStyle(
-                  fontSize: 17.0,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 1.0,
-                  color: Colors.white,
+    return PickupLayout(
+          scaffold: SafeArea(
+        child: Drawer(
+          child: ListView(
+            padding: EdgeInsets.zero,
+            children: [
+              UserAccountsDrawerHeader(
+                accountName: Text(
+                  username,
+                  style: TextStyle(
+                    fontSize: 17.0,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              accountEmail: Text(
-                user.email,
-                style: TextStyle(
-                  fontSize: 15.0,
-                  fontWeight: FontWeight.normal,
-                  letterSpacing: 1.0,
-                  color: Colors.white,
+                accountEmail: Text(
+                  user.email,
+                  style: TextStyle(
+                    fontSize: 15.0,
+                    fontWeight: FontWeight.normal,
+                    letterSpacing: 1.0,
+                    color: Colors.white,
+                  ),
                 ),
-              ),
-              currentAccountPicture: GestureDetector(
-                onTap: () {
-                  {
-                    Navigator.push<MaterialPageRoute>(
-                      context,
-                      MaterialPageRoute(
-                        builder: (BuildContext context) => FullScreenImagePage(
-                          url: photoUrl,
-                        ),
-                      ),
-                    );
-                  }
-                },
-                child: CircleAvatar(
-                  backgroundColor: Colors.black,
-                  child: Material(
-                    child: photoUrl.toString() != null
-                        ? CachedNetworkImage(
-                            placeholder: (context, url) => Container(
-                              decoration: BoxDecoration(
-                                  image: DecorationImage(
-                                image: AssetImage('images/placeHolder.jpg'),
-                              )),
-                              height: 80,
-                              width: 80,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 5, vertical: 5),
-                            ),
-                            imageUrl: photoUrl.toString(),
-                            width: 80.0,
-                            height: 80.0,
-                            fit: BoxFit.cover,
-                          )
-                        : Icon(
-                            Icons.account_circle,
-                            size: 60.0,
-                            color: Colors.white,
+                currentAccountPicture: GestureDetector(
+                  onTap: () {
+                    {
+                      Navigator.push<MaterialPageRoute>(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => FullScreenImagePage(
+                         url: photoUrl.toString() != null
+                                          ? photoUrl.toString()
+                                          : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'
                           ),
-                    borderRadius: BorderRadius.all(Radius.circular(125.0)),
-                    clipBehavior: Clip.hardEdge,
-                  ),
-                ),
-              ),
-              decoration: BoxDecoration(color: Colors.cyan),
-            ),
-            Container(
-              child: InkWell(
-                splashColor: Colors.cyan,
-                onTap: () {
-                  Navigator.push<MaterialPageRoute>(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) => Settings()));
-                },
-                child: Container(
-                  child: ListTile(
-                    leading: Icon(Icons.settings),
-                    trailing: Icon(Icons.edit),
-                    title: Text('Account Settings',
-                        style: TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                        )),
-                    subtitle: Text('Personal',
-                        style: TextStyle(
-                          fontSize: 13.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                        )),
-                  ),
-                ),
-              ),
-            ),
-            Container(
-              child: Consumer<ThemeNotifier>(
-                builder: (BuildContext context, ThemeNotifier notifier,
-                        Widget child) =>
-                    InkWell(
-                  splashColor: Colors.cyan,
-                  child: SwitchListTile(
-                    secondary: const Icon(Icons.nights_stay),
-                    title: const Text('Dark theme',
-                        style: TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                        )),
-                    subtitle:
-                        const Text('Reduce glare and improve night viewing',
-                            style: TextStyle(
-                              fontSize: 13.0,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.0,
-                            )),
-                    value: isDarkTheme,
-                    activeTrackColor: Colors.blueGrey,
-                    activeColor: Colors.cyan,
-                    onChanged: (bool value) {
-                      setState(
-                        () {
-                          isDarkTheme = value;
-                          if (!value) {
-                            _changeTheme(context, MyThemeKeys.LIGHT);
-                          } else {
-                            _changeTheme(context, MyThemeKeys.DARK);
-                          }
-                        },
+                        ),
                       );
-                    },
+                    }
+                  },
+                  child: CircleAvatar(
+                    backgroundColor: Colors.black,
+                    child: Material(
+                      child: photoUrl.toString() != null
+                          ? CachedNetworkImage(
+                              placeholder: (context, url) => Container(
+                                decoration: BoxDecoration(
+                                    image: DecorationImage(
+                                  image: AssetImage('images/placeHolder.jpg'),
+                                )),
+                                height: 80,
+                                width: 80,
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 5, vertical: 5),
+                              ),
+                              imageUrl: photoUrl.toString(),
+                              width: 80.0,
+                              height: 80.0,
+                              fit: BoxFit.cover,
+                            )
+                          : Icon(
+                              Icons.account_circle,
+                              size: 60.0,
+                              color: Colors.white,
+                            ),
+                      borderRadius: BorderRadius.all(Radius.circular(125.0)),
+                      clipBehavior: Clip.hardEdge,
+                    ),
+                  ),
+                ),
+                decoration: BoxDecoration(color: Colors.cyan),
+              ),
+              Container(
+                child: InkWell(
+                  splashColor: Colors.cyan,
+                  onTap: () {
+                    Navigator.push<MaterialPageRoute>(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) => Settings()));
+                  },
+                  child: Container(
+                    child: ListTile(
+                      leading: Icon(Icons.settings),
+                      trailing: Icon(Icons.edit),
+                      title: Text('Account Settings',
+                          style: TextStyle(
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          )),
+                      subtitle: Text('Personal',
+                          style: TextStyle(
+                            fontSize: 13.0,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          )),
+                    ),
                   ),
                 ),
               ),
-            ),
-            Container(
-              child: InkWell(
-                splashColor: Colors.cyan,
-                onTap: () {
-                  openDialog();
-                },
-                child: Container(
-                  child: ListTile(
-                    leading: Icon(Icons.logout),
-                    title: Text('Logout',
-                        style: TextStyle(
-                          fontSize: 17.0,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                        )),
+              Container(
+                child: Consumer<ThemeNotifier>(
+                  builder: (BuildContext context, ThemeNotifier notifier,
+                          Widget child) =>
+                      InkWell(
+                    splashColor: Colors.cyan,
+                    child: SwitchListTile(
+                      secondary: const Icon(Icons.nights_stay),
+                      title: const Text('Dark theme',
+                          style: TextStyle(
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          )),
+                      subtitle:
+                          const Text('Reduce glare and improve night viewing',
+                              style: TextStyle(
+                                fontSize: 13.0,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.0,
+                              )),
+                      value: isDarkTheme,
+                      activeTrackColor: Colors.blueGrey,
+                      activeColor: Colors.cyan,
+                      onChanged: (bool value) {
+                        setState(
+                          () {
+                            isDarkTheme = value;
+                            if (!value) {
+                              _changeTheme(context, MyThemeKeys.LIGHT);
+                            } else {
+                              _changeTheme(context, MyThemeKeys.DARK);
+                            }
+                          },
+                        );
+                      },
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+              Container(
+                child: InkWell(
+                  splashColor: Colors.cyan,
+                  onTap: () {
+                    openDialog();
+                  },
+                  child: Container(
+                    child: ListTile(
+                      leading: Icon(Icons.logout),
+                      title: Text('Logout',
+                          style: TextStyle(
+                            fontSize: 17.0,
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: 1.0,
+                          )),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

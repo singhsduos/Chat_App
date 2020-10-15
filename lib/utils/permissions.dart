@@ -1,5 +1,4 @@
 import 'package:permission_handler/permission_handler.dart';
-
 import 'package:flutter/services.dart';
 
 class Permissions {
@@ -14,6 +13,18 @@ class Permissions {
     } else {
       _handleInvalidPermissions(
           cameraPermissionStatus, microphonePermissionStatus);
+      return false;
+    }
+  }
+
+  static Future<bool> microphonePermissionsGranted() async {
+    PermissionStatus microphonePermissionStatus =
+        await _getMicrophonePermission();
+
+    if (microphonePermissionStatus == PermissionStatus.granted) {
+      return true;
+    } else {
+      _handlemicrophoneInvalidPermissions(microphonePermissionStatus);
       return false;
     }
   }
@@ -60,6 +71,21 @@ class Permissions {
           details: null);
     } else if (cameraPermissionStatus == PermissionStatus.disabled &&
         microphonePermissionStatus == PermissionStatus.disabled) {
+      throw new PlatformException(
+          code: "PERMISSION_DISABLED",
+          message: "Location data is not available on device",
+          details: null);
+    }
+  }
+
+  static void _handlemicrophoneInvalidPermissions(
+      PermissionStatus microphonePermissionStatus) {
+    if (microphonePermissionStatus == PermissionStatus.denied) {
+      throw new PlatformException(
+          code: "PERMISSION_DENIED",
+          message: "Access to microphone denied",
+          details: null);
+    } else if (microphonePermissionStatus == PermissionStatus.disabled) {
       throw new PlatformException(
           code: "PERMISSION_DISABLED",
           message: "Location data is not available on device",

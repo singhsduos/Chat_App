@@ -1,3 +1,4 @@
+import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
 import 'package:ChatApp/modal/message.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -15,29 +16,31 @@ class FullScreenGalleryImage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(
-            Icons.arrow_back_ios,
-            color: Colors.white,
-            size: 23,
+    return PickupLayout(
+          scaffold: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: const Icon(
+              Icons.arrow_back_ios,
+              color: Colors.white,
+              size: 23,
+            ),
+            onPressed: () => Navigator.of(context).pop(),
           ),
-          onPressed: () => Navigator.of(context).pop(),
-        ),
-        backgroundColor: Colors.black,
-        title: Text(
-         iD,
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1.0,
-            color: Colors.white,
+          backgroundColor: Colors.black,
+          title: Text(
+           iD,
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.0,
+              color: Colors.white,
+            ),
           ),
+          centerTitle: true,
         ),
-        centerTitle: true,
-      ),
-      body: FullImage(
-        url: url,
+        body: FullImage(
+          url: url,
+        ),
       ),
     );
   }
@@ -61,23 +64,23 @@ class _FullImageState extends State<FullImage> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      color: Colors.black,
-      child: PhotoViewGallery(
-        pageOptions: <PhotoViewGalleryPageOptions>[
-          PhotoViewGalleryPageOptions(
-            imageProvider: NetworkImage(url.toString()),
-            minScale: PhotoViewComputedScale.contained * 1,
-            // maxScale: PhotoViewComputedScale.covered * 1.1,
+    return  Container(
+        color: Colors.black,
+        child: PhotoViewGallery(
+          pageOptions: <PhotoViewGalleryPageOptions>[
+            PhotoViewGalleryPageOptions(
+              imageProvider: NetworkImage(url.toString()),
+              minScale: PhotoViewComputedScale.contained * 1,
+              // maxScale: PhotoViewComputedScale.covered * 1.1,
+            ),
+          ],
+          loadingBuilder: (context, progress) => Center(
+            child: Container(
+              child: CircularProgressIndicator(),
+            ),
           ),
-        ],
-        loadingBuilder: (context, progress) => Center(
-          child: Container(
-            child: CircularProgressIndicator(),
-          ),
+          backgroundDecoration: BoxDecoration(color: Colors.black),
         ),
-        backgroundDecoration: BoxDecoration(color: Colors.black),
-      ),
-    );
+      );
   }
 }

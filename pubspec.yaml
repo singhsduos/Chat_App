@@ -57,6 +57,7 @@ dependencies:
   agora_rtc_engine:
   permission_handler: ^3.0.0
   gradient_app_bar:
+  esys_flutter_share:
 
     
 
