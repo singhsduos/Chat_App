@@ -511,6 +511,7 @@ class _ChatScreen extends State<ChatScreen> {
   Widget senderLayout(Message message) {
     Radius messageRadius = Radius.circular(15);
     return Container(
+      
       // margin: EdgeInsets.only(top: 12),
       constraints:
           BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
@@ -526,8 +527,11 @@ class _ChatScreen extends State<ChatScreen> {
         padding: message.type != 'image'
             ? EdgeInsets.all(10)
             : EdgeInsets.only(left: 0, top: 5,right: 5,bottom: 2),
-        child: Column(
+        child: 
+        Column(
            crossAxisAlignment: CrossAxisAlignment.end,
+           mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Container(child: getMessage(message), margin: message.type != 'image'
             ? EdgeInsets.only(left: 20) : EdgeInsets.only(left: 0)),
@@ -900,4 +904,18 @@ class _ChatScreen extends State<ChatScreen> {
         .collection(_message.id)
         .add(map);
   }
+}
+
+class TriangleClipper extends CustomClipper<Path> {
+  @override
+  Path getClip(Size size) {
+    final path = Path();
+    path.lineTo(size.width, 0.0);
+    path.lineTo(size.width / 2, size.height);
+    path.close();
+    return path;
+  }
+
+  @override
+  bool shouldReclip(TriangleClipper oldClipper) => false;
 }
