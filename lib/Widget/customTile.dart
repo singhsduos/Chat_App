@@ -25,43 +25,47 @@ class CustomTile extends StatelessWidget {
 
    @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      onLongPress: onLongPress,
-      child: Container(
-        margin: margin,
-        padding: EdgeInsets.symmetric(vertical: mini ? 4 : 16),
-        decoration: BoxDecoration(
-            border: Border(
-                bottom: BorderSide(
-                    width: 1, color: Colors.white))),
-        child: Row(
-          children: <Widget>[
-            leading,
-            Container(
+    return SingleChildScrollView(
+          child: GestureDetector(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        child: Container(
+          margin: margin,
+          padding: EdgeInsets.symmetric(vertical: mini ? 4 : 16),
+                 decoration: BoxDecoration(
+                border:
+                    Border(bottom: BorderSide(color: Colors.grey.shade300))),
+          child: Row(
+            children: <Widget>[
+              Container(child: leading, padding: EdgeInsets.all(5)),
               
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: <Widget>[
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+              Expanded(
+                              child: Container(
+                  
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-
-                      title ?? Container(),
-                      SizedBox(height: 5),
-                      Row(
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          icon ?? Container(),
-                          subtitle,
+
+                          title ?? Container(),
+                          SizedBox(height: 3),
+                          Row(
+                            children: <Widget>[
+                              icon ?? Container(),
+                              subtitle,
+                            ],
+                          )
                         ],
-                      )
+                      ),
+                      trailing ?? Container(),
                     ],
                   ),
-                  trailing ?? Container(),
-                ],
-              ),
-            )
-          ],
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

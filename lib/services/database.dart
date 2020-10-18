@@ -15,6 +15,7 @@ class DatabaseMethods {
       FirebaseFirestore.instance.collection("users");
   Users user = Users();
 
+// DataStorage Methods
   Future<User> getCurrentUser() async {
     User currentUser;
     currentUser = await FirebaseAuth.instance.currentUser;
@@ -22,8 +23,7 @@ class DatabaseMethods {
   }
 
   Future<Users> getUserDetails() async {
-    User currentUser= await FirebaseAuth.instance.currentUser;
-
+    User currentUser = await FirebaseAuth.instance.currentUser;
     DocumentSnapshot documentSnapshot = await users.doc(currentUser.uid).get();
 
     return Users.fromMap(documentSnapshot.data());
@@ -39,11 +39,9 @@ class DatabaseMethods {
     return user;
   }
 
-  
   Future<Users> getUserDetailsById(String id) async {
     try {
-      DocumentSnapshot documentSnapshot =
-          await users.doc(id).get();
+      DocumentSnapshot documentSnapshot = await users.doc(id).get();
       return Users.fromMap(documentSnapshot.data());
     } catch (e) {
       print(e);
@@ -74,44 +72,34 @@ class DatabaseMethods {
     return userList;
   }
 
-  Future<void> uploadUserInfo(dynamic userMap) async {
-    Map<String, String> userMap;
-    return await FirebaseFirestore.instance
-        .collection("users")
-        .add(userMap)
-        .catchError((dynamic e) {
-      print(e.toString());
-    });
-  }
-
+// chat methods
+  Message message;
   DocumentReference getContactsDocument({String of, String forContact}) =>
-      FirebaseFirestore.instance.collection('users').doc(of).collection('contacts').doc(forContact);
+      users.doc(of).collection('contacts').doc(forContact);
 
-   Future<void> addToContacts({String senderId, String receiverId}) async {
-    String currentTime = Timestamp.now().toString();
+  Future<void> addToContacts({String senderId, String receiverId}) async {
+    String currentTime = DateTime.now().millisecondsSinceEpoch.toString();
 
     await addToSenderContacts(senderId, receiverId, currentTime);
     await addToReceiverContacts(senderId, receiverId, currentTime);
   }
 
-
-  
   Future<void> addToSenderContacts(
     String senderId,
     String receiverId,
-   String currentTime,
+    String currentTime,
   ) async {
     DocumentSnapshot senderSnapshot =
         await getContactsDocument(of: senderId, forContact: receiverId).get();
 
     if (!senderSnapshot.exists) {
-      //does not exists
       Contact receiverContact = Contact(
         uid: receiverId,
         addedOn: currentTime,
       );
 
-      var receiverMap = receiverContact.toMap(receiverContact)as Map<String, dynamic>;
+      var receiverMap =
+          receiverContact.toMap(receiverContact) as Map<String, dynamic>;
 
       await getContactsDocument(of: senderId, forContact: receiverId)
           .set(receiverMap);
@@ -127,34 +115,34 @@ class DatabaseMethods {
         await getContactsDocument(of: receiverId, forContact: senderId).get();
 
     if (!receiverSnapshot.exists) {
-      //does not exists
       Contact senderContact = Contact(
         uid: senderId,
         addedOn: currentTime,
       );
 
-      var senderMap = senderContact.toMap(senderContact) as Map<String,dynamic>;
+      var senderMap =
+          senderContact.toMap(senderContact) as Map<String, dynamic>;
 
       await getContactsDocument(of: receiverId, forContact: senderId)
           .set(senderMap);
     }
   }
-  
-User _user = FirebaseAuth.instance.currentUser;
 
-  Stream<QuerySnapshot> fetchContacts({String userId}) =>  users
-      .doc(_user.uid)
-      .collection('contacts')
+  User _user = FirebaseAuth.instance.currentUser;
+
+  Stream<QuerySnapshot> fetchContacts({String userId}) =>
+      users.doc(userId).collection('contacts').orderBy("added_on", descending: true)
       .snapshots();
 
   Stream<QuerySnapshot> fetchLastMessageBetween({
-    @required String senderId,
+    @required String id,
     @required String receiverId,
   }) =>
-     FirebaseFirestore.instance.collection('messages')
-          .doc(senderId)
+      FirebaseFirestore.instance
+          .collection('messages')
+          .doc(id)
           .collection(receiverId)
-          .orderBy("timestamp")
+          .orderBy("timestamp", descending: false)
           .snapshots();
   // user data from snapshot
   Stream<QuerySnapshot> get userInfo {
@@ -170,6 +158,8 @@ User _user = FirebaseAuth.instance.currentUser;
         .collection(message.recevierId)
         .add(map);
 
+    addToContacts(senderId: message.id, receiverId: message.recevierId);
+
     return await FirebaseFirestore.instance
         .collection('messages')
         .doc(message.recevierId)
@@ -177,6 +167,3 @@ User _user = FirebaseAuth.instance.currentUser;
         .add(map);
   }
 }
-
-
-

@@ -44,7 +44,7 @@ class ChatListContainer extends StatelessWidget {
     return Container(
       child: StreamBuilder<QuerySnapshot>(
           stream: databaseMethods.fetchContacts(
-            userId: userProvider.getUser.userId,
+            userId: userProvider.getUser.userId,  
           ),
           builder: (context, snapshot) {
             if (snapshot.hasData) {

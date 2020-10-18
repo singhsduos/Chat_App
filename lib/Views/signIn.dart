@@ -1,5 +1,4 @@
 import 'dart:ui';
-
 import 'package:ChatApp/Views/forgetPassword.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
@@ -11,11 +10,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
-import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../Widget/widget.dart';
 import 'chatRoomsScreen.dart';
 
@@ -125,6 +122,7 @@ class _SignInState extends State<SignIn> {
           'chattingWith': null,
           'email': user.email,
           'aboutMe': 'Hey there! I am using ChaTooApp',
+          // 'state' : null,
         });
 
         // Write data to local
@@ -151,7 +149,7 @@ class _SignInState extends State<SignIn> {
           MaterialPageRoute<MaterialPageRoute>(
               builder: (BuildContext context) => ChatRoom(uid: user.uid)));
     }
-    ;
+    
   }
 
   bool _obscureText = true;

@@ -39,11 +39,11 @@ class PickupScreen extends StatelessWidget {
                 child: CachedNetworkImage(
                   placeholder: (context, url) => Container(
                     child: CircularProgressIndicator(),
-                    width: 50,
+                    width: 90,
                     height: 50,
-                    padding: EdgeInsets.symmetric(vertical: 50, horizontal: 75),
+                    padding: EdgeInsets.symmetric(vertical: 25, horizontal: 25),
                     decoration: BoxDecoration(
-                      color: Colors.cyan,
+                      color: Colors.white,
                       borderRadius: BorderRadius.all(Radius.circular(125.0)),
                     ),
                   ),

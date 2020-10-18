@@ -7,6 +7,7 @@ class Users {
   String photoUrl;
   String createdAt;
   String aboutMe;
+  // int state;
 
   Users({
     this.userId,
@@ -15,6 +16,7 @@ class Users {
     this.photoUrl,
     this.createdAt,
     this.aboutMe,
+    // this.state,
   });
 
   factory Users.fromDocument(DocumentSnapshot doc) {
@@ -27,19 +29,19 @@ class Users {
       photoUrl: getDocs['photoUrl'].toString(),
       createdAt: getDocs['createdAt'].toString(),
       aboutMe: getDocs['aboutMe'].toString(),
+      // state: int.parse(getDocs['state'].toString()),
     );
   }
 
   Map toMap(Users users) {
     var data = Map<String, dynamic>();
     data['id'] = users.userId;
-
     data['email'] = users.email;
     data['username'] = users.username;
-
     data['photoUrl'] = users.photoUrl;
     data[' createdAt'] = users.createdAt;
     data['aboutMe'] = users.aboutMe;
+    // data['state'] = users.state;
     return data;
   }
 
@@ -50,5 +52,6 @@ class Users {
     this.photoUrl = mapData['photoUrl'].toString();
     this.createdAt = mapData['createdAt'].toString();
     this.aboutMe = mapData['aboutMe'].toString();
+    // this.state = int.parse(mapData['state'].toString());
   }
 }

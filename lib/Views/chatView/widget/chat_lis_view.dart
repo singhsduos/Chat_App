@@ -1,6 +1,9 @@
 import 'package:ChatApp/Views/chatView/widget/last_message.dart';
+import 'package:ChatApp/Views/chatView/widget/online_indicator.dart';
 import 'package:ChatApp/Views/conversationScreen.dart';
+import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:ChatApp/modal/contacts.dart';
+import 'package:ChatApp/modal/message.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/provider/provider.dart';
 import 'package:ChatApp/services/database.dart';
@@ -27,7 +30,7 @@ class ChatListView extends StatelessWidget {
           );
         }
         return Center(
-          child: CircularProgressIndicator(),
+          child: Container(),
         );
       },
     );
@@ -45,70 +48,146 @@ class ViewLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final UserProvider userProvider = Provider.of<UserProvider>(context);
+    Message _message; 
 
-    return ListTile(
-      // mini: false,
-      onTap: () => Navigator.push(
-          context,
-          MaterialPageRoute<MaterialPageRoute>(
-            builder: (context) => ConversationScreen(
-              recevier: contact,
-            ),
-          )),
-      title: Padding(
-        padding: EdgeInsets.only(left: 8, top: 0, right: 0, bottom: 0),
-        child: Text(
-          (contact != null ? contact.username : null) != null
-              ? contact.username
-              : '..',
-          style:
-              TextStyle(color: Colors.grey, fontFamily: "Arial", fontSize: 19),
-        ),
-      ),
-      subtitle: Padding(
-        padding: EdgeInsets.only(left: 8, top: 0, right: 0, bottom: 0),
-        child: LastMessageContainer(
-          stream: _chatMethods.fetchLastMessageBetween(
-            senderId: userProvider.getUser.userId,
-            receiverId: contact.userId,
-          ),
-        ),
-      ),
-      leading: Container(
-        // constraints: BoxConstraints(maxHeight: 60, maxWidth: 60),
-        child: Stack(
-          children: <Widget>[
-            Material(
-              child: contact.photoUrl != null
-                  ? CachedNetworkImage(
-                      placeholder: (context, url) => Container(
-                        child: CircularProgressIndicator(
-                          strokeWidth: 1.0,
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Colors.cyan),
-                        ),
-                        width: 50.0,
-                        height: 50.0,
-                        padding: EdgeInsets.all(15.0),
-                      ),
-                      imageUrl: contact.photoUrl,
-                      width: 50.0,
-                      height: 50.0,
-                      fit: BoxFit.cover,
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      child: Row(
+        children: <Widget>[
+          GestureDetector(
+            onTap: () {
+              {
+                Navigator.push<MaterialPageRoute>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (BuildContext context) => FullScreenImagePage(
+                        url: contact.photoUrl != null
+                            ? contact.photoUrl
+                            : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'),
+                  ),
+                );
+              }
+            },
+            child: Container(
+              padding: EdgeInsets.all(1),
+              decoration: BoxDecoration(
+                  border: Border.all(color: Colors.cyan, width: 2),
+                  // shape: BoxShape.circle,
+                  borderRadius: BorderRadius.all(Radius.circular(40)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.5),
+                      spreadRadius: 2,
+                      blurRadius: 5,
                     )
-                  : Icon(
-                      Icons.account_circle,
-                      size: 50.0,
-                      color: Colors.cyan,
-                    ),
-              borderRadius: BorderRadius.all(Radius.circular(25.0)),
-              clipBehavior: Clip.hardEdge,
+                  ]),
+              child: CircleAvatar(
+                radius: 30,
+                backgroundColor: Colors.black,
+                child: Material(
+                  child: contact.photoUrl != null
+                      ? CachedNetworkImage(
+                          placeholder: (context, url) => Container(
+                            decoration: BoxDecoration(
+                                image: DecorationImage(
+                              image: AssetImage('images/placeHolder.jpg'),
+                            )),
+                            height: 80,
+                            width: 80,
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 5, vertical: 5),
+                          ),
+                          imageUrl: contact.photoUrl,
+                          width: 80.0,
+                          height: 80.0,
+                          fit: BoxFit.cover,
+                        )
+                      : Icon(
+                          Icons.account_circle,
+                          size: 60.0,
+                          color: Colors.white,
+                        ),
+                  borderRadius: BorderRadius.all(Radius.circular(125.0)),
+                  clipBehavior: Clip.hardEdge,
+                ),
+              ),
             ),
-            // OnlineDotIndicator(
-            //   uid: contact.userId,
-            // ),
-          ],
-        ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+                border: Border(
+              bottom: BorderSide(color: Colors.grey.shade200, width: 1),
+            )),
+            padding: EdgeInsets.symmetric(vertical: 10),
+            child: InkWell(
+              splashColor: Colors.cyan,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute<MaterialPageRoute>(
+                  builder: (context) => ConversationScreen(
+                    recevier: contact,
+                  ),
+                ),
+              ),
+              child: Container(
+                padding: EdgeInsets.only(left: 15),
+               
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.4,
+                          
+                          
+                          child: Text(
+                            (contact != null ? contact.username : null) != null
+                                ? contact.username
+                                : '..',
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontFamily: "Arial",
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.0,
+                                wordSpacing: 1.0),
+                          ),
+                        ),
+                        // Container(
+                        //   width: 7,
+                        //   height: 7,
+                        //   child: OnlineIndicator(
+                        //     uid: contact.userId,
+                        //   ),
+                        // ),
+                        Container(
+                          child: LastMessageTimeContainer(
+                            stream: _chatMethods.fetchLastMessageBetween(
+                              id: userProvider.getUser.userId,
+                              receiverId: contact.userId,
+                            ),
+                          ),
+                        )
+                      ],
+                    ),
+                    SizedBox(
+                      height: 7,
+                    ),
+                    Container(
+                      child: LastMessageContainer(
+                        stream: _chatMethods.fetchLastMessageBetween(
+                          id: userProvider.getUser.userId,
+                          receiverId: contact.userId,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

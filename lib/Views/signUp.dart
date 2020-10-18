@@ -13,7 +13,6 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'chatRoomsScreen.dart';
-
 import '../Widget/widget.dart';
 
 class SignUp extends StatefulWidget {
@@ -66,6 +65,7 @@ class _SignUpState extends State<SignUp> {
           'chattingWith': null,
           'photoUrl' : user.photoURL,
           'aboutMe' : 'Hey there! I am using ChaTooApp',
+        //  'state' : null,
         }).then((dynamic value) {
           if (signedInUser != null) {
             Fluttertoast.showToast(msg: "SignUp successful");
@@ -143,7 +143,8 @@ class _SignUpState extends State<SignUp> {
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
           'chattingWith': null,
           'email': user.email,
-          'aboutMe' : 'Hey there! I am using ChaTooApp'
+          'aboutMe' : 'Hey there! I am using ChaTooApp',
+          // 'state' : null,
         });
 
         // Write data to local

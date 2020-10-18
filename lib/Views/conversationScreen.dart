@@ -111,7 +111,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
             contentPadding: EdgeInsets.all(16),
             children: <Widget>[
               Container(
-                
                 color: Colors.cyan,
                 margin: EdgeInsets.all(0.0),
                 padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
@@ -137,13 +136,13 @@ class _ConversationScreenState extends State<ConversationScreen> {
               ),
               SimpleDialogOption(
                 onPressed: () async =>
-              await Permissions.microphonePermissionsGranted()
-                  ? CallUtils.dialVoice(
-                       from: sender,
+                    await Permissions.microphonePermissionsGranted()
+                        ? CallUtils.dialVoice(
+                            from: sender,
                             to: widget.recevier,
                             context: context,
-                      callis: "audio")
-                  : {dynamic},
+                            callis: "audio")
+                        : {dynamic},
                 child: Row(
                   children: <Widget>[
                     Container(
@@ -168,8 +167,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             from: sender,
                             to: widget.recevier,
                             context: context,
-                            callis: "video"
-                          )
+                            callis: "video")
                         : {dynamic},
                 child: Row(
                   children: <Widget>[
@@ -223,7 +221,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
   @override
   Widget build(BuildContext context) {
     return PickupLayout(
-          scaffold: Scaffold(
+      scaffold: Scaffold(
         appBar: homepageHeader(context),
         body: ChatScreen(
           recevier: recevier,
@@ -437,27 +435,27 @@ class _ChatScreen extends State<ChatScreen> {
   Widget build(BuildContext context) {
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
     return Scaffold(
-        body: Column(
-          children: <Widget>[
-            // List of messages
-            Flexible(child: messageList()),
+      body: Column(
+        children: <Widget>[
+          // List of messages
+          Flexible(child: messageList()),
 
-            _imageUploadProvider.getViewState == ViewState.LOADING
-                ? Container(
-                    child: CircularProgressIndicator(),
-                    margin: EdgeInsets.only(right: 15),
-                    alignment: Alignment.centerRight,
-                  )
-                : Container(),
+          _imageUploadProvider.getViewState == ViewState.LOADING
+              ? Container(
+                  child: CircularProgressIndicator(),
+                  margin: EdgeInsets.only(right: 15),
+                  alignment: Alignment.centerRight,
+                )
+              : Container(),
 
-            createInput(),
+          createInput(),
 
-            isDisplaySticker ? Container(child: emojiContainer()) : Container(),
-          ],
-        ),
+          isDisplaySticker ? Container(child: emojiContainer()) : Container(),
+        ],
+      ),
 
-        // Loading
-      );
+      // Loading
+    );
   }
 
   Widget messageList() {
@@ -739,7 +737,7 @@ class _ChatScreen extends State<ChatScreen> {
         recevierId: widget.recevier.userId,
         id: sender.userId,
         message: text,
-        timestamp: DateTime.now().toString(),
+        timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
         type: 'text',
       );
       setState(() {
@@ -829,11 +827,11 @@ class _ChatScreen extends State<ChatScreen> {
   Future<void> sendImage(String picUrl) async {
     Message _message;
     _message = Message.imageMessage(
-      message: 'IMAGE',
+      message: 'Photo',
       recevierId: widget.recevier.userId,
       id: sender.userId,
       photoUrl: picUrl,
-      timestamp: DateTime.now().toString(),
+      timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
       type: 'image',
     );
     var map = _message.toImageMap() as Map<String, dynamic>;
@@ -843,7 +841,8 @@ class _ChatScreen extends State<ChatScreen> {
         .doc(_message.id)
         .collection(_message.recevierId)
         .add(map);
-
+    databaseMethods.addToContacts(
+        senderId: _message.id, receiverId: _message.recevierId);
     return await FirebaseFirestore.instance
         .collection('messages')
         .doc(_message.recevierId)
