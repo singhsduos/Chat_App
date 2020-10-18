@@ -15,6 +15,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emoji_picker/emoji_picker.dart';
@@ -250,7 +251,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
             child: CircleAvatar(
               backgroundColor: Colors.black,
               child: Material(
-                child: widget.recevier.photoUrl.toString() != null
+                child: widget.recevier.photoUrl != null
                     ? CachedNetworkImage(
                         placeholder: (context, url) => Container(
                           decoration: BoxDecoration(
@@ -262,7 +263,17 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           padding:
                               EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                         ),
-                        imageUrl: '${widget.recevier.photoUrl}',
+                         errorWidget: (context, url, dynamic error) => Material(
+                    child: Image.asset(
+                      'images/placeHolder.jpg',
+                      width: 200.0,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    clipBehavior: Clip.hardEdge,
+                  ),
+                        imageUrl: widget.recevier.photoUrl,
                         width: 50.0,
                         height: 50.0,
                         fit: BoxFit.cover,
@@ -514,8 +525,25 @@ class _ChatScreen extends State<ChatScreen> {
       child: Padding(
         padding: message.type != 'image'
             ? EdgeInsets.all(10)
-            : EdgeInsets.symmetric(horizontal: 1, vertical: 5),
-        child: getMessage(message),
+            : EdgeInsets.only(left: 0, top: 5,right: 5,bottom: 2),
+        child: Column(
+           crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Container(child: getMessage(message), margin: message.type != 'image'
+            ? EdgeInsets.only(left: 20) : EdgeInsets.only(left: 0)),
+            SizedBox(
+              height: 4,
+            ),
+            Text(
+              DateFormat("hh:mm aa").format(DateTime.fromMillisecondsSinceEpoch(
+                  int.parse(message.timestamp))),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -535,10 +563,33 @@ class _ChatScreen extends State<ChatScreen> {
         ),
       ),
       child: Padding(
-          padding: message.type != 'image'
-              ? EdgeInsets.all(10)
-              : EdgeInsets.symmetric(horizontal: 1, vertical: 5),
-          child: getMessage(message)),
+        padding: message.type != 'image'
+            ? EdgeInsets.all(10)
+            : EdgeInsets.only(left: 0, top: 5,right: 5,bottom: 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+             Container(child: getMessage(message), margin: message.type != 'image'
+            ? EdgeInsets.only(right: 20) : EdgeInsets.only(right: 0)),
+            // Container(
+              
+            //   child: getMessage(message),
+            //   margin: EdgeInsets.only(right: 20),
+            // ),
+            SizedBox(
+              height: 4,
+            ),
+            Text(
+              DateFormat("hh:mm aa").format(DateTime.fromMillisecondsSinceEpoch(
+                  int.parse(message.timestamp))),
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

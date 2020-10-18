@@ -105,7 +105,7 @@ class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
                               }
                             },
                             child: Material(
-                              child: widget.recevier.photoUrl.toString() != null
+                              child: widget.recevier.photoUrl != null
                                   ? CachedNetworkImage(
                                       placeholder: (context, url) => Container(
                                         decoration: BoxDecoration(
@@ -118,7 +118,17 @@ class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
                                         padding: EdgeInsets.symmetric(
                                             horizontal: 5, vertical: 5),
                                       ),
-                                      imageUrl: '${widget.recevier.photoUrl}',
+                                       errorWidget: (context, url, dynamic error) => Material(
+                    child: Image.asset(
+                      'images/placeHolder.jpg',
+                      width: 200.0,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    clipBehavior: Clip.hardEdge,
+                  ),
+                                      imageUrl: widget.recevier.photoUrl,
                                       width: MediaQuery.of(context).size.width,
                                       height:
                                           MediaQuery.of(context).size.height /

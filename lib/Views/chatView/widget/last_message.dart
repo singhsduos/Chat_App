@@ -75,7 +75,7 @@ class LastMessageTimeContainer extends StatelessWidget {
             return SizedBox(
               // width: MediaQuery.of(context).size.width * 0.6,
               child: Text(
-                DateFormat("dd MMM - hh:mm:aa").format(DateTime.fromMillisecondsSinceEpoch(int.parse(message.timestamp))),
+                DateFormat("dd MMM - hh:mm aa").format(DateTime.fromMillisecondsSinceEpoch(int.parse(message.timestamp))),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(

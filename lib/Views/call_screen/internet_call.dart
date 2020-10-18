@@ -297,21 +297,18 @@ class _VoiceCallScreenState extends State<VoiceCallScreen> {
                 Material(
                   child: CachedNetworkImage(
                     placeholder: (context, url) => Container(
-                      child: CircularProgressIndicator(),
-                      width: 75,
-                      height: 50,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 50, horizontal: 75),
                       decoration: BoxDecoration(
-                        color: Colors.cyan,
-                        borderRadius: BorderRadius.all(Radius.circular(125.0)),
-                      ),
+                          image: DecorationImage(
+                        image: AssetImage('images/placeHolder.jpg'),
+                      )),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height / 2,
                     ),
                     errorWidget: (context, url, dynamic error) => Material(
                       child: Image.asset(
-                        'images/no_image.jpg',
-                        width: 150.0,
-                        height: 150,
+                        'images/placeHolder.jpg',
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height / 2,
                         fit: BoxFit.cover,
                       ),
                       borderRadius: BorderRadius.all(Radius.circular(125.0)),
@@ -395,21 +392,18 @@ class _VoiceCallScreenState extends State<VoiceCallScreen> {
                 Material(
                   child: CachedNetworkImage(
                     placeholder: (context, url) => Container(
-                      child: CircularProgressIndicator(),
-                      width: 50,
-                      height: 50,
-                      padding:
-                          EdgeInsets.symmetric(vertical: 50, horizontal: 75),
                       decoration: BoxDecoration(
-                        color: Colors.cyan,
-                        borderRadius: BorderRadius.all(Radius.circular(125.0)),
-                      ),
+                          image: DecorationImage(
+                        image: AssetImage('images/placeHolder.jpg'),
+                      )),
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height / 2,
                     ),
                     errorWidget: (context, url, dynamic error) => Material(
                       child: Image.asset(
-                        'images/no_image.jpg',
-                        width: 150.0,
-                        height: 150,
+                        'images/placeHolder.jpg',
+                        width: MediaQuery.of(context).size.width,
+                        height: MediaQuery.of(context).size.height / 2,
                         fit: BoxFit.cover,
                       ),
                       borderRadius: BorderRadius.all(Radius.circular(125.0)),

@@ -97,6 +97,16 @@ class ViewLayout extends StatelessWidget {
                             padding: EdgeInsets.symmetric(
                                 horizontal: 5, vertical: 5),
                           ),
+                            errorWidget: (context, url, dynamic error) => Material(
+                    child: Image.asset(
+                      'images/placeHolder.jpg',
+                      width: 200.0,
+                      height: 200,
+                      fit: BoxFit.cover,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                    clipBehavior: Clip.hardEdge,
+                  ),
                           imageUrl: contact.photoUrl,
                           width: 80.0,
                           height: 80.0,
@@ -120,7 +130,7 @@ class ViewLayout extends StatelessWidget {
             )),
             padding: EdgeInsets.symmetric(vertical: 10),
             child: InkWell(
-              splashColor: Colors.cyan,
+             
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute<MaterialPageRoute>(
