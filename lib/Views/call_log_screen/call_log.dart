@@ -16,8 +16,8 @@ class LogScreen extends StatelessWidget {
             color: Colors.white,
           ),
         ),
-        body: Center(
-          child: LogListContainer(),
+        body:Padding(padding: EdgeInsets.only(left: 15),
+         child: LogListContainer(),
         ),
       ),
     );

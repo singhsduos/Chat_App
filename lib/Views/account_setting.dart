@@ -618,7 +618,6 @@ class _SettingScreenState extends State<SettingScreen> {
                 height: 40,
               ),
               InkWell(
-                // splashColor: Colors.blue,
                 highlightColor: Colors.transparent,
                 onTap: updateData,
                 child: Container(

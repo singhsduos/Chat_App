@@ -1,18 +1,15 @@
 import 'dart:io';
-
 import 'package:ChatApp/modal/log.dart';
-import 'package:ChatApp/services/repository/local_db.dart/log_interferace.dart';
+import 'package:ChatApp/services/repository_log/local_db.dart/log_interferace.dart';
 import 'package:path_provider/path_provider.dart';
-
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 
 class SqliteMethods implements LogInterface {
   Database _db;
 
-  String databaseName = "LogDB";
-
-  String tableName = "Call_Logs";
+  String databaseName = "";
+ String tableName = "Call_Logs";
 
   // columns
   String id = 'log_id';
@@ -31,6 +28,9 @@ class SqliteMethods implements LogInterface {
     _db = await init();
     return _db;
   }
+
+  @override
+  void openDb(String dbName) => (databaseName = dbName);
 
   @override
   Future<Database> init() async {
@@ -58,7 +58,7 @@ class SqliteMethods implements LogInterface {
  Future<int> deleteLogs(int logId) async {
     var dbClient = await db;
     return await dbClient
-        .delete(tableName, where: '$id = ?', whereArgs: <int>[logId]);
+        .delete(tableName, where: '$id = ?', whereArgs: <int>[logId + 1]);
   }
 
  dynamic updateLogs(Log log) async {

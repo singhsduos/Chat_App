@@ -143,7 +143,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             to: widget.recevier,
                             context: context,
                             callis: "audio")
-                        : {dynamic},
+                        : () {},
                 child: Row(
                   children: <Widget>[
                     Container(
@@ -169,7 +169,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
                             to: widget.recevier,
                             context: context,
                             callis: "video")
-                        : {dynamic},
+                        : () {},
                 child: Row(
                   children: <Widget>[
                     Container(
@@ -263,16 +263,16 @@ class _ConversationScreenState extends State<ConversationScreen> {
                           padding:
                               EdgeInsets.symmetric(horizontal: 5, vertical: 5),
                         ),
-                         errorWidget: (context, url, dynamic error) => Material(
-                    child: Image.asset(
-                      'images/placeHolder.jpg',
-                      width: 200.0,
-                      height: 200,
-                      fit: BoxFit.cover,
-                    ),
-                    borderRadius: BorderRadius.all(Radius.circular(8.0)),
-                    clipBehavior: Clip.hardEdge,
-                  ),
+                        errorWidget: (context, url, dynamic error) => Material(
+                          child: Image.asset(
+                            'images/placeHolder.jpg',
+                            width: 200.0,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                          borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                          clipBehavior: Clip.hardEdge,
+                        ),
                         imageUrl: widget.recevier.photoUrl,
                         width: 50.0,
                         height: 50.0,
@@ -511,7 +511,6 @@ class _ChatScreen extends State<ChatScreen> {
   Widget senderLayout(Message message) {
     Radius messageRadius = Radius.circular(15);
     return Container(
-      
       // margin: EdgeInsets.only(top: 12),
       constraints:
           BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
@@ -526,15 +525,17 @@ class _ChatScreen extends State<ChatScreen> {
       child: Padding(
         padding: message.type != 'image'
             ? EdgeInsets.all(10)
-            : EdgeInsets.only(left: 0, top: 5,right: 5,bottom: 2),
-        child: 
-        Column(
-           crossAxisAlignment: CrossAxisAlignment.end,
-           mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            : EdgeInsets.only(left: 0, top: 5, right: 5, bottom: 2),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Container(child: getMessage(message), margin: message.type != 'image'
-            ? EdgeInsets.only(left: 20) : EdgeInsets.only(left: 0)),
+            Container(
+                child: getMessage(message),
+                margin: message.type != 'image'
+                    ? EdgeInsets.only(left: 20)
+                    : EdgeInsets.only(left: 0)),
             SizedBox(
               height: 4,
             ),
@@ -569,14 +570,17 @@ class _ChatScreen extends State<ChatScreen> {
       child: Padding(
         padding: message.type != 'image'
             ? EdgeInsets.all(10)
-            : EdgeInsets.only(left: 0, top: 5,right: 5,bottom: 2),
+            : EdgeInsets.only(left: 0, top: 5, right: 5, bottom: 2),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-             Container(child: getMessage(message), margin: message.type != 'image'
-            ? EdgeInsets.only(right: 20) : EdgeInsets.only(right: 0)),
+            Container(
+                child: getMessage(message),
+                margin: message.type != 'image'
+                    ? EdgeInsets.only(right: 20)
+                    : EdgeInsets.only(right: 0)),
             // Container(
-              
+
             //   child: getMessage(message),
             //   margin: EdgeInsets.only(right: 20),
             // ),
@@ -661,6 +665,8 @@ class _ChatScreen extends State<ChatScreen> {
             margin: EdgeInsets.all(0),
           );
   }
+
+ 
 
   Widget emojiContainer() {
     return EmojiPicker(
@@ -776,7 +782,10 @@ class _ChatScreen extends State<ChatScreen> {
               ),
               fillColor: Colors.cyan,
               splashColor: Colors.transparent,
-              onPressed: () => onSendMessage(),
+              onPressed: () {
+                
+                onSendMessage();
+              },
             ),
           ),
         ],
@@ -800,10 +809,33 @@ class _ChatScreen extends State<ChatScreen> {
       });
       messageController.text = '';
       databaseMethods.addConversationMessages(_message, sender, recevier);
+      updateContactTime(_message);
+      
     } else {
       Fluttertoast.showToast(
           msg: 'Please type a message', gravity: ToastGravity.CENTER);
     }
+  }
+
+   
+  void updateContactTime(Message message) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(sender.userId)
+        .collection('contacts')
+        .doc(widget.recevier.userId)
+        .update(<String, String>{
+      'added_on': message.timestamp,
+    });
+
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.recevier.userId)
+        .collection('contacts')
+        .doc(sender.userId)
+        .update(<String, String>{
+      'added_on': message.timestamp,
+    });
   }
 
   final picker = ImagePicker();
@@ -898,11 +930,33 @@ class _ChatScreen extends State<ChatScreen> {
         .add(map);
     databaseMethods.addToContacts(
         senderId: _message.id, receiverId: _message.recevierId);
+    updateContactImageTime(_message);
     return await FirebaseFirestore.instance
         .collection('messages')
         .doc(_message.recevierId)
         .collection(_message.id)
         .add(map);
+  }
+
+ 
+  void updateContactImageTime(Message message) {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(sender.userId)
+        .collection('contacts')
+        .doc(widget.recevier.userId)
+        .update(<String, String>{
+      'added_on': message.timestamp,
+    });
+
+     FirebaseFirestore.instance
+        .collection('users')
+        .doc(widget.recevier.userId)
+        .collection('contacts')
+        .doc(sender.userId)
+        .update(<String, String>{
+      'added_on': message.timestamp,
+    });
   }
 }
 

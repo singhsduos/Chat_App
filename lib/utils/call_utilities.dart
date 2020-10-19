@@ -1,17 +1,25 @@
 import 'dart:math';
-
 import 'package:ChatApp/Views/call_screen/internet_call.dart';
 import 'package:ChatApp/Views/call_screen/video_call_screen.dart';
+import 'package:ChatApp/helper/strings.dart';
 import 'package:ChatApp/modal/call.dart';
+import 'package:ChatApp/modal/log.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/services/call_methods.dart';
+import 'package:ChatApp/services/repository_log/local_db.dart/hive.methods.dart';
+import 'package:ChatApp/services/repository_log/local_db.dart/sqlite_methods.dart';
+import 'package:ChatApp/services/repository_log/log_repository.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:flutter/material.dart';
 
 class CallUtils {
   static final CallMethods callMethods = CallMethods();
- static final ClientRole _role = ClientRole.Broadcaster;
-  static void dial({Users from, Users to, BuildContext context,String callis}) async {
+  HiveMethods hiveMethods = HiveMethods();
+  SqliteMethods sqliteMethods = SqliteMethods();
+  bool isHive;
+  static final ClientRole _role = ClientRole.Broadcaster;
+  static void dial(
+      {Users from, Users to, BuildContext context, String callis}) async {
     Call call = Call(
       callerId: from.userId,
       callerName: from.username,
@@ -20,22 +28,35 @@ class CallUtils {
       receiverName: to.username,
       receiverPic: to.photoUrl,
       channelId: Random().nextInt(1000).toString(),
+    );
+
+    Log log = Log(
+      callerName: from.username,
+      callerPic: from.photoUrl,
+      callStatus: CALL_STATUS_DIALLED,
+      receiverName: to.username,
+      receiverPic: to.photoUrl,
+      timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
     );
     bool callMade = await callMethods.makeCall(call: call);
     call.hasDialled = true;
 
     if (callMade) {
+      LogRepository.addLogs(log);
       Navigator.push(
         context,
         MaterialPageRoute<MaterialPageRoute>(
-          builder: (BuildContext context) => CallScreen(call: call, role: _role,),
+          builder: (BuildContext context) => CallScreen(
+            call: call,
+            role: _role,
+          ),
         ),
       );
     }
-    
   }
 
-  static void dialVoice({Users from, Users to, BuildContext context,String callis}) async {
+  static void dialVoice(
+      {Users from, Users to, BuildContext context, String callis}) async {
     Call call = Call(
       callerId: from.userId,
       callerName: from.username,
@@ -45,17 +66,29 @@ class CallUtils {
       receiverPic: to.photoUrl,
       channelId: Random().nextInt(1000).toString(),
     );
+
+    Log log = Log(
+      callerName: from.username,
+      callerPic: from.photoUrl,
+      callStatus: CALL_STATUS_DIALLED,
+      receiverName: to.username,
+      receiverPic: to.photoUrl,
+      timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+    );
     bool callMade = await callMethods.makeVoiceCall(call: call);
     call.hasDialled = true;
 
     if (callMade) {
+      LogRepository.addLogs(log);
       Navigator.push(
         context,
         MaterialPageRoute<MaterialPageRoute>(
-          builder: (BuildContext context) => VoiceCallScreen(call: call, role: _role,),
+          builder: (BuildContext context) => VoiceCallScreen(
+            call: call,
+            role: _role,
+          ),
         ),
       );
     }
-    
   }
 }

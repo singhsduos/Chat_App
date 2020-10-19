@@ -162,7 +162,7 @@ class _SideDrawerState extends State<SideDrawer> {
     User user = FirebaseAuth.instance.currentUser;
 
     return PickupLayout(
-          scaffold: SafeArea(
+      scaffold: SafeArea(
         child: Drawer(
           child: ListView(
             padding: EdgeInsets.zero,
@@ -193,10 +193,9 @@ class _SideDrawerState extends State<SideDrawer> {
                         context,
                         MaterialPageRoute(
                           builder: (BuildContext context) => FullScreenImagePage(
-                         url: photoUrl.toString() != null
-                                          ? photoUrl.toString()
-                                          : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'
-                          ),
+                              url: photoUrl != null
+                                  ? photoUrl
+                                  : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'),
                         ),
                       );
                     }
@@ -204,7 +203,7 @@ class _SideDrawerState extends State<SideDrawer> {
                   child: CircleAvatar(
                     backgroundColor: Colors.black,
                     child: Material(
-                      child: photoUrl.toString() != null
+                      child: photoUrl != null
                           ? CachedNetworkImage(
                               placeholder: (context, url) => Container(
                                 decoration: BoxDecoration(
@@ -216,7 +215,7 @@ class _SideDrawerState extends State<SideDrawer> {
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 5, vertical: 5),
                               ),
-                              imageUrl: photoUrl.toString(),
+                              imageUrl: photoUrl,
                               width: 80.0,
                               height: 80.0,
                               fit: BoxFit.cover,

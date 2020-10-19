@@ -7,6 +7,7 @@ import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/provider/provider.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
+import 'package:ChatApp/services/repository_log/log_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -49,13 +50,12 @@ class ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
     SchedulerBinding.instance.addPostFrameCallback((_) {
       userProvider = Provider.of<UserProvider>(context, listen: false);
       userProvider.refreshUser();
+      LogRepository.init(isHive: false, dbName: user.uid );
     });
     pageController = PageController();
     // registerNotification();
     // configLocalNotification();
   }
-
- 
 
   // @override
   // void didChangeAppLifeCycleChanged(AppLifecycleState state) {

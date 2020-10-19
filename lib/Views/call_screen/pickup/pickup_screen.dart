@@ -1,27 +1,56 @@
 import 'package:ChatApp/Views/call_screen/internet_call.dart';
 import 'package:ChatApp/Views/call_screen/video_call_screen.dart';
+import 'package:ChatApp/helper/strings.dart';
 import 'package:ChatApp/modal/call.dart';
+import 'package:ChatApp/modal/log.dart';
+import 'package:ChatApp/services/repository_log/log_repository.dart';
 import 'package:ChatApp/utils/permissions.dart';
 import 'package:agora_rtc_engine/rtc_engine.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/services/call_methods.dart';
 
-class PickupScreen extends StatelessWidget {
+class PickupScreen extends StatefulWidget {
   final Call call;
   final ClientRole role;
-  final CallMethods callMethods = CallMethods();
+
   PickupScreen({@required this.call, @required this.role});
+
+  @override
+  _PickupScreenState createState() => _PickupScreenState();
+}
+
+class _PickupScreenState extends State<PickupScreen> {
+  final CallMethods callMethods = CallMethods();
+  bool isCallMissed = true;
+  void addToLocalStorage({@required String callStatus}) {
+    Log log = Log(
+        callerName: widget.call.callerName,
+        receiverName: widget.call.receiverName,
+        receiverPic: widget.call.receiverPic,
+        timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+        callStatus: callStatus);
+
+    LogRepository.addLogs(log);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    if (isCallMissed) {
+      addToLocalStorage(callStatus: CALL_STATUS_MISSED);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       backgroundColor: Colors.cyan,
+      backgroundColor: Colors.cyan,
       body: SingleChildScrollView(
-              child: Container(
+        child: Container(
           color: Colors.cyan,
           alignment: Alignment.topCenter,
-          padding: EdgeInsets.symmetric(vertical:  70),
+          padding: EdgeInsets.symmetric(vertical: 70),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
@@ -57,7 +86,7 @@ class PickupScreen extends StatelessWidget {
                     borderRadius: BorderRadius.all(Radius.circular(125.0)),
                     clipBehavior: Clip.hardEdge,
                   ),
-                  imageUrl: call.callerPic,
+                  imageUrl: widget.call.callerPic,
                   width: 200.0,
                   height: 200.0,
                   fit: BoxFit.cover,
@@ -69,7 +98,7 @@ class PickupScreen extends StatelessWidget {
                 height: 15,
               ),
               Text(
-                call.callerName,
+                widget.call.callerName,
                 style: TextStyle(
                   fontSize: 30,
                   color: Colors.white,
@@ -78,7 +107,7 @@ class PickupScreen extends StatelessWidget {
               SizedBox(
                 height: 15,
               ),
-              (call.isCall == 'audio')
+              (widget.call.isCall == 'audio')
                   ? Text(
                       'ChaTooApp voice call',
                       style: TextStyle(
@@ -111,7 +140,9 @@ class PickupScreen extends StatelessWidget {
                     fillColor: Colors.redAccent,
                     splashColor: Colors.transparent,
                     onPressed: () async {
-                      await callMethods.endCall(call: call);
+                      isCallMissed = false;
+                      addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
+                      await callMethods.endCall(call: widget.call);
                     },
                   ),
                   SizedBox(
@@ -128,30 +159,34 @@ class PickupScreen extends StatelessWidget {
                     ),
                     fillColor: Colors.greenAccent,
                     splashColor: Colors.transparent,
-                    onPressed: () async => call.isCall == "video"
-                        ? await Permissions
-                                .cameraAndMicrophonePermissionsGranted()
-                            ? Navigator.push(
-                                context,
-                                MaterialPageRoute<MaterialPageRoute>(
-                                  builder: (context) => CallScreen(
-                                    call: call,
-                                    role: role,
+                    onPressed: () async {
+                      isCallMissed = false;
+                      addToLocalStorage(callStatus: CALL_STATUS_RECEIVED);
+                      widget.call.isCall == "video"
+                          ? await Permissions
+                                  .cameraAndMicrophonePermissionsGranted()
+                              ? Navigator.push(
+                                  context,
+                                  MaterialPageRoute<MaterialPageRoute>(
+                                    builder: (context) => CallScreen(
+                                      call: widget.call,
+                                      role: widget.role,
+                                    ),
                                   ),
-                                ),
-                              )
-                            : {dynamic}
-                        : await Permissions.microphonePermissionsGranted()
-                            ? Navigator.push(
-                                context,
-                                MaterialPageRoute<MaterialPageRoute>(
-                                  builder: (context) => VoiceCallScreen(
-                                    call: call,
-                                    role: role,
+                                )
+                              : () {}
+                          : await Permissions.microphonePermissionsGranted()
+                              ? Navigator.push(
+                                  context,
+                                  MaterialPageRoute<MaterialPageRoute>(
+                                    builder: (context) => VoiceCallScreen(
+                                      call: widget.call,
+                                      role: widget.role,
+                                    ),
                                   ),
-                                ),
-                              )
-                            : {dynamic},
+                                )
+                              : () {};
+                    },
                   ),
                 ],
               )

@@ -1,13 +1,11 @@
 import 'dart:io';
-
-import 'package:ChatApp/services/repository/local_db.dart/log_interferace.dart';
+import 'package:ChatApp/services/repository_log/local_db.dart/log_interferace.dart';
 import 'package:hive/hive.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:ChatApp/modal/log.dart';
 
-
 class HiveMethods implements LogInterface {
-  String _hiveBox;
+  String _hiveBox = '';
 
   @override
   void openDb(String dbName) => _hiveBox = dbName;
@@ -20,7 +18,7 @@ class HiveMethods implements LogInterface {
 
   @override
   Future<int> addLogs(Log log) async {
-    final Box box = await Hive.openBox<dynamic>(_hiveBox);
+    final Box box = await Hive.openBox<String>(_hiveBox);
     var logMap = log.toMap(log);
     int idOfInput = await box.add(logMap);
     Hive.close();
@@ -28,12 +26,20 @@ class HiveMethods implements LogInterface {
   }
 
   @override
+  dynamic updateLogs(int i, Log newLog) async {
+    var box = await Hive.openBox<dynamic>(_hiveBox);
+    var newLogMap = newLog.toMap(newLog);
+    box.putAt(i, newLogMap);
+    close();
+  }
+
+  @override
   Future<List<Log>> getLogs() async {
-    final Box box = await Hive.openBox<dynamic>(_hiveBox);
+    final Box box = await Hive.openBox<String>(_hiveBox);
     List<Log> list = [];
 
     for (int i = 0; i < box.length; i++) {
-     Map<String,dynamic> logMap = box.getAt(i) as Map<String,dynamic>;
+      Map<String, dynamic> logMap = box.getAt(i) as Map<String, dynamic>;
       list.add(
         Log.fromMap(
           logMap,
@@ -46,7 +52,7 @@ class HiveMethods implements LogInterface {
 
   @override
   deleteLogs(int logId) async {
-    final Box box = await Hive.openBox<dynamic>(_hiveBox);
+    final Box box = await Hive.openBox<String>(_hiveBox);
     await box.deleteAt(logId);
   }
 
