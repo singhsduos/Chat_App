@@ -135,3 +135,45 @@ class QuietBox extends StatelessWidget {
     );
   }
 }
+
+class SearchCallContactBox extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 25),
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(16.0),
+            color: Colors.cyan,
+          ),
+          padding: EdgeInsets.symmetric(vertical: 35, horizontal: 25),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: <Widget>[
+              Text(
+                "This is where all yours added contacts displayed.",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 21,
+                    color: Colors.white),
+              ),
+              SizedBox(height: 25),
+              Text(
+                "You have no contacts",
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    letterSpacing: 1.2,
+                    fontWeight: FontWeight.normal,
+                    fontSize: 18,
+                    color: Colors.white),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}

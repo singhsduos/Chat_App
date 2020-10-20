@@ -510,44 +510,78 @@ class _ChatScreen extends State<ChatScreen> {
 
   Widget senderLayout(Message message) {
     Radius messageRadius = Radius.circular(15);
-    return Container(
-      // margin: EdgeInsets.only(top: 12),
-      constraints:
-          BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
-      decoration: BoxDecoration(
-        color: Colors.cyan,
-        borderRadius: BorderRadius.only(
-          topLeft: messageRadius,
-          topRight: messageRadius,
-          bottomLeft: messageRadius,
+    return InkWell(
+      onLongPress: ()=> showDialog<Null>(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Center(
+                        child: Text(
+                          "Delete this message",
+                          style: TextStyle(color: Colors.cyan),
+                        ),
+                      ),
+                      content: Text(
+                        "Are you sure you wish to delete this message?",
+                        style: TextStyle(color: Colors.cyan),
+                      ),
+                      actions: [
+                        FlatButton(
+                          child: Text("YES"),
+                          onPressed: () async {
+                    
+                // FirebaseFirestore.instance
+                //     .collection('messages')
+                //     .doc(sender.userId)
+                //     .collection(widget.recevier.userId)
+                //     .doc()
+                //     .delete();
+                          },
+                        ),
+                        FlatButton(
+                          child: Text("NO"),
+                          onPressed: () => Navigator.maybePop(context),
+                        ),
+                      ],
+                    ),
+                  ),
+          child: Container(
+        constraints:
+            BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
+        decoration: BoxDecoration(
+          color: Colors.cyan,
+          borderRadius: BorderRadius.only(
+            topLeft: messageRadius,
+            topRight: messageRadius,
+            bottomLeft: messageRadius,
+          ),
         ),
-      ),
-      child: Padding(
-        padding: message.type != 'image'
-            ? EdgeInsets.all(10)
-            : EdgeInsets.only(left: 0, top: 5, right: 5, bottom: 2),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Container(
-                child: getMessage(message),
-                margin: message.type != 'image'
-                    ? EdgeInsets.only(left: 20)
-                    : EdgeInsets.only(left: 0)),
-            SizedBox(
-              height: 4,
-            ),
-            Text(
-              DateFormat("hh:mm aa").format(DateTime.fromMillisecondsSinceEpoch(
-                  int.parse(message.timestamp))),
-              style: TextStyle(
-                fontSize: 12,
-                color: Colors.white,
+        child: Padding(
+          padding: message.type != 'image'
+              ? EdgeInsets.all(10)
+              : EdgeInsets.only(left: 0, top: 5, right: 5, bottom: 2),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Container(
+                  child: getMessage(message),
+                  margin: message.type != 'image'
+                      ? EdgeInsets.only(left: 20)
+                      : EdgeInsets.only(left: 0)),
+              SizedBox(
+                height: 4,
               ),
-            ),
-          ],
+              Text(
+                DateFormat("hh:mm aa").format(DateTime.fromMillisecondsSinceEpoch(
+                    int.parse(message.timestamp))),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -556,7 +590,6 @@ class _ChatScreen extends State<ChatScreen> {
   Widget receiverLayout(Message message) {
     Radius messageRadius = Radius.circular(15);
     return Container(
-      // margin: EdgeInsets.only(top: 0),
       constraints:
           BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
       decoration: BoxDecoration(
@@ -579,11 +612,6 @@ class _ChatScreen extends State<ChatScreen> {
                 margin: message.type != 'image'
                     ? EdgeInsets.only(right: 20)
                     : EdgeInsets.only(right: 0)),
-            // Container(
-
-            //   child: getMessage(message),
-            //   margin: EdgeInsets.only(right: 20),
-            // ),
             SizedBox(
               height: 4,
             ),
@@ -665,8 +693,6 @@ class _ChatScreen extends State<ChatScreen> {
             margin: EdgeInsets.all(0),
           );
   }
-
- 
 
   Widget emojiContainer() {
     return EmojiPicker(
@@ -783,7 +809,6 @@ class _ChatScreen extends State<ChatScreen> {
               fillColor: Colors.cyan,
               splashColor: Colors.transparent,
               onPressed: () {
-                
                 onSendMessage();
               },
             ),
@@ -810,14 +835,12 @@ class _ChatScreen extends State<ChatScreen> {
       messageController.text = '';
       databaseMethods.addConversationMessages(_message, sender, recevier);
       updateContactTime(_message);
-      
     } else {
       Fluttertoast.showToast(
           msg: 'Please type a message', gravity: ToastGravity.CENTER);
     }
   }
 
-   
   void updateContactTime(Message message) {
     FirebaseFirestore.instance
         .collection('users')
@@ -938,7 +961,6 @@ class _ChatScreen extends State<ChatScreen> {
         .add(map);
   }
 
- 
   void updateContactImageTime(Message message) {
     FirebaseFirestore.instance
         .collection('users')
@@ -949,7 +971,7 @@ class _ChatScreen extends State<ChatScreen> {
       'added_on': message.timestamp,
     });
 
-     FirebaseFirestore.instance
+    FirebaseFirestore.instance
         .collection('users')
         .doc(widget.recevier.userId)
         .collection('contacts')
