@@ -1,4 +1,5 @@
 import 'package:ChatApp/Widget/customTile.dart';
+import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:ChatApp/Widget/quietbox.dart';
 import 'package:ChatApp/helper/strings.dart';
 import 'package:ChatApp/modal/log.dart';
@@ -70,27 +71,110 @@ class _LogListContainerState extends State<LogListContainer> {
                 bool hasDialled = _log.callStatus == CALL_STATUS_DIALLED;
 
                 return CustomTile(
-                  leading: CircleAvatar(
-                    backgroundColor: Colors.black,
-                    child: CachedNetworkImage(
-                      imageUrl: hasDialled ? _log.receiverPic : _log.callerPic,
+                  leading: GestureDetector(
+                    onTap: () {
+                      {
+                        Navigator.push<MaterialPageRoute>(
+                          context,
+                          MaterialPageRoute(
+                            builder: (BuildContext context) => FullScreenImagePage(
+                                url: _log.receiverPic != null
+                                    ? _log.receiverPic
+                                    : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'),
+                          ),
+                        );
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(1),
+                      decoration: BoxDecoration(
+                          border: Border.all(color: Colors.cyan, width: 2),
+                          // shape: BoxShape.circle,
+                          borderRadius: BorderRadius.all(Radius.circular(40)),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.5),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                            )
+                          ]),
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: Colors.black,
+                        child: Material(
+                          child: (hasDialled
+                                      ? _log.receiverPic
+                                      : _log.callerPic) !=
+                                  null
+                              ? CachedNetworkImage(
+                                  placeholder: (context, url) => Container(
+                                    decoration: BoxDecoration(
+                                        image: DecorationImage(
+                                      image:
+                                          AssetImage('images/placeHolder.jpg'),
+                                    )),
+                                    height: 80,
+                                    width: 80,
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 5, vertical: 5),
+                                  ),
+                                  errorWidget: (context, url, dynamic error) =>
+                                      Material(
+                                    child: Image.asset(
+                                      'images/placeHolder.jpg',
+                                      width: 200.0,
+                                      height: 200,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    borderRadius:
+                                        BorderRadius.all(Radius.circular(8.0)),
+                                    clipBehavior: Clip.hardEdge,
+                                  ),
+                                  imageUrl: (hasDialled
+                                      ? _log.receiverPic
+                                      : _log.callerPic),
+                                  width: 80.0,
+                                  height: 80.0,
+                                  fit: BoxFit.cover,
+                                )
+                              : Icon(
+                                  Icons.account_circle,
+                                  size: 60.0,
+                                  color: Colors.white,
+                                ),
+                          borderRadius:
+                              BorderRadius.all(Radius.circular(125.0)),
+                          clipBehavior: Clip.hardEdge,
+                        ),
+                      ),
                     ),
                   ),
                   mini: false,
                   onLongPress: () => showDialog<Null>(
                     context: context,
                     builder: (context) => AlertDialog(
-                      title: Text(
-                        "Delete this Log?",
-                        style: TextStyle(color: Colors.white),
+                      title: Center(
+                        child: Text(
+                          "Delete this Log?",
+                        ),
                       ),
                       content: Text(
                         "Are you sure you wish to delete this log?",
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(color: Colors.cyan),
                       ),
                       actions: [
                         FlatButton(
-                          child: Text("YES"),
+                          child: Text(
+                            "NO",
+                            style: TextStyle(color: Colors.cyan),
+                          ),
+                          onPressed: () => Navigator.maybePop(context),
+                        ),
+                        FlatButton(
+                          child: Text(
+                            "YES",
+                            style: TextStyle(color: Colors.cyan),
+                          ),
                           onPressed: () async {
                             Navigator.maybePop(context);
                             await LogRepository.deleteLogs(i);
@@ -98,10 +182,6 @@ class _LogListContainerState extends State<LogListContainer> {
                               setState(() {});
                             }
                           },
-                        ),
-                        FlatButton(
-                          child: Text("NO"),
-                          onPressed: () => Navigator.maybePop(context),
                         ),
                       ],
                     ),

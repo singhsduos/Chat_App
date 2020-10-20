@@ -23,32 +23,28 @@ class CustomTile extends StatelessWidget {
       this.onTap,
       this.onLongPress});
 
-   @override
+  @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-          child: GestureDetector(
+      child: GestureDetector(
         onTap: onTap,
         onLongPress: onLongPress,
         child: Container(
           margin: margin,
           padding: EdgeInsets.symmetric(vertical: mini ? 4 : 16),
-                 decoration: BoxDecoration(
-                border:
-                    Border(bottom: BorderSide(color: Colors.grey.shade300))),
+          decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: Colors.grey.shade300))),
           child: Row(
             children: <Widget>[
-              Container(child: leading, padding: EdgeInsets.all(5)),
-              
+              Container(child: leading, padding: EdgeInsets.all(5), ),
               Expanded(
-                              child: Container(
-                  
+                child: Container(
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-
                           title ?? Container(),
                           SizedBox(height: 3),
                           Row(

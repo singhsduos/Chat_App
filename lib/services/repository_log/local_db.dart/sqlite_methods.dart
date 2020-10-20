@@ -29,8 +29,6 @@ class SqliteMethods implements LogInterface {
     return _db;
   }
 
-  @override
-  void openDb(String dbName) => (databaseName = dbName);
 
   @override
   Future<Database> init() async {
@@ -105,6 +103,9 @@ class SqliteMethods implements LogInterface {
       return null;
     }
   }
+
+  @override
+  void openDb(String dbName) => (databaseName = dbName);
 
   @override
   close() async {

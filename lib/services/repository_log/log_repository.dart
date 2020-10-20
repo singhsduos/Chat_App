@@ -10,7 +10,7 @@ class LogRepository {
  
 
   static Future<void> init({@required bool isHive, @required String dbName}) async {
-    dbObject == isHive ? HiveMethods() : SqliteMethods();
+    dbObject = isHive ? HiveMethods() : SqliteMethods();
     dbObject.openDb(dbName);
     dbObject.init();
   }

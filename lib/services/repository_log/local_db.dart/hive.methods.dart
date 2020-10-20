@@ -6,9 +6,17 @@ import 'package:ChatApp/modal/log.dart';
 
 class HiveMethods implements LogInterface {
   String _hiveBox = '';
+  //  Database _db;
 
-  @override
-  void openDb(String dbName) => _hiveBox = dbName;
+  // String databaseName = "";
+
+
+  // @override
+  // void openDb(String dbName) => (databaseName = dbName);
+
+ 
+  
+
 
   @override
   init() async {
@@ -55,6 +63,9 @@ class HiveMethods implements LogInterface {
     final Box box = await Hive.openBox<String>(_hiveBox);
     await box.deleteAt(logId);
   }
+
+   @override
+  void openDb(String dbName) =>( _hiveBox = dbName);
 
   @override
   close() => Hive.close();
