@@ -43,20 +43,37 @@ class _ContactListScreenState extends State<ContactListScreen> {
               onPressed: () {
                 setState(() {
                   if (this.actionIcon.icon == Icons.search) {
-                    this.actionIcon = new Icon(Icons.close);
+                    this.actionIcon = new Icon(Icons.close,size: 27);
                     this.appBarTitle = new TextField(
-                      style: new TextStyle(
+                      cursorColor: Colors.black,
+                      style: TextStyle(
+                        fontSize: 19.0,
+                        fontFamily: 'Arial ',
+                        letterSpacing: 1.0,
                         color: Colors.white,
                       ),
                       decoration: new InputDecoration(
-                          prefixIcon:
-                              new Icon(Icons.search, color: Colors.white),
-                          hintText: "Search...",
-                          hintStyle: new TextStyle(color: Colors.white)),
+                        prefixIcon: new Icon(Icons.search, color: Colors.white),
+                        hintText: "Search...",
+                        hintStyle: TextStyle(
+                          fontSize: 19.0,
+                          fontFamily: 'Arial ',
+                          letterSpacing: 1.0,
+                          color: Color(0xfffecf0f1),
+                        ),
+                      ),
                     );
                   } else {
-                    this.actionIcon = new Icon(Icons.search);
-                    this.appBarTitle = new Text("AppBar Title");
+                    this.actionIcon = new Icon(Icons.search,size: 27,);
+                    this.appBarTitle = Text(
+                      'Select contact',
+                      style: TextStyle(
+                        fontSize: 19.0,
+                        fontFamily: 'Arial ',
+                        letterSpacing: 1.0,
+                        color: Colors.white,
+                      ),
+                    );
                   }
                 });
               },
