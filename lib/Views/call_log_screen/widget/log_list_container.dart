@@ -2,9 +2,9 @@ import 'package:ChatApp/Widget/customTile.dart';
 import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:ChatApp/Widget/quietbox.dart';
 import 'package:ChatApp/helper/strings.dart';
+import 'package:ChatApp/modal/call.dart';
 import 'package:ChatApp/modal/log.dart';
 import 'package:ChatApp/services/repository_log/log_repository.dart';
-import 'package:ChatApp/utils/utilites.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -15,6 +15,7 @@ class LogListContainer extends StatefulWidget {
 }
 
 class _LogListContainerState extends State<LogListContainer> {
+  Call call;
   Widget getIcon(String callStatus) {
     Icon _icon;
     double _iconSize = 15;
@@ -205,6 +206,9 @@ class _LogListContainerState extends State<LogListContainer> {
                       // color: Colors.white,
                     ),
                   ),
+                  // trailing: call.isCall == 'audio'
+                  //     ? Icon(Icons.call)
+                  //     : Icon(Icons.video_call),
                 );
               },
             );

@@ -9,28 +9,59 @@ import 'package:ChatApp/utils/permissions.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:ChatApp/Views/chatView/widget/last_message.dart';
-import 'package:ChatApp/modal/message.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-class ContactListScreen extends StatelessWidget {
+class ContactListScreen extends StatefulWidget {
+  @override
+  _ContactListScreenState createState() => _ContactListScreenState();
+}
+
+class _ContactListScreenState extends State<ContactListScreen> {
+  Widget appBarTitle = Text(
+    'Select contact',
+    style: TextStyle(
+      fontSize: 19.0,
+      fontFamily: 'Arial ',
+      letterSpacing: 1.0,
+      color: Colors.white,
+    ),
+  );
+  Icon actionIcon = new Icon(Icons.search);
   @override
   Widget build(BuildContext context) {
     return PickupLayout(
       scaffold: Scaffold(
         appBar: AppBar(
           iconTheme: new IconThemeData(color: Colors.white),
-          title: Text(
-            'Select contact',
-            style: TextStyle(
-              fontSize: 19.0,
-              fontFamily: 'Arial ',
-              letterSpacing: 1.0,
-              color: Colors.white,
+          centerTitle: true,
+          title: appBarTitle,
+          actions: <Widget>[
+            new IconButton(
+              icon: actionIcon,
+              onPressed: () {
+                setState(() {
+                  if (this.actionIcon.icon == Icons.search) {
+                    this.actionIcon = new Icon(Icons.close);
+                    this.appBarTitle = new TextField(
+                      style: new TextStyle(
+                        color: Colors.white,
+                      ),
+                      decoration: new InputDecoration(
+                          prefixIcon:
+                              new Icon(Icons.search, color: Colors.white),
+                          hintText: "Search...",
+                          hintStyle: new TextStyle(color: Colors.white)),
+                    );
+                  } else {
+                    this.actionIcon = new Icon(Icons.search);
+                    this.appBarTitle = new Text("AppBar Title");
+                  }
+                });
+              },
             ),
-          ),
+          ],
           leading: IconButton(
             icon: const Icon(
               Icons.arrow_back_ios,
