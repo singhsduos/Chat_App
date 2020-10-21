@@ -26,6 +26,7 @@ class _PickupScreenState extends State<PickupScreen> {
   void addToLocalStorage({@required String callStatus}) {
     Log log = Log(
         callerName: widget.call.callerName,
+        callerPic: widget.call.callerPic,
         receiverName: widget.call.receiverName,
         receiverPic: widget.call.receiverPic,
         timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -191,7 +192,7 @@ class _PickupScreenState extends State<PickupScreen> {
                 ],
               )
             ],
-          ),
+          ), 
         ),
       ),
     );

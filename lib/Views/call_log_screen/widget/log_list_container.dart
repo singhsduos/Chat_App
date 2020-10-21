@@ -79,8 +79,13 @@ class _LogListContainerState extends State<LogListContainer> {
                           context,
                           MaterialPageRoute(
                             builder: (BuildContext context) => FullScreenImagePage(
-                                url: _log.receiverPic != null
-                                    ? _log.receiverPic
+                                url: (hasDialled
+                                            ? _log.receiverPic
+                                            : _log.callerPic) !=
+                                        null
+                                    ? (hasDialled
+                                        ? _log.receiverPic
+                                        : _log.callerPic)
                                     : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'),
                           ),
                         );
@@ -151,9 +156,12 @@ class _LogListContainerState extends State<LogListContainer> {
                     ),
                   ),
                   mini: false,
-                  onLongPress: () => showDialog<Null>(
+                  onLongPress: () => showDialog<void>(
                     context: context,
                     builder: (context) => AlertDialog(
+                       contentPadding:
+                EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+               
                       title: Center(
                         child: Text(
                           "Delete this Log?",
@@ -198,7 +206,7 @@ class _LogListContainerState extends State<LogListContainer> {
                   ),
                   icon: getIcon(_log.callStatus),
                   subtitle: Text(
-                    DateFormat("dd MMM yyyy - hh:mm aa").format(
+                    DateFormat("dd MMM yyyy - hh:mm aa"). format(
                         DateTime.fromMillisecondsSinceEpoch(
                             int.parse(_log.timestamp))),
                     style: TextStyle(

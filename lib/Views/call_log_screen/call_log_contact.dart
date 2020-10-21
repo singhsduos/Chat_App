@@ -1,4 +1,5 @@
 import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
+import 'package:ChatApp/Widget/customTile.dart';
 import 'package:ChatApp/Widget/fullscreenImage.dart';
 import 'package:ChatApp/Widget/quietbox.dart';
 import 'package:ChatApp/modal/contacts.dart';
@@ -19,6 +20,125 @@ class ContactListScreen extends StatefulWidget {
 }
 
 class _ContactListScreenState extends State<ContactListScreen> {
+  final DatabaseMethods _chatMethods = DatabaseMethods();
+  List<Users> sender;
+
+  String _currentUserId;
+  String username = '';
+  String email = '';
+  String createdAt = '';
+  String photoUrl = '';
+  String aboutMe = '';
+  String id = '';
+
+  List<Users> userList;
+  String query = '';
+
+  TextEditingController searchTextEditingController = TextEditingController();
+
+  // @override
+  // void initState() {
+  //   super.initState();
+
+  //   _chatMethods.getCurrentUser().then((user) {
+  //     _currentUserId = user.uid;
+  //     setState(() {
+  //       sender =
+  //           Users(userId: user.uid, username: username, photoUrl: photoUrl) as List<Users> ;
+  //     });
+  //   });
+  // }
+
+  // dynamic emptyTextFormField() {
+  //   searchTextEditingController.clear();
+  // }
+
+  // Widget buildSuggestions(String query) {
+  //   final List<Users> suggestionList = query.isEmpty
+  //       ? []
+  //       : userList != null
+  //           ? userList.where((Users users) {
+  //               String _getUsername = users.username.toLowerCase();
+  //               String _query = query.toLowerCase();
+  //               String _getEmail = users.email.toLowerCase();
+  //               bool matchesUsername = _getUsername.contains(_query);
+  //               bool matchesEmail = _getEmail.contains(_query);
+  //               return (matchesEmail || matchesUsername);
+  //             }).toList()
+  //           : [];
+
+  //   if (suggestionList.isEmpty) {
+  //     return ContactListContainer();
+  //   }
+
+  //   return ListView.builder(
+  //     // shrinkWrap: true,
+  //     itemCount: suggestionList.length,
+  //     itemBuilder: ((context, index) {
+  //       Contact contact = Contact.fromMap(docList[index].data()
+  //       );
+  //       // print("Role: " + searchedUser.role);
+  //       return ListTile(
+  //         onTap: () {
+
+  //         },
+  //         leading: CircleAvatar(
+  //           radius: 24,
+  //           backgroundColor: Colors.black,
+  //           child: Material(
+  //             child: widget.contact.photoUrl != null
+  //                 ? CachedNetworkImage(
+  //                     placeholder: (context, url) => Container(
+  //                       decoration: BoxDecoration(
+  //                           image: DecorationImage(
+  //                         image: AssetImage('images/placeHolder.jpg'),
+  //                       )),
+  //                       height: 80,
+  //                       width: 80,
+  //                       padding:
+  //                           EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+  //                     ),
+  //                     errorWidget: (context, url, dynamic error) => Material(
+  //                       child: Image.asset(
+  //                         'images/placeHolder.jpg',
+  //                         width: 200.0,
+  //                         height: 200,
+  //                         fit: BoxFit.cover,
+  //                       ),
+  //                       borderRadius: BorderRadius.all(Radius.circular(8.0)),
+  //                       clipBehavior: Clip.hardEdge,
+  //                     ),
+  //                     imageUrl: widget.contact.photoUrl,
+  //                     width: 80.0,
+  //                     height: 80.0,
+  //                     fit: BoxFit.cover,
+  //                   )
+  //                 : Icon(
+  //                     Icons.account_circle,
+  //                     size: 60.0,
+  //                     color: Colors.white,
+  //                   ),
+  //             borderRadius: BorderRadius.all(Radius.circular(125.0)),
+  //             clipBehavior: Clip.hardEdge,
+  //           ),
+  //         ),
+  //         title: Text(
+  //           (widget.contact != null ? widget.contact.username : null) != null
+  //               ? widget.contact.username
+  //               : '..',
+  //           overflow: TextOverflow.ellipsis,
+  //           style: TextStyle(
+  //               fontFamily: "Arial",
+  //               fontSize: 16,
+  //               fontWeight: FontWeight.bold,
+  //               letterSpacing: 1.0,
+  //               wordSpacing: 1.0),
+  //         ),
+  //       );
+  //     }),
+  //   );
+  // }
+
   Widget appBarTitle = Text(
     'Select contact',
     style: TextStyle(
@@ -35,7 +155,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
       scaffold: Scaffold(
         appBar: AppBar(
           iconTheme: new IconThemeData(color: Colors.white),
-          centerTitle: true,
+          // centerTitle: true,
           title: appBarTitle,
           actions: <Widget>[
             new IconButton(
@@ -43,28 +163,53 @@ class _ContactListScreenState extends State<ContactListScreen> {
               onPressed: () {
                 setState(() {
                   if (this.actionIcon.icon == Icons.search) {
-                    this.actionIcon = new Icon(Icons.close,size: 27);
-                    this.appBarTitle = new TextField(
+                    this.actionIcon = new Icon(Icons.close, size: 27);
+                    this.appBarTitle = TextField(
+                      controller: searchTextEditingController,
+                      onChanged: (val) {
+                        setState(() {
+                          query = val;
+                        });
+                      },
                       cursorColor: Colors.black,
+                      autofocus: false,
                       style: TextStyle(
-                        fontSize: 19.0,
-                        fontFamily: 'Arial ',
-                        letterSpacing: 1.0,
+                        fontWeight: FontWeight.bold,
                         color: Colors.white,
+                        fontSize: 25,
                       ),
-                      decoration: new InputDecoration(
-                        prefixIcon: new Icon(Icons.search, color: Colors.white),
-                        hintText: "Search...",
+                      decoration: InputDecoration(
+                        prefixIcon: Icon(
+                          Icons.search,
+                          size: 27.0,
+                          color: Colors.white,
+                        ),
+                        // suffixIcon: IconButton(
+                        //   icon: Icon(
+                        //     Icons.close,
+                        //     color: Colors.white,
+                        //     size: 30.0,
+                        //   ),
+                        //   onPressed: () {
+                        //     WidgetsBinding.instance.addPostFrameCallback(
+                        //         (_) => searchTextEditingController.clear());
+                        //   },
+                        // ),
+                        border: InputBorder.none,
+                        hintText: "Search Contacts",
                         hintStyle: TextStyle(
-                          fontSize: 19.0,
                           fontFamily: 'Arial ',
                           letterSpacing: 1.0,
+                          fontSize: 19,
                           color: Color(0xfffecf0f1),
                         ),
                       ),
                     );
                   } else {
-                    this.actionIcon = new Icon(Icons.search,size: 27,);
+                    this.actionIcon = new Icon(
+                      Icons.search,
+                      size: 27,
+                    );
                     this.appBarTitle = Text(
                       'Select contact',
                       style: TextStyle(
@@ -89,7 +234,11 @@ class _ContactListScreenState extends State<ContactListScreen> {
           ),
           backgroundColor: Colors.cyan,
         ),
-        body: ContactListContainer(),
+        body: Container(
+          padding: EdgeInsets.all(4.0),
+          // child: buildSuggestions(query),
+          child: ContactListContainer(),
+        ),
       ),
     );
   }
@@ -210,150 +359,129 @@ class _ViewLayoutState extends State<ViewLayout> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 10, vertical: 10),
-      child: Row(
-        children: <Widget>[
-          GestureDetector(
-            onTap: () {
-              {
-                Navigator.push<MaterialPageRoute>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (BuildContext context) => FullScreenImagePage(
-                        url: widget.contact.photoUrl != null
-                            ? widget.contact.photoUrl
-                            : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'),
-                  ),
-                );
-              }
-            },
-            child: Container(
-              padding: EdgeInsets.all(1),
-              decoration: BoxDecoration(
-                  border: Border.all(color: Colors.cyan, width: 2),
-                  // shape: BoxShape.circle,
-                  borderRadius: BorderRadius.all(Radius.circular(40)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.5),
-                      spreadRadius: 2,
-                      blurRadius: 5,
-                    )
-                  ]),
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: Colors.black,
-                child: Material(
-                  child: widget.contact.photoUrl != null
-                      ? CachedNetworkImage(
-                          placeholder: (context, url) => Container(
-                            decoration: BoxDecoration(
-                                image: DecorationImage(
-                              image: AssetImage('images/placeHolder.jpg'),
-                            )),
-                            height: 80,
-                            width: 80,
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 5, vertical: 5),
-                          ),
-                          errorWidget: (context, url, dynamic error) =>
-                              Material(
-                            child: Image.asset(
-                              'images/placeHolder.jpg',
-                              width: 200.0,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            ),
-                            borderRadius:
-                                BorderRadius.all(Radius.circular(8.0)),
-                            clipBehavior: Clip.hardEdge,
-                          ),
-                          imageUrl: widget.contact.photoUrl,
-                          width: 80.0,
-                          height: 80.0,
+    return CustomTile(
+      leading: GestureDetector(
+        onTap: () {
+          {
+            Navigator.push<MaterialPageRoute>(
+              context,
+              MaterialPageRoute(
+                builder: (BuildContext context) => FullScreenImagePage(
+                    url: widget.contact.photoUrl != null
+                        ? widget.contact.photoUrl
+                        : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'),
+              ),
+            );
+          }
+        },
+        child: Container(
+          padding: EdgeInsets.all(1),
+          decoration: BoxDecoration(
+              border: Border.all(color: Colors.cyan, width: 2),
+              // shape: BoxShape.circle,
+              borderRadius: BorderRadius.all(Radius.circular(40)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.5),
+                  spreadRadius: 2,
+                  blurRadius: 5,
+                )
+              ]),
+          child: CircleAvatar(
+            radius: 24,
+            backgroundColor: Colors.black,
+            child: Material(
+              child: widget.contact.photoUrl != null
+                  ? CachedNetworkImage(
+                      placeholder: (context, url) => Container(
+                        decoration: BoxDecoration(
+                            image: DecorationImage(
+                          image: AssetImage('images/placeHolder.jpg'),
+                        )),
+                        height: 80,
+                        width: 80,
+                        padding:
+                            EdgeInsets.symmetric(horizontal: 5, vertical: 5),
+                      ),
+                      errorWidget: (context, url, dynamic error) => Material(
+                        child: Image.asset(
+                          'images/placeHolder.jpg',
+                          width: 200.0,
+                          height: 200,
                           fit: BoxFit.cover,
-                        )
-                      : Icon(
-                          Icons.account_circle,
-                          size: 60.0,
-                          color: Colors.white,
                         ),
-                  borderRadius: BorderRadius.all(Radius.circular(125.0)),
-                  clipBehavior: Clip.hardEdge,
-                ),
-              ),
+                        borderRadius: BorderRadius.all(Radius.circular(8.0)),
+                        clipBehavior: Clip.hardEdge,
+                      ),
+                      imageUrl: widget.contact.photoUrl,
+                      width: 80.0,
+                      height: 80.0,
+                      fit: BoxFit.cover,
+                    )
+                  : Icon(
+                      Icons.account_circle,
+                      size: 60.0,
+                      color: Colors.white,
+                    ),
+              borderRadius: BorderRadius.all(Radius.circular(125.0)),
+              clipBehavior: Clip.hardEdge,
             ),
           ),
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 10),
+        ),
+      ),
+      //  mini: false,
+      title: Text(
+        (widget.contact != null ? widget.contact.username : null) != null
+            ? widget.contact.username
+            : '..',
+        overflow: TextOverflow.ellipsis,
+        style: TextStyle(
+            fontFamily: "Arial",
+            fontSize: 16,
+            fontWeight: FontWeight.bold,
+            letterSpacing: 1.0,
+            wordSpacing: 1.0),
+      ),
+      subtitle: Container(),
+      trailing: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: [
+          GestureDetector(
+            onTap: () async => await Permissions.microphonePermissionsGranted()
+                ? CallUtils.dialVoice(
+                    from: sender,
+                    to: widget.contact,
+                    context: context,
+                    callis: "audio")
+                : () {},
             child: Container(
-              padding: EdgeInsets.only(left: 15),
-              alignment: Alignment.centerLeft,
-              child: Column(
-                children: <Widget>[
-                  Row(
-                    children: <Widget>[
-                      Container(
-                        width: MediaQuery.of(context).size.width * 0.55,
-                        child: Text(
-                          (widget.contact != null
-                                      ? widget.contact.username
-                                      : null) !=
-                                  null
-                              ? widget.contact.username
-                              : '..',
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontFamily: "Arial",
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.0,
-                              wordSpacing: 1.0),
-                        ),
-                      ),
-                      GestureDetector(
-                        onTap: () async =>
-                            await Permissions.microphonePermissionsGranted()
-                                ? CallUtils.dialVoice(
-                                    from: sender,
-                                    to: widget.contact,
-                                    context: context,
-                                    callis: "audio")
-                                : () {},
-                        child: Container(
-                            child: Icon(
-                          Icons.call,
-                          color: Colors.cyan,
-                        )),
-                      ),
-                      SizedBox(
-                        width: 15,
-                      ),
-                      GestureDetector(
-                        onTap: () async => await Permissions
-                                .cameraAndMicrophonePermissionsGranted()
-                            ? CallUtils.dial(
-                                from: sender,
-                                to: widget.contact,
-                                context: context,
-                                callis: "video")
-                            : () {},
-                        child: Container(
-                            child: Icon(
-                          Icons.video_call,
-                          color: Colors.cyan,
-                        )),
-                      )
-                    ],
-                  ),
-                  SizedBox(
-                    height: 7,
-                  ),
-                ],
+              // alignment: Alignment.,
+              // margin: EdgeInsets.only(left: 100),
+              child: Icon(
+                Icons.call,
+                color: Colors.cyan,
               ),
             ),
           ),
+          SizedBox(
+            width: 15,
+          ),
+          GestureDetector(
+            onTap: () async =>
+                await Permissions.cameraAndMicrophonePermissionsGranted()
+                    ? CallUtils.dial(
+                        from: sender,
+                        to: widget.contact,
+                        context: context,
+                        callis: "video")
+                    : () {},
+            child: Container(
+                child: Icon(
+              Icons.video_call,
+              color: Colors.cyan,
+            )),
+          )
         ],
       ),
     );

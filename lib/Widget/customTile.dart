@@ -36,25 +36,37 @@ class CustomTile extends StatelessWidget {
               border: Border(bottom: BorderSide(color: Colors.grey.shade300))),
           child: Row(
             children: <Widget>[
-              Container(child: leading, padding: EdgeInsets.all(5), ),
+              Container(
+                child: leading,
+                padding: EdgeInsets.all(5),
+              ),
               Expanded(
                 child: Container(
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    // mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    mainAxisSize: MainAxisSize.max,
                     children: <Widget>[
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                         Container( padding: EdgeInsets.only(left: 10), child:title ?? Container()),
-                          SizedBox(height: 3),
-                          Row(
+                      Expanded(
+                        child: Container(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: <Widget>[
-                               Container( padding: EdgeInsets.only(left: 10), child: icon ?? Container(),),
-                             
-                              subtitle,
+                              Container(
+                                  padding: EdgeInsets.only(left: 10),
+                                  child: title ?? Container()),
+                              SizedBox(height: 7),
+                              Row(
+                                children: <Widget>[
+                                  Container(
+                                      padding: EdgeInsets.only(left: 10),
+                                      child: icon ?? Container()),
+                                  subtitle,
+                                ],
+                              )
                             ],
-                          )
-                        ],
+                          ),
+                        ),
                       ),
                       trailing ?? Container(),
                     ],

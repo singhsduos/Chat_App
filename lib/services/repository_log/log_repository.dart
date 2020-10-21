@@ -17,8 +17,8 @@ class LogRepository {
 
   static void addLogs(Log log) => dbObject.addLogs(log);
 
-  static Future<int> deleteLogs(int logId) =>
-      dbObject.deleteLogs(logId) as Future<int>;
+  static void deleteLogs(int logId) =>
+      dbObject.deleteLogs(logId);
 
   static Future<List<Log>> getLogs() => dbObject.getLogs() as Future<List<Log>>;
 

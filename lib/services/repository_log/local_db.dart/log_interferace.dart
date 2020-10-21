@@ -9,7 +9,7 @@ abstract class LogInterface {
   // returns a list of logs
   Future<List<Log>> getLogs();
 
-  void deleteLogs(int logId);
+  Future<void> deleteLogs(int logId);
 
   void close();
 }

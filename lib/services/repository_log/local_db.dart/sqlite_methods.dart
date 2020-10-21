@@ -9,7 +9,7 @@ class SqliteMethods implements LogInterface {
   Database _db;
 
   String databaseName = "";
- String tableName = "Call_Logs";
+  String tableName = "Call_Logs";
 
   // columns
   String id = 'log_id';
@@ -29,6 +29,8 @@ class SqliteMethods implements LogInterface {
     return _db;
   }
 
+  @override
+  void openDb(String dbName) => (databaseName = dbName);
 
   @override
   Future<Database> init() async {
@@ -38,11 +40,12 @@ class SqliteMethods implements LogInterface {
     return db;
   }
 
- dynamic _onCreate(Database db, int version) async {
+  dynamic _onCreate(Database db, int version) async {
     String createTableQuery =
         "CREATE TABLE $tableName ($id INTEGER PRIMARY KEY, $callerName TEXT, $callerPic TEXT, $receiverName TEXT, $receiverPic TEXT, $callStatus TEXT, $timestamp TEXT)";
 
     await db.execute(createTableQuery);
+
     print("table created");
   }
 
@@ -53,13 +56,13 @@ class SqliteMethods implements LogInterface {
   }
 
   @override
- Future<int> deleteLogs(int logId) async {
-    var dbClient = await db;
+  Future<void> deleteLogs(int logId) async {
+    final dbClient = await db;
     return await dbClient
-        .delete(tableName, where: '$id = ?', whereArgs: <int>[logId + 1]);
+        .delete(tableName, where: '$id = ?', whereArgs: <int>[logId]);
   }
 
- dynamic updateLogs(Log log) async {
+  Future<void> updateLogs(Log log) async {
     var dbClient = await db;
 
     await dbClient.update(
@@ -103,9 +106,6 @@ class SqliteMethods implements LogInterface {
       return null;
     }
   }
-
-  @override
-  void openDb(String dbName) => (databaseName = dbName);
 
   @override
   close() async {
