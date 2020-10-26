@@ -1,6 +1,7 @@
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
+import 'package:ChatApp/helper/authenticate.dart';
 import 'package:ChatApp/helper/constants.dart';
 import 'package:ChatApp/helper/helperfunctions.dart';
 import 'package:ChatApp/services/auth.dart';
@@ -28,7 +29,6 @@ class _SignUpState extends State<SignUp> {
   bool isLoggedIn = false;
   User currentUser;
 
-  final _firestore = FirebaseFirestore.instance;
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -43,54 +43,64 @@ class _SignUpState extends State<SignUp> {
 
   // ignore: missing_return
   Future<Null> signMeUp() async {
+    prefs = await SharedPreferences.getInstance();
     if (formKey.currentState.validate()) {
-      HelperFunctions.saveUserEmailSharedPreference(
-          emailTextEditingController.text.trim());
-      HelperFunctions.saveUserNameSharedPreference(
-          userNameTextEditingController.text);
       setState(() {
         isLoading = true;
       });
 
-      authMethods
+      await authMethods
           .signUpWithEmailAndPassword(
               emailTextEditingController.text.trim(), _pass.text, context)
-          .then((dynamic signedInUser) {
-        User user = FirebaseAuth.instance.currentUser;
-        _firestore.collection('users').doc(user.uid).set(<String, dynamic>{
-          'username': userNameTextEditingController.text,
-          'email': emailTextEditingController.text.trim(),
-          'id': FirebaseAuth.instance.currentUser.uid,
-          'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
-          'chattingWith': null,
-          'photoUrl' : user.photoURL,
-          'aboutMe' : 'Hey there! I am using ChaTooApp',
-        //  'state' : null,
-        }).then((dynamic value) {
-          if (signedInUser != null) {
-            Fluttertoast.showToast(msg: "SignUp successful");
-            HelperFunctions.saveUserLoggedInSharedPreference(true);
-            User user = FirebaseAuth.instance.currentUser;
+          .then((dynamic signedInUser) async {
+        if (signedInUser != null) {
+          User user = FirebaseAuth.instance.currentUser;
+          FirebaseFirestore.instance
+              .collection('users')
+              .doc(user.uid)
+              .set(<String, dynamic>{
+            'username': userNameTextEditingController.text,
+            'email': emailTextEditingController.text.trim(),
+            'id': FirebaseAuth.instance.currentUser.uid,
+            'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
+            'chattingWith': null,
+            'photoUrl': user.photoURL,
+            'aboutMe': 'Hey there! I am using ChaTooApp',
 
-            Navigator.pushReplacement(
-                context,
-                MaterialPageRoute<MaterialPageRoute>(
-                    builder: (BuildContext context) =>
-                        ChatRoom(uid: user.uid)));
-          }
-        }).catchError((dynamic e) {
-          print(e);
-          setState(() {
-            isLoading = false;
-            Fluttertoast.showToast(
-              msg: 'Email already in use',
-              textColor: const Color(0xFFFFFFFF),
-              backgroundColor: Colors.cyan,
-              fontSize: 16.0,
-              timeInSecForIosWeb: 4,
-            );
+            //  'state' : null,
+          }).catchError((dynamic e) {
+            print(e);
+            setState(() {
+              isLoading = false;
+              Fluttertoast.showToast(
+                msg: 'Email already in use',
+                textColor: Color(0xFFFFFFFF),
+                backgroundColor: Colors.cyan,
+                fontSize: 16.0,
+                timeInSecForIosWeb: 4,
+              );
+            });
           });
-        });
+
+          Fluttertoast.showToast(msg: "SignUp successful");
+          print("signed up " + emailTextEditingController.text.trim());
+          HelperFunctions.saveUserLoggedInSharedPreference(true);
+          HelperFunctions.saveUserNameSharedPreference(
+              userNameTextEditingController.text);
+          HelperFunctions.saveUserEmailSharedPreference(
+              emailTextEditingController.text.trim());
+
+          await prefs.setString('id', user.uid);
+          await prefs.setString('username', userNameTextEditingController.text);
+          await prefs.setString('photoUrl', user.photoURL);
+          await prefs.setString(
+              'email', emailTextEditingController.text.trim());
+          await prefs.setString('aboutMe', 'Hey there! I am using ChaTooApp');
+          Navigator.pushReplacement(
+              context,
+              MaterialPageRoute<MaterialPageRoute>(
+                  builder: (BuildContext context) => ChatRoom()));
+        }
       }).catchError((dynamic e) {
         print(e);
         setState(() {
@@ -114,9 +124,19 @@ class _SignUpState extends State<SignUp> {
     this.setState(() {
       isLoading = true;
     });
-    final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+    final GoogleSignInAccount googleUser = await googleSignIn
+        .signIn()
+        .catchError((dynamic onError) => print(onError));
+    if (googleUser == null) {
+      Fluttertoast.showToast(msg: 'SignUp fail');
+      
+      this.setState(() {
+        isLoading = false;
+        Authenticate();
+      });
+    }
     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
+    final AuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
@@ -143,7 +163,7 @@ class _SignUpState extends State<SignUp> {
           'createdAt': DateTime.now().millisecondsSinceEpoch.toString(),
           'chattingWith': null,
           'email': user.email,
-          'aboutMe' : 'Hey there! I am using ChaTooApp',
+          'aboutMe': 'Hey there! I am using ChaTooApp',
           // 'state' : null,
         });
 
@@ -160,7 +180,6 @@ class _SignUpState extends State<SignUp> {
         await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
         await prefs.setString('email', '${documents[0].data()['email']}');
         await prefs.setString('aboutMe', '${documents[0].data()['aboutMe']}');
-
       }
       Fluttertoast.showToast(msg: 'SignUp successful');
       this.setState(() {
@@ -170,7 +189,7 @@ class _SignUpState extends State<SignUp> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute<MaterialPageRoute>(
-              builder: (BuildContext context) => ChatRoom(uid: user.uid)));
+              builder: (BuildContext context) => ChatRoom()));
     } else {
       Fluttertoast.showToast(msg: 'SignUp fail');
       this.setState(() {
@@ -222,7 +241,7 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: Container(
                             child: Icon(
                               Icons.person_outlined,
-                              color: Colors.black54,
+                              
                             ),
                           ),
                           focusedBorder: const OutlineInputBorder(
@@ -269,7 +288,7 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: Container(
                             child: Icon(
                               Icons.mail_outline,
-                              color: Colors.black54,
+                             
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
@@ -324,7 +343,7 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: Container(
                             child: Icon(
                               Icons.vpn_key_outlined,
-                              color: Colors.black54,
+                             
                             ),
                           ),
                           suffixIcon: Container(
@@ -391,7 +410,7 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: Container(
                             child: Icon(
                               Icons.vpn_key_outlined,
-                              color: Colors.black54,
+                           
                             ),
                           ),
                           suffixIcon: Container(

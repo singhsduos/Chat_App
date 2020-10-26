@@ -1,13 +1,23 @@
+import 'package:ChatApp/Views/conversationScreen.dart';
 import 'package:ChatApp/Widget/customTile.dart';
+import 'package:ChatApp/Widget/fullScreenUserImage.dart';
 import 'package:ChatApp/Widget/fullscreenImage.dart';
+import 'package:ChatApp/Widget/photoCard.dart';
 import 'package:ChatApp/Widget/quietbox.dart';
 import 'package:ChatApp/helper/strings.dart';
 import 'package:ChatApp/modal/call.dart';
 import 'package:ChatApp/modal/log.dart';
+import 'package:ChatApp/modal/user.dart';
+import 'package:ChatApp/services/database.dart';
 import 'package:ChatApp/services/repository_log/log_repository.dart';
+import 'package:ChatApp/utils/call_utilities.dart';
+import 'package:ChatApp/utils/permissions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LogListContainer extends StatefulWidget {
   @override
@@ -16,6 +26,7 @@ class LogListContainer extends StatefulWidget {
 
 class _LogListContainerState extends State<LogListContainer> {
   Call call;
+
   Widget getIcon(String callStatus) {
     Icon _icon;
     double _iconSize = 15;
@@ -52,6 +63,55 @@ class _LogListContainerState extends State<LogListContainer> {
     );
   }
 
+  Users sender;
+
+  final DatabaseMethods _chatMethods = DatabaseMethods();
+
+  String _currentUserId;
+  String username = '';
+  String email = '';
+  String createdAt = '';
+  String photoUrl = '';
+  String aboutMe = '';
+  String id = '';
+  SharedPreferences preferences;
+  String currentUserId;
+  DatabaseMethods databaseMethods = DatabaseMethods();
+  List<Users> userList;
+  String query = '';
+
+  Future readDataFromLocal() async {
+    preferences = await SharedPreferences.getInstance();
+    photoUrl = preferences.getString('photoUrl');
+    username = preferences.getString('username');
+    email = preferences.getString('email');
+    aboutMe = preferences.getString('aboutMe');
+    createdAt = preferences.getString('createdAt');
+    id = preferences.getString('id');
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    readDataFromLocal();
+
+    _chatMethods.getCurrentUser().then((user) {
+      _currentUserId = user.uid;
+      setState(() {
+        sender = Users(
+          userId: user.uid,
+          username: username,
+          photoUrl: photoUrl,
+          email: user.email,
+          aboutMe: aboutMe,
+          createdAt: createdAt,
+        );
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<dynamic>(
@@ -73,24 +133,162 @@ class _LogListContainerState extends State<LogListContainer> {
 
                 return CustomTile(
                   leading: GestureDetector(
-                    onTap: () {
-                      {
-                        Navigator.push<MaterialPageRoute>(
-                          context,
-                          MaterialPageRoute(
-                            builder: (BuildContext context) => FullScreenImagePage(
-                                url: (hasDialled
-                                            ? _log.receiverPic
-                                            : _log.callerPic) !=
-                                        null
-                                    ? (hasDialled
-                                        ? _log.receiverPic
-                                        : _log.callerPic)
-                                    : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'),
+                    onTap: () => showDialog<Widget>(
+                      context: context,
+                      builder: (BuildContext context) => CustomDialog(
+                        url: (hasDialled ? _log.receiverPic : _log.callerPic),
+                        title: Text(
+                          hasDialled
+                              ? _log?.receiverName ?? ".."
+                              : _log?.callerName ?? "..s",
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                              fontFamily: "Arial",
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1.0,
+                              wordSpacing: 1.0),
+                        ),
+                        icon1: IconButton(
+                          icon: Icon(
+                            Icons.info_outline,
+                            color: Colors.cyan,
+                            size: 27,
                           ),
-                        );
-                      }
-                    },
+                          onPressed: () {
+                            Navigator.push<MaterialPageRoute>(
+                              context,
+                              MaterialPageRoute(
+                                builder: (BuildContext context) => UserDetails(
+                                  recevier: Users(
+                                    username: hasDialled
+                                        ? _log.receiverName
+                                        : _log.callerName,
+                                    photoUrl: hasDialled
+                                        ? _log.receiverPic
+                                        : _log.callerPic,
+                                    userId: hasDialled
+                                        ? _log.receiverId
+                                        : _log.callerId,
+                                    email: hasDialled
+                                        ? _log.receiverEmail
+                                        : _log.callerEmail,
+                                    createdAt: hasDialled
+                                        ? _log.receiverCreatedAt
+                                        : _log.callerCreatedAt,
+                                    aboutMe: hasDialled
+                                        ? _log.receiverAboutMe
+                                        : _log.callerAboutMe,
+                                  ),
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                        icon2: IconButton(
+                          icon: Icon(
+                            Icons.video_call,
+                            color: Colors.cyan,
+                            size: 27,
+                          ),
+                          onPressed: () async => await Permissions
+                                  .cameraAndMicrophonePermissionsGranted()
+                              ? CallUtils.dial(
+                                  from: sender,
+                                  to: Users(
+                                    username: hasDialled
+                                        ? _log.receiverName
+                                        : _log.callerName,
+                                    photoUrl: hasDialled
+                                        ? _log.receiverPic
+                                        : _log.callerPic,
+                                    userId: hasDialled
+                                        ? _log.receiverId
+                                        : _log.callerId,
+                                    email: hasDialled
+                                        ? _log.receiverEmail
+                                        : _log.callerEmail,
+                                    createdAt: hasDialled
+                                        ? _log.receiverCreatedAt
+                                        : _log.callerCreatedAt,
+                                    aboutMe: hasDialled
+                                        ? _log.receiverAboutMe
+                                        : _log.callerAboutMe,
+                                  ),
+                                  context: context,
+                                  callis: "video")
+                              : () {},
+                        ),
+                        icon3: IconButton(
+                          icon: Icon(
+                            Icons.call,
+                            color: Colors.cyan,
+                            size: 27,
+                          ),
+                          onPressed: () async =>
+                              await Permissions.microphonePermissionsGranted()
+                                  ? CallUtils.dialVoice(
+                                      from: sender,
+                                      to: Users(
+                                        username: hasDialled
+                                            ? _log.receiverName
+                                            : _log.callerName,
+                                        photoUrl: hasDialled
+                                            ? _log.receiverPic
+                                            : _log.callerPic,
+                                        userId: hasDialled
+                                            ? _log.receiverId
+                                            : _log.callerId,
+                                        email: hasDialled
+                                            ? _log.receiverEmail
+                                            : _log.callerEmail,
+                                        createdAt: hasDialled
+                                            ? _log.receiverCreatedAt
+                                            : _log.callerCreatedAt,
+                                        aboutMe: hasDialled
+                                            ? _log.receiverAboutMe
+                                            : _log.callerAboutMe,
+                                      ),
+                                      context: context,
+                                      callis: "audio")
+                                  : () {},
+                        ),
+                        icon4: IconButton(
+                          icon: Icon(
+                            Icons.chat,
+                            color: Colors.cyan,
+                            size: 27,
+                          ),
+                          onPressed: () => Navigator.push(
+                            context,
+                            MaterialPageRoute<MaterialPageRoute>(
+                              builder: (context) => ConversationScreen(
+                                recevier: Users(
+                                  username: hasDialled
+                                      ? _log.receiverName
+                                      : _log.callerName,
+                                  photoUrl: hasDialled
+                                      ? _log.receiverPic
+                                      : _log.callerPic,
+                                  userId: hasDialled
+                                      ? _log.receiverId
+                                      : _log.callerId,
+                                  email: hasDialled
+                                      ? _log.receiverEmail
+                                      : _log.callerEmail,
+                                  createdAt: hasDialled
+                                      ? _log.receiverCreatedAt
+                                      : _log.callerCreatedAt,
+                                  aboutMe: hasDialled
+                                      ? _log.receiverAboutMe
+                                      : _log.callerAboutMe,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
                     child: Container(
                       padding: EdgeInsets.all(1),
                       decoration: BoxDecoration(
@@ -143,10 +341,11 @@ class _LogListContainerState extends State<LogListContainer> {
                                   height: 80.0,
                                   fit: BoxFit.cover,
                                 )
-                              : Icon(
-                                  Icons.account_circle,
-                                  size: 60.0,
-                                  color: Colors.white,
+                              : Image(
+                                  image: AssetImage('images/placeHolder.jpg'),
+                                  height: 80,
+                                  width: 80,
+                                  fit: BoxFit.cover,
                                 ),
                           borderRadius:
                               BorderRadius.all(Radius.circular(125.0)),
@@ -159,9 +358,8 @@ class _LogListContainerState extends State<LogListContainer> {
                   onLongPress: () => showDialog<void>(
                     context: context,
                     builder: (context) => AlertDialog(
-                       contentPadding:
-                EdgeInsets.only(left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
-               
+                      contentPadding: EdgeInsets.only(
+                          left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
                       title: Center(
                         child: Text(
                           "Delete this Log?",
@@ -206,7 +404,7 @@ class _LogListContainerState extends State<LogListContainer> {
                   ),
                   icon: getIcon(_log.callStatus),
                   subtitle: Text(
-                    DateFormat("dd MMM yyyy - hh:mm aa"). format(
+                    DateFormat("dd MMM yyyy - hh:mm aa").format(
                         DateTime.fromMillisecondsSinceEpoch(
                             int.parse(_log.timestamp))),
                     style: TextStyle(

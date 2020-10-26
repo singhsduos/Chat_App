@@ -38,47 +38,62 @@ class _SignInState extends State<SignIn> {
   Future<Null> signIn() async {
     prefs = await SharedPreferences.getInstance();
     if (formKey.currentState.validate()) {
-      this.setState(() {
+      setState(() {
         isLoading = true;
       });
 
-      authMethods
+      await authMethods
           .signInWithEmailAndPassword(emailTextEditingController.text.trim(),
               passwordTextEditingController.text, context)
-          .then((dynamic val) async {
-        if (val != null) {
-          User user = FirebaseAuth.instance.currentUser;
-          final QuerySnapshot result = await FirebaseFirestore.instance
-              .collection('users')
-              .where('id', isEqualTo: user.uid)
-              .get();
+          .then(
+        (dynamic result) async {
+          if (result != null) {
+            User user = FirebaseAuth.instance.currentUser;
+            QuerySnapshot userInfoSnapshot = await FirebaseFirestore.instance
+                .collection("users")
+                .where("email",
+                    isEqualTo: emailTextEditingController.text.trim())
+                .get()
+                .catchError((dynamic e) {
+              print(e.toString());
+            });
+            final List<DocumentSnapshot> documents = userInfoSnapshot.docs;
 
-          databaseMethods
-              .getByUserEmail(emailTextEditingController.text.trim());
-          Fluttertoast.showToast(msg: "SignIn successful");
-          HelperFunctions.saveUserLoggedInSharedPreference(true);
-          HelperFunctions.getUserNameSharedPreference();
-          HelperFunctions.getUserEmailPreference();
-          // print("signed in " + user.displayName);
-          Navigator.pushReplacement(
-              context,
-              MaterialPageRoute<MaterialPageRoute>(
-                  builder: (BuildContext context) => ChatRoom(
-                        uid: user.uid,
-                      )));
-        } else {
-          setState(() {
-            Fluttertoast.showToast(
-              msg: "Invalid email/password",
-              textColor: Color(0xFFFFFFFF),
-              backgroundColor: Colors.cyan,
-              fontSize: 16.0,
-              timeInSecForIosWeb: 3,
-            );
-            isLoading = false;
-          });
-        }
-      });
+            HelperFunctions.saveUserLoggedInSharedPreference(true);
+            HelperFunctions.saveUserNameSharedPreference(
+                userInfoSnapshot.docs[0].data()['username'].toString());
+            HelperFunctions.saveUserEmailSharedPreference(
+                userInfoSnapshot.docs[0].data()["email"].toString());
+            await prefs.setString('id', '${documents[0].data()['id']}');
+            await prefs.setString(
+                'username', '${documents[0].data()['username']}');
+            await prefs.setString(
+                'photoUrl', '${documents[0].data()['photoUrl']}');
+            await prefs.setString('email', '${documents[0].data()['email']}');
+            await prefs.setString(
+                'aboutMe', '${documents[0].data()['aboutMe']}');
+
+            Fluttertoast.showToast(msg: "SignIn successful");
+            Navigator.pushReplacement(
+                context,
+                MaterialPageRoute<MaterialPageRoute>(
+                    builder: (BuildContext context) => ChatRoom(
+                         
+                        )));
+          } else {
+            setState(() {
+              Fluttertoast.showToast(
+                msg: "Invalid email/password",
+                textColor: Color(0xFFFFFFFF),
+                backgroundColor: Colors.cyan,
+                fontSize: 16.0,
+                timeInSecForIosWeb: 3,
+              );
+              isLoading = false;
+            });
+          }
+        },
+      );
     }
   }
 
@@ -91,9 +106,24 @@ class _SignInState extends State<SignIn> {
     this.setState(() {
       isLoading = true;
     });
-    final GoogleSignInAccount googleUser = await googleSignIn.signIn();
+    final GoogleSignInAccount googleUser =
+        await googleSignIn.signIn().catchError((dynamic e) {
+      print(e);
+      setState(() {
+        isLoading = false;
+        Fluttertoast.showToast(
+          msg: 'SignUp fail',
+        );
+      });
+    });
+    if (googleUser == null) {
+      Fluttertoast.showToast(msg: 'SignUp fail');
+      this.setState(() {
+        isLoading = false;
+      });
+    }
     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
-    final AuthCredential credential = GoogleAuthProvider.getCredential(
+    final AuthCredential credential = GoogleAuthProvider.credential(
       accessToken: googleAuth.accessToken,
       idToken: googleAuth.idToken,
     );
@@ -147,9 +177,8 @@ class _SignInState extends State<SignIn> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute<MaterialPageRoute>(
-              builder: (BuildContext context) => ChatRoom(uid: user.uid)));
+              builder: (BuildContext context) => ChatRoom()));
     }
-    
   }
 
   bool _obscureText = true;
@@ -186,7 +215,7 @@ class _SignInState extends State<SignIn> {
                               prefixIcon: Container(
                                 child: Icon(
                                   Icons.mail_outline,
-                                  color: Colors.black54,
+                                  // color: Colors.black54,
                                 ),
                               ),
                               focusedBorder: OutlineInputBorder(
@@ -235,7 +264,7 @@ class _SignInState extends State<SignIn> {
                               prefixIcon: Container(
                                 child: Icon(
                                   Icons.vpn_key_outlined,
-                                  color: Colors.black54,
+                                 
                                 ),
                               ),
                               suffixIcon: Container(

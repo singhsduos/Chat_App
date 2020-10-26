@@ -47,6 +47,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
+      CustomTheme.instanceOf(buildContext).changeTheme(key);
+    }
+
     // User user = FirebaseAuth.instance.currentUser;
     return MultiProvider(
       providers: [
@@ -59,11 +63,11 @@ class _MyAppState extends State<MyApp> {
           return MaterialApp(
               debugShowCheckedModeBanner: false,
               title: 'ChatooApp',
-              theme: CustomTheme.of(context),
+              theme: notifier.darkTheme
+                  ? MyThemes.darkTheme
+                  : MyThemes.lightTheme,
               home: Constants.prefs.getBool('userIsLoggedIn') == true
-                  ? ChatRoom(
-                      uid: null
-                    )
+                  ? ChatRoom()
                   : Authenticate());
         },
       ),

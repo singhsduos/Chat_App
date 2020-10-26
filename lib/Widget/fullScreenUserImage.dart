@@ -65,13 +65,10 @@ class _UsersDetailsScreenState extends State<UsersDetailsScreen> {
     Key key,
     @required this.recevier,
   });
-  TextEditingController usernameTextEditingController;
-  TextEditingController aboutMeTextEditingController;
+
   SharedPreferences preferences;
 
   File imageFileAvatar;
-  final FocusNode usernameFocusNode = FocusNode();
-  final FocusNode aboutMeFocusNode = FocusNode();
   bool isLoading = false;
 
   @override

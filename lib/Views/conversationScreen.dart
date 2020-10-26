@@ -14,15 +14,20 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:emoji_picker/emoji_picker.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class ConversationScreen extends StatefulWidget {
   final Users recevier;
@@ -69,8 +74,8 @@ class _ConversationScreenState extends State<ConversationScreen> {
     username = preferences.getString('username');
     email = preferences.getString('email');
     aboutMe = preferences.getString('aboutMe');
+id = preferences.getString('id');
     createdAt = preferences.getString('createdAt');
-    id = preferences.getString('id');
 
     setState(() {});
   }
@@ -83,8 +88,14 @@ class _ConversationScreenState extends State<ConversationScreen> {
     databaseMethods.getCurrentUser().then((user) {
       _currentUserId = user.uid;
       setState(() {
-        sender =
-            Users(userId: user.uid, username: username, photoUrl: photoUrl);
+        sender = Users(
+          userId: user.uid,
+          username: username,
+          photoUrl: photoUrl,
+          email: user.email,
+          aboutMe: aboutMe,
+          createdAt: createdAt,
+        );
       });
     });
   }
@@ -278,10 +289,11 @@ class _ConversationScreenState extends State<ConversationScreen> {
                         height: 50.0,
                         fit: BoxFit.cover,
                       )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 50.0,
-                        color: Colors.grey,
+                    : Image(
+                        image: AssetImage('images/placeHolder.jpg'),
+                        height: 50,
+                        width: 50,
+                        fit: BoxFit.cover,
                       ),
                 borderRadius: BorderRadius.all(Radius.circular(25.0)),
                 clipBehavior: Clip.hardEdge,
@@ -307,9 +319,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
         onPressed: () => Navigator.pushReplacement(
             context,
             MaterialPageRoute<MaterialPageRoute>(
-                builder: (BuildContext context) => ChatRoom(
-                      uid: user.uid,
-                    ))),
+                builder: (BuildContext context) => ChatRoom())),
       ),
       centerTitle: false,
       title: GestureDetector(
@@ -371,6 +381,10 @@ class _ChatScreen extends State<ChatScreen> {
   String _currentUserId;
   List<QueryDocumentSnapshot> listMessage = new List.from(<String>[]);
   ImageUploadProvider _imageUploadProvider;
+  // final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+  // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  //     FlutterLocalNotificationsPlugin();
+  final GoogleSignIn googleSignIn = GoogleSignIn();
 
   SharedPreferences preferences;
 
@@ -410,6 +424,8 @@ class _ChatScreen extends State<ChatScreen> {
         );
       });
     });
+    //  registerNotification();
+    // configLocalNotification();
 
     isLoading = false;
 
@@ -511,40 +527,39 @@ class _ChatScreen extends State<ChatScreen> {
   Widget senderLayout(Message message) {
     Radius messageRadius = Radius.circular(15);
     return InkWell(
-      onLongPress: ()=> showDialog<Null>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      title: Center(
-                        child: Text(
-                          "Delete this message",
-                          style: TextStyle(color: Colors.cyan),
-                        ),
-                      ),
-                      content: Text(
-                        "Are you sure you wish to delete this message?",
-                        style: TextStyle(color: Colors.cyan),
-                      ),
-                      actions: [
-                        FlatButton(
-                          child: Text("YES"),
-                          onPressed: () async {
-                    
+      onLongPress: () => showDialog<Null>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Center(
+            child: Text(
+              "Delete this message",
+              style: TextStyle(color: Colors.cyan),
+            ),
+          ),
+          content: Text(
+            "Are you sure you wish to delete this message?",
+            style: TextStyle(color: Colors.cyan),
+          ),
+          actions: [
+            FlatButton(
+              child: Text("YES"),
+              onPressed: () async {
                 // FirebaseFirestore.instance
                 //     .collection('messages')
                 //     .doc(sender.userId)
                 //     .collection(widget.recevier.userId)
                 //     .doc()
                 //     .delete();
-                          },
-                        ),
-                        FlatButton(
-                          child: Text("NO"),
-                          onPressed: () => Navigator.maybePop(context),
-                        ),
-                      ],
-                    ),
-                  ),
-          child: Container(
+              },
+            ),
+            FlatButton(
+              child: Text("NO"),
+              onPressed: () => Navigator.maybePop(context),
+            ),
+          ],
+        ),
+      ),
+      child: Container(
         constraints:
             BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
         decoration: BoxDecoration(
@@ -573,8 +588,9 @@ class _ChatScreen extends State<ChatScreen> {
                 height: 4,
               ),
               Text(
-                DateFormat("hh:mm aa").format(DateTime.fromMillisecondsSinceEpoch(
-                    int.parse(message.timestamp))),
+                DateFormat("hh:mm aa").format(
+                    DateTime.fromMillisecondsSinceEpoch(
+                        int.parse(message.timestamp))),
                 style: TextStyle(
                   fontSize: 12,
                   color: Colors.white,
@@ -694,10 +710,77 @@ class _ChatScreen extends State<ChatScreen> {
           );
   }
 
+  // void registerNotification() {
+  //   firebaseMessaging.requestNotificationPermissions();
+
+  //   firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
+  //     print('onMessage: $message');
+  //     Platform.isAndroid
+  //         ? showNotification(message['notification'])
+  //         : showNotification(message['aps']['alert']);
+  //     return;
+  //   }, onResume: (Map<String, dynamic> message) {
+  //     print('onResume: $message');
+  //     return;
+  //   }, onLaunch: (Map<String, dynamic> message) {
+  //     print('onLaunch: $message');
+  //     return;
+  //   });
+
+  //   firebaseMessaging.getToken().then((token) {
+  //     print('token: $token');
+  //     FirebaseFirestore.instance
+  //         .collection('users')
+  //         .doc(uid)
+  //         .update({'pushToken': token});
+  //   }).catchError((dynamic err) {
+  //     Fluttertoast.showToast(msg: err.message.toString());
+  //   });
+  // }
+
+  // void configLocalNotification() {
+  //   var initializationSettingsAndroid =
+  //       new AndroidInitializationSettings('app_icon');
+  //   var initializationSettingsIOS = new IOSInitializationSettings();
+  //   var initializationSettings = new InitializationSettings(
+  //       initializationSettingsAndroid, initializationSettingsIOS);
+  //   flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  // }
+
+  // void showNotification(message) async {
+  //   var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
+  //     Platform.isAndroid
+  //          'com.example.ChatApp',
+
+  //     'Flutter ChatApp',
+  //     'your channel description',
+  //     playSound: true,
+  //     enableVibration: true,
+  //     importance: Importance.Max,
+  //     priority: Priority.High,
+  //   );
+
+  //   var platformChannelSpecifics = new NotificationDetails(
+  //       androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
+
+  //   print(message);
+  //  print(message['body'].toString());
+  //  print(json.encode(message));
+
+  //   await flutterLocalNotificationsPlugin.show(0, message['title'].toString(),
+  //       message['body'].toString(), platformChannelSpecifics,
+  //       payload: json.encode(message));
+
+  // //  await flutterLocalNotificationsPlugin.show(
+  // //      0, 'plain title', 'plain body', platformChannelSpecifics,
+  // //      payload: 'item x');
+  // }
+
   Widget emojiContainer() {
     return EmojiPicker(
-      bgColor: Colors.white,
+      // bgColor:  Colors.cyan,
       indicatorColor: Colors.cyan,
+
       rows: 3,
       columns: 8,
       onEmojiSelected: (emoji, category) {
@@ -779,7 +862,7 @@ class _ChatScreen extends State<ChatScreen> {
                 ),
                 //emoji button
                 IconButton(
-                  splashColor: Colors.transparent,
+                  // splashColor: Colors.transparent,
                   color: Colors.white60,
                   highlightColor: Colors.transparent,
                   icon: Icon(Icons.emoji_emotions),
@@ -862,16 +945,13 @@ class _ChatScreen extends State<ChatScreen> {
   }
 
   final picker = ImagePicker();
-
+  //gallery image
   Future getImage() async {
     final imageFileUpload = await picker.getImage(source: ImageSource.gallery);
 
     try {
       if (imageFileUpload != null) {
-        setState(() {
-          this.imageFile = File(imageFileUpload.path);
-          isLoading = true;
-        });
+        cropImage(File(imageFileUpload.path));
       } else {
         throw ('File is not available');
       }
@@ -889,16 +969,60 @@ class _ChatScreen extends State<ChatScreen> {
         );
       });
     }
-    uploadImageFile();
   }
 
+  // camera Image
   Future cameraImage() async {
     final imageFileUpload = await picker.getImage(source: ImageSource.camera);
 
     if (imageFileUpload != null) {
+      cropImage(File(imageFileUpload.path));
+    }
+  }
+
+  Future cropImage(File imageFileAvatar) async {
+    File croppedFile = await ImageCropper.cropImage(
+      sourcePath: imageFileAvatar.path,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.ratio5x4,
+        CropAspectRatioPreset.ratio7x5,
+        CropAspectRatioPreset.ratio16x9
+      ],
+      androidUiSettings: AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          statusBarColor: Colors.cyan,
+          toolbarColor: Colors.cyan,
+          toolbarWidgetColor: Colors.white,
+          activeControlsWidgetColor: Colors.cyan,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false),
+      maxHeight: 800,
+    );
+    try {
+      if (croppedFile != null) {
+        setState(() {
+          imageFile = croppedFile;
+          isLoading = true;
+        });
+      } else {
+        throw ('File is not available');
+      }
+    } catch (e) {
+      print(e);
       setState(() {
-        this.imageFile = File(imageFileUpload.path);
-        isLoading = true;
+        isLoading = false;
+        Fluttertoast.showToast(
+          msg: e.toString(),
+          textColor: Color(0xFFFFFFFF),
+          fontSize: 16.0,
+          // timeInSecForIosWeb: 4,
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.cyan,
+        );
       });
     }
     uploadImageFile();

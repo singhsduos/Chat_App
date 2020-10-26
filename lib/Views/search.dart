@@ -1,5 +1,4 @@
 import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:gradient_app_bar/gradient_app_bar.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -99,11 +98,7 @@ class _SearchState extends State<Search> {
                       height: 80.0,
                       fit: BoxFit.cover,
                     )
-                  : Icon(
-                      Icons.account_circle,
-                      size: 60.0,
-                      color: Colors.white,
-                    ),
+                  : Image(image: AssetImage('images/placeHolder.jpg'),height: 80, width: 80,fit: BoxFit.cover,), 
               borderRadius: BorderRadius.all(Radius.circular(125.0)),
               clipBehavior: Clip.hardEdge,
             ),
@@ -151,7 +146,7 @@ class _SearchState extends State<Search> {
       ),
       elevation: 0,
       bottom: PreferredSize(
-        preferredSize: const Size.fromHeight(kToolbarHeight + 1),
+        preferredSize: const Size.fromHeight(kToolbarHeight - 10),
         child: Padding(
           padding: EdgeInsets.only(left: 20),
           child: TextField(

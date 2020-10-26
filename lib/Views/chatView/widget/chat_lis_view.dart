@@ -2,15 +2,22 @@ import 'package:ChatApp/Views/chatView/widget/last_message.dart';
 import 'package:ChatApp/Views/chatView/widget/online_indicator.dart';
 import 'package:ChatApp/Views/conversationScreen.dart';
 import 'package:ChatApp/Widget/customTile.dart';
+import 'package:ChatApp/Widget/fullScreenUserImage.dart';
 import 'package:ChatApp/Widget/fullscreenImage.dart';
+import 'package:ChatApp/Widget/photoCard.dart';
 import 'package:ChatApp/modal/contacts.dart';
 import 'package:ChatApp/modal/message.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/provider/provider.dart';
+import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
+import 'package:ChatApp/utils/call_utilities.dart';
+import 'package:ChatApp/utils/permissions.dart';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatListView extends StatelessWidget {
   final Contact contact;
@@ -38,13 +45,84 @@ class ChatListView extends StatelessWidget {
   }
 }
 
-class ViewLayout extends StatelessWidget {
+class ViewLayout extends StatefulWidget {
   final Users contact;
-  final DatabaseMethods _chatMethods = DatabaseMethods();
-
   ViewLayout({
     @required this.contact,
   });
+
+  @override
+  _ViewLayoutState createState() => _ViewLayoutState(contact: contact);
+}
+
+class _ViewLayoutState extends State<ViewLayout> {
+  final Users contact;
+  _ViewLayoutState({
+    @required this.contact,
+  });
+  final DatabaseMethods _chatMethods = DatabaseMethods();
+
+  Users sender;
+
+  DatabaseMethods databaseMethods = DatabaseMethods();
+
+  AuthMethods authMethods = AuthMethods();
+
+  String iD;
+
+  String _currentUserId;
+
+  SharedPreferences preferences;
+
+  Users _users;
+
+  final FirebaseAuth auth = FirebaseAuth.instance;
+
+  bool isDarkTheme = false;
+
+  String username = '';
+
+  String email = '';
+
+  String createdAt = '';
+
+  String photoUrl = '';
+
+  String aboutMe = '';
+
+  String id = '';
+
+  Future readDataFromLocal() async {
+    preferences = await SharedPreferences.getInstance();
+    photoUrl = preferences.getString('photoUrl');
+    username = preferences.getString('username');
+    email = preferences.getString('email');
+    aboutMe = preferences.getString('aboutMe');
+    createdAt = preferences.getString('createdAt');
+    id = preferences.getString('id');
+
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    readDataFromLocal();
+
+    databaseMethods.getCurrentUser().then((user) {
+      _currentUserId = user.uid;
+      setState(() {
+        sender = Users(
+          userId: user.uid,
+          username: username,
+          photoUrl: photoUrl,
+          email: user.email,
+          aboutMe: aboutMe,
+          createdAt: createdAt,
+        );
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,25 +134,92 @@ class ViewLayout extends StatelessWidget {
         context,
         MaterialPageRoute<MaterialPageRoute>(
           builder: (context) => ConversationScreen(
-            recevier: contact,
+            recevier: widget.contact,
           ),
         ),
       ),
       child: CustomTile(
         leading: GestureDetector(
-          onTap: () {
-            {
-              Navigator.push<MaterialPageRoute>(
-                context,
-                MaterialPageRoute(
-                  builder: (BuildContext context) => FullScreenImagePage(
-                      url: contact.photoUrl != null
-                          ? contact.photoUrl
-                          : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg'),
+          onTap: () => showDialog<Widget>(
+            context: context,
+            builder: (BuildContext context) => CustomDialog(
+              url: contact.photoUrl != null
+                  ? contact.photoUrl
+                  : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg',
+              title: Text(
+                (widget.contact != null ? widget.contact.username : null) !=
+                        null
+                    ? widget.contact.username
+                    : '..',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(
+                    fontFamily: "Arial",
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.0,
+                    wordSpacing: 1.0),
+              ),
+              icon1: IconButton(
+                icon: Icon(
+                  Icons.info_outline,
+                  color: Colors.cyan,
+                  size: 27,
                 ),
-              );
-            }
-          },
+                onPressed: () {
+                  Navigator.push<MaterialPageRoute>(
+                      context,
+                      MaterialPageRoute(
+                          builder: (BuildContext context) =>
+                              UserDetails(recevier: widget.contact)));
+                },
+              ),
+              icon2: IconButton(
+                icon: Icon(
+                  Icons.video_call,
+                  color: Colors.cyan,
+                  size: 27,
+                ),
+                onPressed: () async =>
+                    await Permissions.cameraAndMicrophonePermissionsGranted()
+                        ? CallUtils.dial(
+                            from: sender,
+                            to: contact,
+                            context: context,
+                            callis: "video")
+                        : () {},
+              ),
+              icon3: IconButton(
+                icon: Icon(
+                  Icons.call,
+                  color: Colors.cyan,
+                  size: 27,
+                ),
+                onPressed: () async =>
+                    await Permissions.microphonePermissionsGranted()
+                        ? CallUtils.dialVoice(
+                            from: sender,
+                            to: widget.contact,
+                            context: context,
+                            callis: "audio")
+                        : () {},
+              ),
+              icon4: IconButton(
+                icon: Icon(
+                  Icons.chat,
+                  color: Colors.cyan,
+                  size: 27,
+                ),
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute<MaterialPageRoute>(
+                    builder: (context) => ConversationScreen(
+                      recevier: widget.contact,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
           child: Container(
             padding: EdgeInsets.all(1),
             decoration: BoxDecoration(
@@ -92,7 +237,7 @@ class ViewLayout extends StatelessWidget {
               radius: 30,
               backgroundColor: Colors.black,
               child: Material(
-                child: contact.photoUrl != null
+                child: widget.contact.photoUrl != null
                     ? CachedNetworkImage(
                         placeholder: (context, url) => Container(
                           decoration: BoxDecoration(
@@ -114,15 +259,16 @@ class ViewLayout extends StatelessWidget {
                           borderRadius: BorderRadius.all(Radius.circular(8.0)),
                           clipBehavior: Clip.hardEdge,
                         ),
-                        imageUrl: contact.photoUrl,
+                        imageUrl: widget.contact.photoUrl,
                         width: 80.0,
                         height: 80.0,
                         fit: BoxFit.cover,
                       )
-                    : Icon(
-                        Icons.account_circle,
-                        size: 60.0,
-                        color: Colors.white,
+                    : Image(
+                        image: AssetImage('images/placeHolder.jpg'),
+                        height: 80,
+                        width: 80,
+                        fit: BoxFit.cover,
                       ),
                 borderRadius: BorderRadius.all(Radius.circular(125.0)),
                 clipBehavior: Clip.hardEdge,
@@ -136,7 +282,7 @@ class ViewLayout extends StatelessWidget {
             context,
             MaterialPageRoute<MaterialPageRoute>(
               builder: (context) => ConversationScreen(
-                recevier: contact,
+                recevier: widget.contact,
               ),
             ),
           ),
@@ -145,8 +291,9 @@ class ViewLayout extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Text(
-                (contact != null ? contact.username : null) != null
-                    ? contact.username
+                (widget.contact != null ? widget.contact.username : null) !=
+                        null
+                    ? widget.contact.username
                     : '..',
                 overflow: TextOverflow.ellipsis,
                 style: TextStyle(
@@ -160,7 +307,7 @@ class ViewLayout extends StatelessWidget {
                 child: LastMessageTimeContainer(
                   stream: _chatMethods.fetchLastMessageBetween(
                     id: userProvider.getUser.userId,
-                    receiverId: contact.userId,
+                    receiverId: widget.contact.userId,
                   ),
                 ),
               )
@@ -172,7 +319,7 @@ class ViewLayout extends StatelessWidget {
             context,
             MaterialPageRoute<MaterialPageRoute>(
               builder: (context) => ConversationScreen(
-                recevier: contact,
+                recevier: widget.contact,
               ),
             ),
           ),
@@ -180,7 +327,7 @@ class ViewLayout extends StatelessWidget {
             child: LastMessageContainer(
               stream: _chatMethods.fetchLastMessageBetween(
                 id: userProvider.getUser.userId,
-                receiverId: contact.userId,
+                receiverId: widget.contact.userId,
               ),
             ),
           ),

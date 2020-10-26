@@ -75,6 +75,8 @@ class _VoiceCallScreenState extends State<VoiceCallScreen> {
           .listen((DocumentSnapshot ds) {
         if (ds.data() == null) {
           Navigator.pop(context);
+        } else {
+          return;
         }
       });
     });
@@ -285,7 +287,7 @@ class _VoiceCallScreenState extends State<VoiceCallScreen> {
                         ),
                       )
                     : Text(
-                        'Calling...',
+                        'Connected',
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.white,
@@ -380,7 +382,7 @@ class _VoiceCallScreenState extends State<VoiceCallScreen> {
                   height: 5,
                 ),
                 Text(
-                  'Calling',
+                  'Connected',
                   style: TextStyle(
                     fontSize: 14,
                     color: Colors.white,

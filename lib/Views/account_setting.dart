@@ -8,6 +8,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter/material.dart';
@@ -95,14 +96,71 @@ class _SettingScreenState extends State<SettingScreen> {
   }
 
   final picker = ImagePicker();
-
+//image from gallery
   Future getImage() async {
     final newImagefile = await picker.getImage(source: ImageSource.gallery);
     final ScaffoldState scaffold = _scaffoldKey.currentState;
     try {
       if (newImagefile != null) {
+        cropImage(File(newImagefile.path));
+        // setState(() {
+        //   this.imageFileAvatar = File(newImagefile.path);
+        //   isLoading = true;
+        // });
+      } else {
+        throw ('File is not available');
+      }
+    } catch (e) {
+      print(e);
+      setState(() {
+        isLoading = false;
+        Fluttertoast.showToast(
+          msg: e.toString(),
+          textColor: Color(0xFFFFFFFF),
+          fontSize: 16.0,
+          // timeInSecForIosWeb: 4,
+          gravity: ToastGravity.CENTER,
+          backgroundColor: Colors.cyan,
+        );
+      });
+    }
+  }
+
+//image from camera
+  Future cameraImage() async {
+    final newImagefile = await picker.getImage(source: ImageSource.camera);
+
+    if (newImagefile != null) {
+      cropImage(File(newImagefile.path));
+    }
+  }
+
+  Future cropImage(File imageFile) async {
+    File croppedFile = await ImageCropper.cropImage(
+      sourcePath: imageFile.path,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.ratio5x4,
+        CropAspectRatioPreset.ratio7x5,
+        CropAspectRatioPreset.ratio16x9
+      ],
+      androidUiSettings: AndroidUiSettings(
+          toolbarTitle: 'Crop Image',
+          statusBarColor: Colors.cyan,
+          toolbarColor: Colors.cyan,
+          toolbarWidgetColor: Colors.white,
+          activeControlsWidgetColor: Colors.cyan,
+          initAspectRatio: CropAspectRatioPreset.original,
+          lockAspectRatio: false),
+      maxHeight: 800,
+    );
+    try {
+      if (croppedFile != null) {
         setState(() {
-          this.imageFileAvatar = File(newImagefile.path);
+          imageFileAvatar = croppedFile;
           isLoading = true;
         });
       } else {
@@ -125,16 +183,41 @@ class _SettingScreenState extends State<SettingScreen> {
     uploadImageToFirestoreAndStorage();
   }
 
-  Future cameraImage() async {
-    final newImagefile = await picker.getImage(source: ImageSource.camera);
+  Future uploadImageToFirestoreAndStorage() async {
+    String mFileName = basename(imageFileAvatar.path);
+    StorageReference storageReference =
+        FirebaseStorage.instance.ref().child('uploadsImages/$mFileName');
+    StorageUploadTask storageUploadTask =
+        storageReference.putFile(imageFileAvatar);
+    StorageTaskSnapshot storageTaskSnapshot =
+        await storageUploadTask.onComplete;
+    print('File Uploaded');
+    storageTaskSnapshot.ref.getDownloadURL().then((dynamic value) {
+      photoUrl = '$value';
 
-    if (newImagefile != null) {
-      setState(() {
-        this.imageFileAvatar = File(newImagefile.path);
-        isLoading = true;
+      // ignore: always_specify_types
+      FirebaseFirestore.instance
+          .collection('users')
+          .doc(id)
+          .update(<String, String>{
+        'photoUrl': photoUrl,
+        'aboutMe': aboutMe,
+        'username': username,
+      }).then((data) async {
+        await preferences.setString('photoUrl', photoUrl);
+        setState(() {
+          isLoading = false;
+        });
+        Fluttertoast.showToast(
+            msg: 'Picture updated successfully.', gravity: ToastGravity.CENTER);
       });
-    }
-    uploadImageToFirestoreAndStorage();
+    }, onError: (Object errorMsg) {
+      setState(() {
+        isLoading = false;
+      });
+      Fluttertoast.showToast(
+          msg: errorMsg.toString(), gravity: ToastGravity.CENTER);
+    });
   }
 
   Future<void> _settingModalBottomSheet(BuildContext context) async {
@@ -170,33 +253,6 @@ class _SettingScreenState extends State<SettingScreen> {
                                 Container(
                                   padding: EdgeInsets.only(bottom: 10),
                                   child: IconButton(
-                                    onPressed: cameraImage,
-                                    icon: Icon(
-                                      Icons.camera,
-                                      size: 50.0,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  margin: EdgeInsets.only(right: 10.0),
-                                ),
-                                Text(
-                                  'Camera',
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 20),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                        Center(
-                          child: Container(
-                            margin: EdgeInsets.only(bottom: 10.0),
-                            padding: EdgeInsets.all(16.0),
-                            child: Column(
-                              children: <Widget>[
-                                Container(
-                                  padding: EdgeInsets.only(bottom: 10),
-                                  child: IconButton(
                                     onPressed: getImage,
                                     icon: Icon(
                                       Icons.image,
@@ -212,6 +268,33 @@ class _SettingScreenState extends State<SettingScreen> {
                                     color: Colors.white,
                                     fontSize: 20,
                                   ),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                        Center(
+                          child: Container(
+                            margin: EdgeInsets.only(bottom: 10.0),
+                            padding: EdgeInsets.all(16.0),
+                            child: Column(
+                              children: <Widget>[
+                                Container(
+                                  padding: EdgeInsets.only(bottom: 10),
+                                  child: IconButton(
+                                    onPressed: cameraImage,
+                                    icon: Icon(
+                                      Icons.camera,
+                                      size: 50.0,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  margin: EdgeInsets.only(right: 10.0),
+                                ),
+                                Text(
+                                  'Camera',
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 20),
                                 )
                               ],
                             ),
@@ -361,43 +444,6 @@ class _SettingScreenState extends State<SettingScreen> {
     });
   }
 
-  Future uploadImageToFirestoreAndStorage() async {
-    String mFileName = basename(imageFileAvatar.path);
-    StorageReference storageReference =
-        FirebaseStorage.instance.ref().child('uploadsImages/$mFileName');
-    StorageUploadTask storageUploadTask =
-        storageReference.putFile(imageFileAvatar);
-    StorageTaskSnapshot storageTaskSnapshot =
-        await storageUploadTask.onComplete;
-    print('File Uploaded');
-    storageTaskSnapshot.ref.getDownloadURL().then((dynamic value) {
-      photoUrl = '$value';
-
-      // ignore: always_specify_types
-      FirebaseFirestore.instance
-          .collection('users')
-          .doc(id)
-          .update(<String, String>{
-        'photoUrl': photoUrl,
-        'aboutMe': aboutMe,
-        'username': username,
-      }).then((data) async {
-        await preferences.setString('photoUrl', photoUrl);
-        setState(() {
-          isLoading = false;
-        });
-        Fluttertoast.showToast(
-            msg: 'Picture updated successfully.', gravity: ToastGravity.CENTER);
-      });
-    }, onError: (Object errorMsg) {
-      setState(() {
-        isLoading = false;
-      });
-      Fluttertoast.showToast(
-          msg: errorMsg.toString(), gravity: ToastGravity.CENTER);
-    });
-  }
-
   void updateData() {
     usernameFocusNode.unfocus();
     aboutMeFocusNode.unfocus();
@@ -471,10 +517,11 @@ class _SettingScreenState extends State<SettingScreen> {
                                     height: 200.0,
                                     fit: BoxFit.cover,
                                   )
-                                : Icon(
-                                    Icons.account_circle,
-                                    size: 200.0,
-                                    color: Colors.white,
+                                : Image(
+                                    image: AssetImage('images/placeHolder.jpg'),
+                                    height: 200,
+                                    width: 200,
+                                    fit: BoxFit.cover,
                                   ),
                             borderRadius:
                                 BorderRadius.all(Radius.circular(125.0)),

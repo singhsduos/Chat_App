@@ -27,8 +27,16 @@ class _PickupScreenState extends State<PickupScreen> {
     Log log = Log(
         callerName: widget.call.callerName,
         callerPic: widget.call.callerPic,
+        callerId: widget.call.callerId,
+        callerAboutMe: widget.call.callerAboutMe,
+        callerEmail: widget.call.callerEmail,
+        callerCreatedAt: widget.call.callerCreatedAt,
         receiverName: widget.call.receiverName,
         receiverPic: widget.call.receiverPic,
+        receiverId: widget.call.receiverId,
+        receiverAboutMe: widget.call.receiverAboutMe,
+        receiverCreatedAt: widget.call.receiverCreatedAt,
+        receiverEmail: widget.call.receiverEmail,
         timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
         callStatus: callStatus);
 
@@ -79,7 +87,7 @@ class _PickupScreenState extends State<PickupScreen> {
                   ),
                   errorWidget: (context, url, dynamic error) => Material(
                     child: Image.asset(
-                      'images/no_image.jpg',
+                      'images/placeHolder.jpg',
                       width: 150.0,
                       height: 150,
                       fit: BoxFit.cover,
@@ -192,7 +200,7 @@ class _PickupScreenState extends State<PickupScreen> {
                 ],
               )
             ],
-          ), 
+          ),
         ),
       ),
     );

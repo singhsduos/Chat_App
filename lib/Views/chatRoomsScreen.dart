@@ -2,7 +2,7 @@ import 'package:ChatApp/Views/call_log_screen/call_log.dart';
 import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
 import 'package:ChatApp/Views/chatView/chatList.dart';
 import 'package:ChatApp/Views/drawer.dart';
-import 'package:ChatApp/enum/users_state.dart';
+import 'package:ChatApp/helper/authenticate.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:ChatApp/provider/provider.dart';
 import 'package:ChatApp/services/auth.dart';
@@ -15,16 +15,11 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 class ChatRoom extends StatefulWidget {
-  final String uid;
-
-  ChatRoom({Key key, @required this.uid}) : super(key: key);
-
   @override
-  State createState() => ChatRoomState(uid: uid);
+  _ChatRoomState createState() => _ChatRoomState();
 }
 
-class ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
-  ChatRoomState({Key key, @required this.uid});
+class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -32,10 +27,10 @@ class ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
   PageController pageController;
   int _page = 0;
 
-  final String uid;
+  String uid;
   String currentUserId;
   String initials;
-  // final FirebaseMessaging firebaseMessaging = FirebaseMessaging();
+
   // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
   //     FlutterLocalNotificationsPlugin();
   final GoogleSignIn googleSignIn = GoogleSignIn();
@@ -49,12 +44,17 @@ class ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
 
     SchedulerBinding.instance.addPostFrameCallback((_) {
       userProvider = Provider.of<UserProvider>(context, listen: false);
+
       userProvider.refreshUser();
-      LogRepository.init(isHive: false, dbName: user.uid );
+      LogRepository.init(isHive: false, dbName: user.uid);
     });
     pageController = PageController();
-    // registerNotification();
-    // configLocalNotification();
+  }
+
+  @override
+  void dispose() {
+    
+    super.dispose();
   }
 
   // @override
@@ -100,72 +100,6 @@ class ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
   void navigationTapped(int page) {
     pageController.jumpToPage(page);
   }
-
-//   void registerNotification() {
-//     firebaseMessaging.requestNotificationPermissions();
-
-//     firebaseMessaging.configure(onMessage: (Map<String, dynamic> message) {
-//       print('onMessage: $message');
-//       Platform.isAndroid
-//           ? showNotification(message['notification'])
-//           : showNotification(message['aps']['alert']);
-//       return;
-//     }, onResume: (Map<String, dynamic> message) {
-//       print('onResume: $message');
-//       return;
-//     }, onLaunch: (Map<String, dynamic> message) {
-//       print('onLaunch: $message');
-//       return;
-//     });
-
-//     firebaseMessaging.getToken().then((token) {
-//       print('token: $token');
-//       FirebaseFirestore.instance
-//           .collection('users')
-//           .doc(uid)
-//           .update({'pushToken': token});
-//     }).catchError((err) {
-//       Fluttertoast.showToast(msg: err.message.toString());
-//     });
-//   }
-
-//   void configLocalNotification() {
-//     var initializationSettingsAndroid =
-//         new AndroidInitializationSettings('app_icon');
-//     var initializationSettingsIOS = new IOSInitializationSettings();
-//     var initializationSettings = new InitializationSettings(
-//         initializationSettingsAndroid, initializationSettingsIOS);
-//     flutterLocalNotificationsPlugin.initialize(initializationSettings);
-//   }
-
-//   void showNotification(message) async {
-//     var androidPlatformChannelSpecifics = new AndroidNotificationDetails(
-//       Platform.isAndroid
-//           ? 'com.dfa.flutterchatdemo'
-//           : 'com.duytq.flutterchatdemo',
-//       'Flutter chat demo',
-//       'your channel description',
-//       playSound: true,
-//       enableVibration: true,
-//       importance: Importance.Max,
-//       priority: Priority.High,
-//     );
-//     var iOSPlatformChannelSpecifics = new IOSNotificationDetails();
-//     var platformChannelSpecifics = new NotificationDetails(
-//         androidPlatformChannelSpecifics, iOSPlatformChannelSpecifics);
-
-//     print(message);
-  //  print(message['body'].toString());
-  //  print(json.encode(message));
-
-//     await flutterLocalNotificationsPlugin.show(0, message['title'].toString(),
-//         message['body'].toString(), platformChannelSpecifics,
-//         payload: json.encode(message));
-
-//    await flutterLocalNotificationsPlugin.show(
-//        0, 'plain title', 'plain body', platformChannelSpecifics,
-//        payload: 'item x');
-//   }
 
   Future<bool> onBackPress() {
     return Future.value(true);

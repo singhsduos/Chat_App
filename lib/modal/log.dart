@@ -2,10 +2,18 @@ class Log {
   int logId;
   String callerName;
   String callerPic;
+  String callerId;
   String receiverName;
   String receiverPic;
+  String receiverId;
   String callStatus;
   String timestamp;
+  String callerAboutMe;
+  String callerEmail;
+  String callerCreatedAt;
+  String receiverAboutMe;
+  String receiverEmail;
+  String receiverCreatedAt;
 
   Log({
     this.logId,
@@ -15,6 +23,14 @@ class Log {
     this.receiverPic,
     this.callStatus,
     this.timestamp,
+    this.callerAboutMe,
+    this.callerEmail,
+    this.callerCreatedAt,
+    this.receiverAboutMe,
+    this.receiverEmail,
+    this.receiverCreatedAt,
+    this.callerId,
+    this.receiverId,
   });
 
   // to map
@@ -27,6 +43,14 @@ class Log {
     logMap["receiver_pic"] = log.receiverPic;
     logMap["call_status"] = log.callStatus;
     logMap["timestamp"] = log.timestamp;
+    logMap['caller_aboutMe'] = log.callerAboutMe;
+    logMap['caller_email'] = log.callerEmail;
+    logMap['caller_createdAt'] = log.callerCreatedAt;
+    logMap['receiver_aboutMe'] = log.receiverAboutMe;
+    logMap['receiver_email'] = log.receiverEmail;
+    logMap['receiver_createdAt'] = log.receiverCreatedAt;
+    logMap["caller_id"] = log.callerId;
+    logMap["receiver_id"] = log.receiverId;
     return logMap;
   }
 
@@ -38,5 +62,13 @@ class Log {
     this.receiverPic = logMap["receiver_pic"].toString();
     this.callStatus = logMap["call_status"].toString();
     this.timestamp = logMap["timestamp"].toString();
+    this.callerAboutMe = logMap['caller_aboutMe'].toString();
+    this.callerEmail = logMap['caller_email'].toString();
+    this.callerCreatedAt = logMap['caller_createdAt'].toString();
+    this.receiverAboutMe = logMap['receiver_aboutMe'].toString();
+    this.receiverEmail = logMap['receiver_email'].toString();
+    this.receiverCreatedAt = logMap['receiver_createdAt'].toString();
+    this.callerId = logMap["caller_id"].toString();
+    this.receiverId = logMap["receiver_id"].toString();
   }
 }

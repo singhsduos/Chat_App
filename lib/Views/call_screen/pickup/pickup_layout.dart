@@ -15,7 +15,7 @@ class PickupLayout extends StatelessWidget {
   PickupLayout({@required this.scaffold});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { 
     final UserProvider userProvider = Provider.of<UserProvider>(context);
     ClientRole _role = ClientRole.Broadcaster;
 

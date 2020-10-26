@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:ChatApp/modal/contacts.dart';
 import 'package:ChatApp/modal/message.dart';
 import 'package:ChatApp/modal/user.dart';

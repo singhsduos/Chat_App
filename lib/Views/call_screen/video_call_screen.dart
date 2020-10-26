@@ -69,6 +69,8 @@ class _CallScreenState extends State<CallScreen> {
           .listen((DocumentSnapshot ds) {
         if (ds.data() == null) {
           Navigator.pop(context);
+        } else {
+          return;
         }
       });
     });
