@@ -131,35 +131,184 @@ class _LogListContainerState extends State<LogListContainer> {
                 Log _log = logList[i] as Log;
                 bool hasDialled = _log.callStatus == CALL_STATUS_DIALLED;
 
-                return CustomTile(
-                  leading: GestureDetector(
-                    onTap: () => showDialog<Widget>(
-                      context: context,
-                      builder: (BuildContext context) => CustomDialog(
-                        url: (hasDialled ? _log.receiverPic : _log.callerPic),
-                        title: Text(
-                          hasDialled
-                              ? _log?.receiverName ?? ".."
-                              : _log?.callerName ?? "..s",
-                          overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
-                              fontFamily: "Arial",
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1.0,
-                              wordSpacing: 1.0),
-                        ),
-                        icon1: IconButton(
-                          icon: Icon(
-                            Icons.info_outline,
-                            color: Colors.cyan,
-                            size: 27,
+                return GestureDetector(
+                  onTap: () async => _log.callType == 'audio'
+                      ? await Permissions.microphonePermissionsGranted()
+                          ? CallUtils.dialVoice(
+                              from: sender,
+                              to: Users(
+                                username: hasDialled
+                                    ? _log.receiverName
+                                    : _log.callerName,
+                                photoUrl: hasDialled
+                                    ? _log.receiverPic
+                                    : _log.callerPic,
+                                userId: hasDialled
+                                    ? _log.receiverId
+                                    : _log.callerId,
+                                email: hasDialled
+                                    ? _log.receiverEmail
+                                    : _log.callerEmail,
+                                createdAt: _log.receiverCreatedAt,
+                                aboutMe: hasDialled
+                                    ? _log.receiverAboutMe
+                                    : _log.callerAboutMe,
+                              ),
+                              context: context,
+                              callis: "audio")
+                          : () {}
+                      : await Permissions
+                              .cameraAndMicrophonePermissionsGranted()
+                          ? CallUtils.dial(
+                              from: sender,
+                              to: Users(
+                                username: hasDialled
+                                    ? _log.receiverName
+                                    : _log.callerName,
+                                photoUrl: hasDialled
+                                    ? _log.receiverPic
+                                    : _log.callerPic,
+                                userId: hasDialled
+                                    ? _log.receiverId
+                                    : _log.callerId,
+                                email: hasDialled
+                                    ? _log.receiverEmail
+                                    : _log.callerEmail,
+                                createdAt: _log.receiverCreatedAt,
+                                aboutMe: hasDialled
+                                    ? _log.receiverAboutMe
+                                    : _log.callerAboutMe,
+                              ),
+                              context: context,
+                              callis: "video")
+                          : () {},
+                  child: CustomTile(
+                    leading: GestureDetector(
+                      onTap: () => showDialog<Widget>(
+                        context: context,
+                        builder: (BuildContext context) => CustomDialog(
+                          url: (hasDialled ? _log.receiverPic : _log.callerPic),
+                          title: Text(
+                            hasDialled
+                                ? _log?.receiverName ?? ".."
+                                : _log?.callerName ?? "..s",
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontFamily: "Arial",
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1.0,
+                                wordSpacing: 1.0),
                           ),
-                          onPressed: () {
-                            Navigator.push<MaterialPageRoute>(
+                          icon1: IconButton(
+                            icon: Icon(
+                              Icons.info_outline,
+                              color: Colors.cyan,
+                              size: 27,
+                            ),
+                            onPressed: () {
+                              Navigator.push<MaterialPageRoute>(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (BuildContext context) =>
+                                      UserDetails(
+                                    recevier: Users(
+                                      username: hasDialled
+                                          ? _log.receiverName
+                                          : _log.callerName,
+                                      photoUrl: hasDialled
+                                          ? _log.receiverPic
+                                          : _log.callerPic,
+                                      userId: hasDialled
+                                          ? _log.receiverId
+                                          : _log.callerId,
+                                      email: hasDialled
+                                          ? _log.receiverEmail
+                                          : _log.callerEmail,
+                                      createdAt: _log.receiverCreatedAt,
+                                      aboutMe: hasDialled
+                                          ? _log.receiverAboutMe
+                                          : _log.callerAboutMe,
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
+                          icon2: IconButton(
+                            icon: Icon(
+                              Icons.video_call,
+                              color: Colors.cyan,
+                              size: 27,
+                            ),
+                            onPressed: () async => await Permissions
+                                    .cameraAndMicrophonePermissionsGranted()
+                                ? CallUtils.dial(
+                                    from: sender,
+                                    to: Users(
+                                      username: hasDialled
+                                          ? _log.receiverName
+                                          : _log.callerName,
+                                      photoUrl: hasDialled
+                                          ? _log.receiverPic
+                                          : _log.callerPic,
+                                      userId: hasDialled
+                                          ? _log.receiverId
+                                          : _log.callerId,
+                                      email: hasDialled
+                                          ? _log.receiverEmail
+                                          : _log.callerEmail,
+                                      createdAt: _log.receiverCreatedAt,
+                                      aboutMe: hasDialled
+                                          ? _log.receiverAboutMe
+                                          : _log.callerAboutMe,
+                                    ),
+                                    context: context,
+                                    callis: "video")
+                                : () {},
+                          ),
+                          icon3: IconButton(
+                            icon: Icon(
+                              Icons.call,
+                              color: Colors.cyan,
+                              size: 27,
+                            ),
+                            onPressed: () async =>
+                                await Permissions.microphonePermissionsGranted()
+                                    ? CallUtils.dialVoice(
+                                        from: sender,
+                                        to: Users(
+                                          username: hasDialled
+                                              ? _log.receiverName
+                                              : _log.callerName,
+                                          photoUrl: hasDialled
+                                              ? _log.receiverPic
+                                              : _log.callerPic,
+                                          userId: hasDialled
+                                              ? _log.receiverId
+                                              : _log.callerId,
+                                          email: hasDialled
+                                              ? _log.receiverEmail
+                                              : _log.callerEmail,
+                                          createdAt: _log.receiverCreatedAt,
+                                          aboutMe: hasDialled
+                                              ? _log.receiverAboutMe
+                                              : _log.callerAboutMe,
+                                        ),
+                                        context: context,
+                                        callis: "audio")
+                                    : () {},
+                          ),
+                          icon4: IconButton(
+                            icon: Icon(
+                              Icons.chat,
+                              color: Colors.cyan,
+                              size: 27,
+                            ),
+                            onPressed: () => Navigator.push(
                               context,
-                              MaterialPageRoute(
-                                builder: (BuildContext context) => UserDetails(
+                              MaterialPageRoute<MaterialPageRoute>(
+                                builder: (context) => ConversationScreen(
                                   recevier: Users(
                                     username: hasDialled
                                         ? _log.receiverName
@@ -173,240 +322,216 @@ class _LogListContainerState extends State<LogListContainer> {
                                     email: hasDialled
                                         ? _log.receiverEmail
                                         : _log.callerEmail,
-                                    createdAt:_log.receiverCreatedAt,
+                                    createdAt: _log.receiverCreatedAt,
                                     aboutMe: hasDialled
                                         ? _log.receiverAboutMe
                                         : _log.callerAboutMe,
                                   ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
-                        icon2: IconButton(
-                          icon: Icon(
-                            Icons.video_call,
-                            color: Colors.cyan,
-                            size: 27,
-                          ),
-                          onPressed: () async => await Permissions
-                                  .cameraAndMicrophonePermissionsGranted()
-                              ? CallUtils.dial(
-                                  from: sender,
-                                  to: Users(
-                                    username: hasDialled
-                                        ? _log.receiverName
-                                        : _log.callerName,
-                                    photoUrl: hasDialled
-                                        ? _log.receiverPic
-                                        : _log.callerPic,
-                                    userId: hasDialled
-                                        ? _log.receiverId
-                                        : _log.callerId,
-                                    email: hasDialled
-                                        ? _log.receiverEmail
-                                        : _log.callerEmail,
-                                    createdAt:_log.receiverCreatedAt,
-                                    aboutMe: hasDialled
-                                        ? _log.receiverAboutMe
-                                        : _log.callerAboutMe,
-                                  ),
-                                  context: context,
-                                  callis: "video")
-                              : () {},
-                        ),
-                        icon3: IconButton(
-                          icon: Icon(
-                            Icons.call,
-                            color: Colors.cyan,
-                            size: 27,
-                          ),
-                          onPressed: () async =>
-                              await Permissions.microphonePermissionsGranted()
-                                  ? CallUtils.dialVoice(
-                                      from: sender,
-                                      to: Users(
-                                        username: hasDialled
-                                            ? _log.receiverName
-                                            : _log.callerName,
-                                        photoUrl: hasDialled
-                                            ? _log.receiverPic
-                                            : _log.callerPic,
-                                        userId: hasDialled
-                                            ? _log.receiverId
-                                            : _log.callerId,
-                                        email: hasDialled
-                                            ? _log.receiverEmail
-                                            : _log.callerEmail,
-                                        createdAt:_log.receiverCreatedAt,
-                                        aboutMe: hasDialled
-                                            ? _log.receiverAboutMe
-                                            : _log.callerAboutMe,
-                                      ),
-                                      context: context,
-                                      callis: "audio")
-                                  : () {},
-                        ),
-                        icon4: IconButton(
-                          icon: Icon(
-                            Icons.chat,
-                            color: Colors.cyan,
-                            size: 27,
-                          ),
-                          onPressed: () => Navigator.push(
-                            context,
-                            MaterialPageRoute<MaterialPageRoute>(
-                              builder: (context) => ConversationScreen(
-                                recevier: Users(
-                                  username: hasDialled
-                                      ? _log.receiverName
-                                      : _log.callerName,
-                                  photoUrl: hasDialled
-                                      ? _log.receiverPic
-                                      : _log.callerPic,
-                                  userId: hasDialled
-                                      ? _log.receiverId
-                                      : _log.callerId,
-                                  email: hasDialled
-                                      ? _log.receiverEmail
-                                      : _log.callerEmail,
-                                  createdAt:_log.receiverCreatedAt,
-                                  aboutMe: hasDialled
-                                      ? _log.receiverAboutMe
-                                      : _log.callerAboutMe,
                                 ),
                               ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                    child: Container(
-                      padding: EdgeInsets.all(1),
-                      decoration: BoxDecoration(
-                          border: Border.all(color: Colors.cyan, width: 2),
-                          // shape: BoxShape.circle,
-                          borderRadius: BorderRadius.all(Radius.circular(40)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.5),
-                              spreadRadius: 2,
-                              blurRadius: 5,
-                            )
-                          ]),
-                      child: CircleAvatar(
-                        radius: 20,
-                        backgroundColor: Colors.black,
-                        child: Material(
-                          child: (hasDialled
-                                      ? _log.receiverPic
-                                      : _log.callerPic) !=
-                                  null
-                              ? CachedNetworkImage(
-                                  placeholder: (context, url) => Container(
-                                    decoration: BoxDecoration(
-                                        image: DecorationImage(
-                                      image:
-                                          AssetImage('images/placeHolder.jpg'),
-                                    )),
+                      child: Container(
+                        padding: EdgeInsets.all(1),
+                        decoration: BoxDecoration(
+                            border: Border.all(color: Colors.cyan, width: 2),
+                            // shape: BoxShape.circle,
+                            borderRadius: BorderRadius.all(Radius.circular(40)),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.5),
+                                spreadRadius: 2,
+                                blurRadius: 5,
+                              )
+                            ]),
+                        child: CircleAvatar(
+                          radius: 20,
+                          backgroundColor: Colors.black,
+                          child: Material(
+                            child: (hasDialled
+                                        ? _log.receiverPic
+                                        : _log.callerPic) !=
+                                    null
+                                ? CachedNetworkImage(
+                                    placeholder: (context, url) => Container(
+                                      decoration: BoxDecoration(
+                                          image: DecorationImage(
+                                        image: AssetImage(
+                                            'images/placeHolder.jpg'),
+                                      )),
+                                      height: 80,
+                                      width: 80,
+                                      padding: EdgeInsets.symmetric(
+                                          horizontal: 5, vertical: 5),
+                                    ),
+                                    errorWidget:
+                                        (context, url, dynamic error) =>
+                                            Material(
+                                      child: Image.asset(
+                                        'images/placeHolder.jpg',
+                                        width: 200.0,
+                                        height: 200,
+                                        fit: BoxFit.cover,
+                                      ),
+                                      borderRadius: BorderRadius.all(
+                                          Radius.circular(8.0)),
+                                      clipBehavior: Clip.hardEdge,
+                                    ),
+                                    imageUrl: (hasDialled
+                                        ? _log.receiverPic
+                                        : _log.callerPic),
+                                    width: 80.0,
+                                    height: 80.0,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image(
+                                    image: AssetImage('images/placeHolder.jpg'),
                                     height: 80,
                                     width: 80,
-                                    padding: EdgeInsets.symmetric(
-                                        horizontal: 5, vertical: 5),
+                                    fit: BoxFit.cover,
                                   ),
-                                  errorWidget: (context, url, dynamic error) =>
-                                      Material(
-                                    child: Image.asset(
-                                      'images/placeHolder.jpg',
-                                      width: 200.0,
-                                      height: 200,
-                                      fit: BoxFit.cover,
-                                    ),
-                                    borderRadius:
-                                        BorderRadius.all(Radius.circular(8.0)),
-                                    clipBehavior: Clip.hardEdge,
-                                  ),
-                                  imageUrl: (hasDialled
-                                      ? _log.receiverPic
-                                      : _log.callerPic),
-                                  width: 80.0,
-                                  height: 80.0,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image(
-                                  image: AssetImage('images/placeHolder.jpg'),
-                                  height: 80,
-                                  width: 80,
-                                  fit: BoxFit.cover,
-                                ),
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(125.0)),
-                          clipBehavior: Clip.hardEdge,
+                            borderRadius:
+                                BorderRadius.all(Radius.circular(125.0)),
+                            clipBehavior: Clip.hardEdge,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  mini: false,
-                  onLongPress: () => showDialog<void>(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                      contentPadding: EdgeInsets.only(
-                          left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
-                      title: Center(
-                        child: Text(
-                          "Delete this Log?",
-                        ),
-                      ),
-                      content: Text(
-                        "Are you sure you wish to delete this log?",
-                        style: TextStyle(color: Colors.cyan),
-                      ),
-                      actions: [
-                        FlatButton(
+                    mini: false,
+                    onLongPress: () => showDialog<void>(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        contentPadding: EdgeInsets.only(
+                            left: 15.0, right: 15.0, top: 15.0, bottom: 15.0),
+                        title: Center(
                           child: Text(
-                            "NO",
-                            style: TextStyle(color: Colors.cyan),
+                            "Delete this Log?",
                           ),
-                          onPressed: () => Navigator.maybePop(context),
                         ),
-                        FlatButton(
-                          child: Text(
-                            "YES",
-                            style: TextStyle(color: Colors.cyan),
+                        content: Text(
+                          "Are you sure you wish to delete this log?",
+                          style: TextStyle(color: Colors.cyan),
+                        ),
+                        actions: [
+                          FlatButton(
+                            child: Text(
+                              "NO",
+                              style: TextStyle(color: Colors.cyan),
+                            ),
+                            onPressed: () => Navigator.maybePop(context),
                           ),
-                          onPressed: () async {
-                            Navigator.maybePop(context);
-                            await LogRepository.deleteLogs(i+1);
-                            if (mounted) {
-                              setState(() {});
-                            }
-                          },
+                          FlatButton(
+                            child: Text(
+                              "YES",
+                              style: TextStyle(color: Colors.cyan),
+                            ),
+                            onPressed: () async {
+                              Navigator.maybePop(context);
+                              await LogRepository.deleteLogs(i + 1);
+                              if (mounted) {
+                                setState(() {});
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                    title: Text(
+                      hasDialled
+                          ? _log?.receiverName ?? ".."
+                          : _log?.callerName ?? "..s",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 17,
+                      ),
+                    ),
+                    icon: getIcon(_log.callStatus),
+                    subtitle: Text(
+                      DateFormat("dd MMM yyyy - hh:mm aa").format(
+                          DateTime.fromMillisecondsSinceEpoch(
+                              int.parse(_log.timestamp))),
+                      style: TextStyle(
+                        fontSize: 13,
+                        // color: Colors.white,
+                      ),
+                    ),
+                    trailing: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: _log.callType == 'audio'
+                              ? GestureDetector(
+                                  onTap: () async => await Permissions
+                                          .microphonePermissionsGranted()
+                                      ? CallUtils.dialVoice(
+                                          from: sender,
+                                          to: Users(
+                                            username: hasDialled
+                                                ? _log.receiverName
+                                                : _log.callerName,
+                                            photoUrl: hasDialled
+                                                ? _log.receiverPic
+                                                : _log.callerPic,
+                                            userId: hasDialled
+                                                ? _log.receiverId
+                                                : _log.callerId,
+                                            email: hasDialled
+                                                ? _log.receiverEmail
+                                                : _log.callerEmail,
+                                            createdAt: _log.receiverCreatedAt,
+                                            aboutMe: hasDialled
+                                                ? _log.receiverAboutMe
+                                                : _log.callerAboutMe,
+                                          ),
+                                          context: context,
+                                          callis: "audio")
+                                      : () {},
+                                  child: Icon(
+                                    Icons.call,
+                                    color: Colors.cyan,
+                                    size: 27,
+                                  ),
+                                )
+                              : GestureDetector(
+                                  onTap: () async => await Permissions
+                                          .cameraAndMicrophonePermissionsGranted()
+                                      ? CallUtils.dial(
+                                          from: sender,
+                                          to: Users(
+                                            username: hasDialled
+                                                ? _log.receiverName
+                                                : _log.callerName,
+                                            photoUrl: hasDialled
+                                                ? _log.receiverPic
+                                                : _log.callerPic,
+                                            userId: hasDialled
+                                                ? _log.receiverId
+                                                : _log.callerId,
+                                            email: hasDialled
+                                                ? _log.receiverEmail
+                                                : _log.callerEmail,
+                                            createdAt: _log.receiverCreatedAt,
+                                            aboutMe: hasDialled
+                                                ? _log.receiverAboutMe
+                                                : _log.callerAboutMe,
+                                          ),
+                                          context: context,
+                                          callis: "video")
+                                      : () {},
+                                  child: Icon(
+                                    Icons.video_call,
+                                    color: Colors.cyan,
+                                    size: 27,
+                                  ),
+                                ),
+                          onPressed: () {},
                         ),
                       ],
                     ),
                   ),
-                  title: Text(
-                    hasDialled
-                        ? _log?.receiverName ?? ".."
-                        : _log?.callerName ?? "..s",
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 17,
-                    ),
-                  ),
-                  icon: getIcon(_log.callStatus),
-                  subtitle: Text(
-                    DateFormat("dd MMM yyyy - hh:mm aa").format(
-                        DateTime.fromMillisecondsSinceEpoch(
-                            int.parse(_log.timestamp))),
-                    style: TextStyle(
-                      fontSize: 13,
-                      // color: Colors.white,
-                    ),
-                  ),
-                  // trailing: call.isCall == 'audio'
-                  //     ? Icon(Icons.call)
-                  //     : Icon(Icons.video_call),
                 );
               },
             );

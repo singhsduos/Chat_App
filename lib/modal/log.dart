@@ -14,6 +14,7 @@ class Log {
   String receiverAboutMe;
   String receiverEmail;
   String receiverCreatedAt;
+  String callType;
 
   Log({
     this.logId,
@@ -31,6 +32,7 @@ class Log {
     this.receiverCreatedAt,
     this.callerId,
     this.receiverId,
+    this.callType,
   });
 
   // to map
@@ -51,6 +53,7 @@ class Log {
     logMap['receiver_createdAt'] = log.receiverCreatedAt;
     logMap["caller_id"] = log.callerId;
     logMap["receiver_id"] = log.receiverId;
+    logMap["call_type"] = log.callType;
     return logMap;
   }
 
@@ -70,5 +73,6 @@ class Log {
     this.receiverCreatedAt = logMap['receiver_createdAt'].toString();
     this.callerId = logMap["caller_id"].toString();
     this.receiverId = logMap["receiver_id"].toString();
+    this.callType = logMap["call_type"].toString();
   }
 }

@@ -51,6 +51,7 @@ class CallUtils {
       receiverCreatedAt: to.createdAt,
       receiverEmail: to.email,
       timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+      callType: 'video',
     );
     bool callMade = await callMethods.makeCall(call: call);
     call.hasDialled = true;
@@ -77,7 +78,6 @@ class CallUtils {
       callerPic: from.photoUrl,
       callerAboutMe: from.aboutMe,
       callerEmail: from.email,
-      // callerCreatedAt: from.createdAt,
       receiverId: to.userId,
       receiverName: to.username,
       receiverPic: to.photoUrl,
@@ -102,6 +102,7 @@ class CallUtils {
       receiverCreatedAt: to.createdAt,
       receiverEmail: to.email,
       timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+      callType: 'audio',
     );
     bool callMade = await callMethods.makeVoiceCall(call: call);
     call.hasDialled = true;

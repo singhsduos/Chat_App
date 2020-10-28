@@ -27,6 +27,7 @@ class SqliteMethods implements LogInterface {
   String receiverCreatedAt = 'receiver_createdAt';
   String callerId = "caller_id";
   String receiverId = "receiver_id";
+  String callType = 'call_type';
 
   Future<Database> get db async {
     if (_db != null) {
@@ -50,7 +51,7 @@ class SqliteMethods implements LogInterface {
 
   dynamic _onCreate(Database db, int version) async {
     String createTableQuery =
-        "CREATE TABLE $tableName ($id INTEGER PRIMARY KEY, $callerName TEXT, $callerPic TEXT, $receiverName TEXT, $receiverPic TEXT, $callStatus TEXT, $timestamp TEXT,$callerEmail TEXT,$callerAboutMe TEXT,$receiverAboutMe TEXT,$receiverEmail TEXT,$receiverCreatedAt TEXT,$callerId TEXT,$receiverId TEXT)";
+        "CREATE TABLE $tableName ($id INTEGER PRIMARY KEY, $callerName TEXT, $callerPic TEXT, $receiverName TEXT, $receiverPic TEXT, $callStatus TEXT, $timestamp TEXT,$callerEmail TEXT,$callerAboutMe TEXT,$receiverAboutMe TEXT,$receiverEmail TEXT,$receiverCreatedAt TEXT,$callerId TEXT,$receiverId TEXT, $callType TEXT)";
     // createTableQuery.sort((int a, int b) {
     //   int adate = a['timestamp']; //before -> var adate = a.expiry;
     //   int bdate = b['timestamp']; //before -> var bdate = b.expiry;
@@ -108,6 +109,7 @@ class SqliteMethods implements LogInterface {
           receiverCreatedAt,
           callerId,
           receiverId,
+          callType
         ],
       );
 

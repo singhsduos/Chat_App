@@ -25,20 +25,22 @@ class _PickupScreenState extends State<PickupScreen> {
   bool isCallMissed = true;
   void addToLocalStorage({@required String callStatus}) {
     Log log = Log(
-        callerName: widget.call.callerName,
-        callerPic: widget.call.callerPic,
-        callerId: widget.call.callerId,
-        callerAboutMe: widget.call.callerAboutMe,
-        callerEmail: widget.call.callerEmail,
-        // callerCreatedAt: widget.call.callerCreatedAt,
-        receiverName: widget.call.receiverName,
-        receiverPic: widget.call.receiverPic,
-        receiverId: widget.call.receiverId,
-        receiverAboutMe: widget.call.receiverAboutMe,
-        receiverCreatedAt: widget.call.receiverCreatedAt,
-        receiverEmail: widget.call.receiverEmail,
-        timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
-        callStatus: callStatus);
+      callerName: widget.call.callerName,
+      callerPic: widget.call.callerPic,
+      callerId: widget.call.callerId,
+      callerAboutMe: widget.call.callerAboutMe,
+      callerEmail: widget.call.callerEmail,
+      // callerCreatedAt: widget.call.callerCreatedAt,
+      receiverName: widget.call.receiverName,
+      receiverPic: widget.call.receiverPic,
+      receiverId: widget.call.receiverId,
+      receiverAboutMe: widget.call.receiverAboutMe,
+      receiverCreatedAt: widget.call.receiverCreatedAt,
+      receiverEmail: widget.call.receiverEmail,
+      timestamp: DateTime.now().millisecondsSinceEpoch.toString(),
+      callStatus: callStatus,
+      callType: widget.call.isCall,
+    );
 
     LogRepository.addLogs(log);
   }
