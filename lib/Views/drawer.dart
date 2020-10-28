@@ -45,92 +45,94 @@ class _SideDrawerState extends State<SideDrawer> {
     switch (await showDialog<int>(
         context: context,
         builder: (BuildContext context) {
-          return SimpleDialog(
-            contentPadding:
-                EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
-            children: <Widget>[
-              Container(
-                color: Colors.cyan,
-                margin: EdgeInsets.all(0.0),
-                padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.logout,
-                        size: 30.0,
-                        color: Colors.white,
-                      ),
-                      margin: EdgeInsets.only(bottom: 10.0),
-                    ),
-                    Text(
-                      'Log out',
-                      style: TextStyle(
+          return PickupLayout(
+                      scaffold: SimpleDialog(
+              contentPadding:
+                  EdgeInsets.only(left: 0.0, right: 0.0, top: 0.0, bottom: 0.0),
+              children: <Widget>[
+                Container(
+                  color: Colors.cyan,
+                  margin: EdgeInsets.all(0.0),
+                  padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        child: Icon(
+                          Icons.logout,
+                          size: 30.0,
                           color: Colors.white,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'Are you sure you want to log out?',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14.0,
-                        letterSpacing: 1.0,
+                        ),
+                        margin: EdgeInsets.only(bottom: 10.0),
                       ),
-                    ),
-                  ],
+                      Text(
+                        'Log out',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Are you sure you want to log out?',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 14.0,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              SimpleDialogOption(
-                onPressed: () {
-                  Constants.prefs.setBool('userIsLoggedIn', false);
-                  authMethods.signOut();
+                SimpleDialogOption(
+                  onPressed: () {
+                    Constants.prefs.setBool('userIsLoggedIn', false);
+                    authMethods.signOut();
 
-                  Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute<MaterialPageRoute>(
-                          builder: (BuildContext context) =>
-                              Authenticate())); // Navigator.pop(context, 1);
-                },
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.check_circle,
-                        color: Colors.cyan,
+                    Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute<MaterialPageRoute>(
+                            builder: (BuildContext context) =>
+                                Authenticate())); // Navigator.pop(context, 1);
+                  },
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        child: Icon(
+                          Icons.check_circle,
+                          color: Colors.cyan,
+                        ),
+                        margin: EdgeInsets.only(right: 10.0),
                       ),
-                      margin: EdgeInsets.only(right: 10.0),
-                    ),
-                    Text(
-                      'LOG OUT',
-                      style: TextStyle(
-                          color: Colors.cyan, fontWeight: FontWeight.bold),
-                    )
-                  ],
+                      Text(
+                        'LOG OUT',
+                        style: TextStyle(
+                            color: Colors.cyan, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.pop(context, 0);
-                },
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.cancel,
-                        color: Colors.cyan,
+                SimpleDialogOption(
+                  onPressed: () {
+                    Navigator.pop(context, 0);
+                  },
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        child: Icon(
+                          Icons.cancel,
+                          color: Colors.cyan,
+                        ),
+                        margin: EdgeInsets.only(right: 10.0),
                       ),
-                      margin: EdgeInsets.only(right: 10.0),
-                    ),
-                    Text(
-                      'CANCEL',
-                      style: TextStyle(
-                          color: Colors.cyan, fontWeight: FontWeight.bold),
-                    )
-                  ],
+                      Text(
+                        'CANCEL',
+                        style: TextStyle(
+                            color: Colors.cyan, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           );
         })) {
       case 0:

@@ -10,7 +10,7 @@ class Log {
   String timestamp;
   String callerAboutMe;
   String callerEmail;
-  String callerCreatedAt;
+  // String callerCreatedAt;
   String receiverAboutMe;
   String receiverEmail;
   String receiverCreatedAt;
@@ -25,7 +25,7 @@ class Log {
     this.timestamp,
     this.callerAboutMe,
     this.callerEmail,
-    this.callerCreatedAt,
+    // this.callerCreatedAt,
     this.receiverAboutMe,
     this.receiverEmail,
     this.receiverCreatedAt,
@@ -45,7 +45,7 @@ class Log {
     logMap["timestamp"] = log.timestamp;
     logMap['caller_aboutMe'] = log.callerAboutMe;
     logMap['caller_email'] = log.callerEmail;
-    logMap['caller_createdAt'] = log.callerCreatedAt;
+    // logMap['caller_createdAt'] = log.callerCreatedAt;
     logMap['receiver_aboutMe'] = log.receiverAboutMe;
     logMap['receiver_email'] = log.receiverEmail;
     logMap['receiver_createdAt'] = log.receiverCreatedAt;
@@ -64,7 +64,7 @@ class Log {
     this.timestamp = logMap["timestamp"].toString();
     this.callerAboutMe = logMap['caller_aboutMe'].toString();
     this.callerEmail = logMap['caller_email'].toString();
-    this.callerCreatedAt = logMap['caller_createdAt'].toString();
+    // this.callerCreatedAt = logMap['caller_createdAt'].toString();
     this.receiverAboutMe = logMap['receiver_aboutMe'].toString();
     this.receiverEmail = logMap['receiver_email'].toString();
     this.receiverCreatedAt = logMap['receiver_createdAt'].toString();

@@ -4,7 +4,7 @@ class Call {
   String callerPic;
   String callerAboutMe;
   String callerEmail;
-  String callerCreatedAt;
+  // String callerCreatedAt;
   String receiverId;
   String receiverName;
   String receiverPic;
@@ -26,7 +26,7 @@ class Call {
       this.hasDialled,
       this.callerAboutMe,
       this.callerEmail,
-      this.callerCreatedAt,
+      // this.callerCreatedAt,
       this.receiverAboutMe,
       this.receiverEmail,
       this.receiverCreatedAt,
@@ -47,7 +47,7 @@ class Call {
     callMap["is_Call"] = call.isCall;
     callMap['caller_aboutMe'] = call.callerAboutMe;
     callMap['caller_email'] = call.callerEmail;
-    callMap['caller_createdAt'] = call.callerCreatedAt;
+    // callMap['caller_createdAt'] = call.callerCreatedAt;
     callMap['receiver_aboutMe'] = call.receiverAboutMe;
     callMap['receiver_email'] = call.receiverEmail;
     callMap['receiver_createdAt'] = call.receiverCreatedAt;
@@ -64,7 +64,7 @@ class Call {
     this.channelId = callMap["channel_id"].toString();
     this.callerAboutMe = callMap['caller_aboutMe'].toString();
     this.callerEmail = callMap['caller_email'].toString();
-    this.callerCreatedAt = callMap['caller_createdAt'].toString();
+    // this.callerCreatedAt = callMap['caller_createdAt'].toString();
     this.receiverAboutMe = callMap['receiver_aboutMe'].toString();
     this.receiverEmail = callMap['receiver_email'].toString();
     this.receiverCreatedAt = callMap['receiver_createdAt'].toString();

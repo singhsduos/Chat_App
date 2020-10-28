@@ -30,7 +30,7 @@ class _PickupScreenState extends State<PickupScreen> {
         callerId: widget.call.callerId,
         callerAboutMe: widget.call.callerAboutMe,
         callerEmail: widget.call.callerEmail,
-        callerCreatedAt: widget.call.callerCreatedAt,
+        // callerCreatedAt: widget.call.callerCreatedAt,
         receiverName: widget.call.receiverName,
         receiverPic: widget.call.receiverPic,
         receiverId: widget.call.receiverId,

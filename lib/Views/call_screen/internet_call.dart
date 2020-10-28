@@ -93,24 +93,29 @@ class _VoiceCallScreenState extends State<VoiceCallScreen> {
   /// Add agora event handlers
   void _addAgoraEventHandlers() {
     _engine.setEventHandler(RtcEngineEventHandler(error: (code) {
+      // if (!mounted) return;
       setState(() {
         final info = 'onError: $code';
         _infoStrings.add(info);
         _engine.disableVideo();
       });
     }, joinChannelSuccess: (channel, uid, elapsed) {
+      // if (!mounted) return;
       setState(() {
         final info = 'onJoinChannel: $channel, uid: $uid';
         _infoStrings.add(info);
         _engine.disableVideo();
       });
     }, leaveChannel: (stats) {
+      if (!mounted) return;
+
       setState(() {
         _infoStrings.add('onLeaveChannel');
         _users.clear();
         _engine.disableVideo();
       });
     }, userJoined: (uid, elapsed) {
+      // if (!mounted) return;
       setState(() {
         final info = 'userJoined: $uid';
         _infoStrings.add(info);
@@ -119,6 +124,7 @@ class _VoiceCallScreenState extends State<VoiceCallScreen> {
       });
     }, userOffline: (uid, elapsed) {
       callMethods.endCall(call: widget.call);
+      if (!mounted) return;
       setState(() {
         final info = 'userOffline: $uid';
         _infoStrings.add(info);
@@ -126,6 +132,7 @@ class _VoiceCallScreenState extends State<VoiceCallScreen> {
         _engine.disableVideo();
       });
     }, firstRemoteVideoFrame: (uid, width, height, elapsed) {
+      // if (!mounted) return;
       setState(() {
         final info = 'firstRemoteVideo: $uid ${width}x $height';
         _infoStrings.add(info);

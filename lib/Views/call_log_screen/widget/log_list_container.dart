@@ -173,9 +173,7 @@ class _LogListContainerState extends State<LogListContainer> {
                                     email: hasDialled
                                         ? _log.receiverEmail
                                         : _log.callerEmail,
-                                    createdAt: hasDialled
-                                        ? _log.receiverCreatedAt
-                                        : _log.callerCreatedAt,
+                                    createdAt:_log.receiverCreatedAt,
                                     aboutMe: hasDialled
                                         ? _log.receiverAboutMe
                                         : _log.callerAboutMe,
@@ -208,9 +206,7 @@ class _LogListContainerState extends State<LogListContainer> {
                                     email: hasDialled
                                         ? _log.receiverEmail
                                         : _log.callerEmail,
-                                    createdAt: hasDialled
-                                        ? _log.receiverCreatedAt
-                                        : _log.callerCreatedAt,
+                                    createdAt:_log.receiverCreatedAt,
                                     aboutMe: hasDialled
                                         ? _log.receiverAboutMe
                                         : _log.callerAboutMe,
@@ -242,9 +238,7 @@ class _LogListContainerState extends State<LogListContainer> {
                                         email: hasDialled
                                             ? _log.receiverEmail
                                             : _log.callerEmail,
-                                        createdAt: hasDialled
-                                            ? _log.receiverCreatedAt
-                                            : _log.callerCreatedAt,
+                                        createdAt:_log.receiverCreatedAt,
                                         aboutMe: hasDialled
                                             ? _log.receiverAboutMe
                                             : _log.callerAboutMe,
@@ -276,9 +270,7 @@ class _LogListContainerState extends State<LogListContainer> {
                                   email: hasDialled
                                       ? _log.receiverEmail
                                       : _log.callerEmail,
-                                  createdAt: hasDialled
-                                      ? _log.receiverCreatedAt
-                                      : _log.callerCreatedAt,
+                                  createdAt:_log.receiverCreatedAt,
                                   aboutMe: hasDialled
                                       ? _log.receiverAboutMe
                                       : _log.callerAboutMe,
@@ -384,7 +376,7 @@ class _LogListContainerState extends State<LogListContainer> {
                           ),
                           onPressed: () async {
                             Navigator.maybePop(context);
-                            await LogRepository.deleteLogs(i);
+                            await LogRepository.deleteLogs(i+1);
                             if (mounted) {
                               setState(() {});
                             }

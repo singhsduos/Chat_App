@@ -87,34 +87,41 @@ class _CallScreenState extends State<CallScreen> {
   /// Add agora event handlers
   void _addAgoraEventHandlers() {
     _engine.setEventHandler(RtcEngineEventHandler(error: (code) {
+      // if (!mounted) return;
       setState(() {
         final info = 'onError: $code';
         _infoStrings.add(info);
       });
     }, joinChannelSuccess: (channel, uid, elapsed) {
+      // if (!mounted) return;
       setState(() {
         final info = 'onJoinChannel: $channel, uid: $uid';
         _infoStrings.add(info);
       });
     }, leaveChannel: (stats) {
+      if (!mounted) return;
       setState(() {
         _infoStrings.add('onLeaveChannel');
         _users.clear();
       });
     }, userJoined: (uid, elapsed) {
+      // if (!mounted) return;
       setState(() {
         final info = 'userJoined: $uid';
         _infoStrings.add(info);
         _users.add(uid);
       });
     }, userOffline: (uid, elapsed) {
+
       callMethods.endCall(call: widget.call);
+      if (!mounted) return;
       setState(() {
         final info = 'userOffline: $uid';
         _infoStrings.add(info);
         _users.remove(uid);
       });
     }, firstRemoteVideoFrame: (uid, width, height, elapsed) {
+      // if (!mounted) return;
       setState(() {
         final info = 'firstRemoteVideo: $uid ${width}x $height';
         _infoStrings.add(info);
@@ -182,7 +189,7 @@ class _CallScreenState extends State<CallScreen> {
         ));
       default:
     }
-    return Container();
+    return Container(); 
   }
 
   /// Info panel to show logs
@@ -350,7 +357,7 @@ class _CallScreenState extends State<CallScreen> {
         child: Stack(
           children: <Widget>[
             _viewRows(),
-            _panel(),
+            // _panel(),
             _topToolbar(),
             _bottomToolbar(),
           ],

@@ -117,109 +117,111 @@ id = preferences.getString('id');
     switch (await showDialog<int>(
         context: context,
         builder: (BuildContext context) {
-          return SimpleDialog(
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.all(Radius.circular(20.0))),
-            contentPadding: EdgeInsets.all(16),
-            children: <Widget>[
-              Container(
-                color: Colors.cyan,
-                margin: EdgeInsets.all(0.0),
-                padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
-                child: Column(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.call,
-                        size: 30.0,
-                        color: Colors.white,
-                      ),
-                      margin: EdgeInsets.only(bottom: 10.0),
-                    ),
-                    Text(
-                      'Make calls to your friends',
-                      style: TextStyle(
+          return PickupLayout(
+                      scaffold: SimpleDialog(
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(20.0))),
+              contentPadding: EdgeInsets.all(16),
+              children: <Widget>[
+                Container(
+                  color: Colors.cyan,
+                  margin: EdgeInsets.all(0.0),
+                  padding: EdgeInsets.only(bottom: 10.0, top: 10.0),
+                  child: Column(
+                    children: <Widget>[
+                      Container(
+                        child: Icon(
+                          Icons.call,
+                          size: 30.0,
                           color: Colors.white,
-                          fontSize: 18.0,
-                          fontWeight: FontWeight.bold),
-                    ),
-                  ],
-                ),
-              ),
-              SimpleDialogOption(
-                onPressed: () async =>
-                    await Permissions.microphonePermissionsGranted()
-                        ? CallUtils.dialVoice(
-                            from: sender,
-                            to: widget.recevier,
-                            context: context,
-                            callis: "audio")
-                        : () {},
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.call,
-                        color: Colors.cyan,
+                        ),
+                        margin: EdgeInsets.only(bottom: 10.0),
                       ),
-                      margin: EdgeInsets.only(right: 10.0),
-                    ),
-                    Text(
-                      'Internet Call',
-                      style: TextStyle(
-                          color: Colors.cyan, fontWeight: FontWeight.bold),
-                    )
-                  ],
-                ),
-              ),
-              SimpleDialogOption(
-                onPressed: () async =>
-                    await Permissions.cameraAndMicrophonePermissionsGranted()
-                        ? CallUtils.dial(
-                            from: sender,
-                            to: widget.recevier,
-                            context: context,
-                            callis: "video")
-                        : () {},
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.video_call,
-                        color: Colors.cyan,
+                      Text(
+                        'Make calls to your friends',
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18.0,
+                            fontWeight: FontWeight.bold),
                       ),
-                      margin: EdgeInsets.only(right: 10.0),
-                    ),
-                    Text(
-                      'Video Call',
-                      style: TextStyle(
-                          color: Colors.cyan, fontWeight: FontWeight.bold),
-                    )
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-              SimpleDialogOption(
-                onPressed: () {
-                  Navigator.pop(context, 0);
-                },
-                child: Row(
-                  children: <Widget>[
-                    Container(
-                      child: Icon(
-                        Icons.cancel,
-                        color: Colors.cyan,
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      await Permissions.microphonePermissionsGranted()
+                          ? CallUtils.dialVoice(
+                              from: sender,
+                              to: widget.recevier,
+                              context: context,
+                              callis: "audio")
+                          : () {},
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        child: Icon(
+                          Icons.call,
+                          color: Colors.cyan,
+                        ),
+                        margin: EdgeInsets.only(right: 10.0),
                       ),
-                      margin: EdgeInsets.only(right: 10.0),
-                    ),
-                    Text(
-                      'Cancel',
-                      style: TextStyle(
-                          color: Colors.cyan, fontWeight: FontWeight.bold),
-                    )
-                  ],
+                      Text(
+                        'Internet Call',
+                        style: TextStyle(
+                            color: Colors.cyan, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
                 ),
-              ),
-            ],
+                SimpleDialogOption(
+                  onPressed: () async =>
+                      await Permissions.cameraAndMicrophonePermissionsGranted()
+                          ? CallUtils.dial(
+                              from: sender,
+                              to: widget.recevier,
+                              context: context,
+                              callis: "video")
+                          : () {},
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        child: Icon(
+                          Icons.video_call,
+                          color: Colors.cyan,
+                        ),
+                        margin: EdgeInsets.only(right: 10.0),
+                      ),
+                      Text(
+                        'Video Call',
+                        style: TextStyle(
+                            color: Colors.cyan, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                ),
+                SimpleDialogOption(
+                  onPressed: () {
+                    Navigator.pop(context, 0);
+                  },
+                  child: Row(
+                    children: <Widget>[
+                      Container(
+                        child: Icon(
+                          Icons.cancel,
+                          color: Colors.cyan,
+                        ),
+                        margin: EdgeInsets.only(right: 10.0),
+                      ),
+                      Text(
+                        'Cancel',
+                        style: TextStyle(
+                            color: Colors.cyan, fontWeight: FontWeight.bold),
+                      )
+                    ],
+                  ),
+                ),
+              ],
+            ),
           );
         })) {
       case 0:

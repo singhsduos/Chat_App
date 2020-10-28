@@ -160,8 +160,10 @@ class CustomDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Dialog(
-      child: dialogContent(context),
+    return PickupLayout(
+          scaffold: Dialog(
+        child: dialogContent(context),
+      ),
     );
   }
 }

@@ -13,12 +13,20 @@ class SqliteMethods implements LogInterface {
 
   // columns
   String id = 'log_id';
-  String callerName = 'caller_name';
-  String callerPic = 'caller_pic';
-  String receiverName = 'receiver_name';
-  String receiverPic = 'receiver_pic';
-  String callStatus = 'call_status';
-  String timestamp = 'timestamp';
+  String callerName = "caller_name";
+  String callerPic = "caller_pic";
+  String receiverName = "receiver_name";
+  String receiverPic = "receiver_pic";
+  String callStatus = "call_status";
+  String timestamp = "timestamp";
+  String callerAboutMe = 'caller_aboutMe';
+  String callerEmail = 'caller_email';
+  // String callerCreatedAt = 'caller_createdAt';
+  String receiverAboutMe = 'receiver_aboutMe';
+  String receiverEmail = 'receiver_email';
+  String receiverCreatedAt = 'receiver_createdAt';
+  String callerId = "caller_id";
+  String receiverId = "receiver_id";
 
   Future<Database> get db async {
     if (_db != null) {
@@ -42,8 +50,12 @@ class SqliteMethods implements LogInterface {
 
   dynamic _onCreate(Database db, int version) async {
     String createTableQuery =
-        "CREATE TABLE $tableName ($id INTEGER PRIMARY KEY, $callerName TEXT, $callerPic TEXT, $receiverName TEXT, $receiverPic TEXT, $callStatus TEXT, $timestamp TEXT)";
-
+        "CREATE TABLE $tableName ($id INTEGER PRIMARY KEY, $callerName TEXT, $callerPic TEXT, $receiverName TEXT, $receiverPic TEXT, $callStatus TEXT, $timestamp TEXT,$callerEmail TEXT,$callerAboutMe TEXT,$receiverAboutMe TEXT,$receiverEmail TEXT,$receiverCreatedAt TEXT,$callerId TEXT,$receiverId TEXT)";
+    // createTableQuery.sort((int a, int b) {
+    //   int adate = a['timestamp']; //before -> var adate = a.expiry;
+    //   int bdate = b['timestamp']; //before -> var bdate = b.expiry;
+    //   return a.compareTo(b); //to get the order other way just switch `adate & bdate`
+    // });
     await db.execute(createTableQuery);
 
     print("table created");
@@ -56,7 +68,7 @@ class SqliteMethods implements LogInterface {
   }
 
   @override
-  Future<void> deleteLogs(int logId) async {
+  Future<int> deleteLogs(int logId) async {
     final dbClient = await db;
     return await dbClient
         .delete(tableName, where: '$id = ?', whereArgs: <int>[logId]);
@@ -89,6 +101,13 @@ class SqliteMethods implements LogInterface {
           receiverPic,
           callStatus,
           timestamp,
+          callerAboutMe,
+          callerEmail,
+          receiverAboutMe,
+          receiverEmail,
+          receiverCreatedAt,
+          callerId,
+          receiverId,
         ],
       );
 
