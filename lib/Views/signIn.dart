@@ -1,5 +1,6 @@
 import 'dart:ui';
 import 'package:ChatApp/Views/forgetPassword.dart';
+import 'package:ChatApp/Views/signUp.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
 import 'package:ChatApp/helper/constants.dart';
@@ -8,6 +9,7 @@ import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:ChatApp/Widget/widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -18,13 +20,17 @@ import 'chatRoomsScreen.dart';
 
 class SignIn extends StatefulWidget {
   final Function toggle;
-  SignIn(this.toggle);
+  final String token;
+  SignIn({Key key, this.toggle, this.token}) : super(key: key);
 
   @override
-  _SignInState createState() => _SignInState();
+  _SignInState createState() => _SignInState(this.token, this.toggle);
 }
 
 class _SignInState extends State<SignIn> {
+  String token;
+  final Function toggle;
+  _SignInState(this.token, this.toggle);
   final formKey = GlobalKey<FormState>();
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
@@ -72,14 +78,13 @@ class _SignInState extends State<SignIn> {
             await prefs.setString('email', '${documents[0].data()['email']}');
             await prefs.setString(
                 'aboutMe', '${documents[0].data()['aboutMe']}');
+            await prefs.setString('token', '${documents[0].data()['token']}');
 
             Fluttertoast.showToast(msg: "SignIn successful");
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute<MaterialPageRoute>(
-                    builder: (BuildContext context) => ChatRoom(
-                         
-                        )));
+                    builder: (BuildContext context) => ChatRoom()));
           } else {
             setState(() {
               Fluttertoast.showToast(
@@ -152,6 +157,7 @@ class _SignInState extends State<SignIn> {
           'chattingWith': null,
           'email': user.email,
           'aboutMe': 'Hey there! I am using ChaTooApp',
+          'token': token,
           // 'state' : null,
         });
 
@@ -161,6 +167,9 @@ class _SignInState extends State<SignIn> {
         await prefs.setString('username', currentUser.displayName);
         await prefs.setString('photoUrl', currentUser.photoURL);
         await prefs.setString('email', currentUser.email);
+        await prefs.setString('token', token);
+        await prefs.setString('aboutMe', 'Hey there! I am using ChaTooApp');
+
       } else {
         // Write data to local
         await prefs.setString('id', '${documents[0].data()['id']}');
@@ -168,6 +177,7 @@ class _SignInState extends State<SignIn> {
         await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
         await prefs.setString('email', '${documents[0].data()['email']}');
         await prefs.setString('aboutMe', '${documents[0].data()['aboutMe']}');
+        await prefs.setString('token', '${documents[0].data()['token']}');
       }
       Fluttertoast.showToast(msg: "SignIn successful");
       this.setState(() {
@@ -264,7 +274,6 @@ class _SignInState extends State<SignIn> {
                               prefixIcon: Container(
                                 child: Icon(
                                   Icons.vpn_key_outlined,
-                                 
                                 ),
                               ),
                               suffixIcon: Container(
@@ -416,7 +425,11 @@ class _SignInState extends State<SignIn> {
                                       color: Colors.blue, fontSize: 16)),
                               InkWell(
                                 onTap: () {
-                                  widget.toggle();
+                                  Navigator.push<MaterialPageRoute>(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (BuildContext context) =>
+                                              SignUp(token: token)));
                                 },
                                 child: Container(
                                   padding: EdgeInsets.symmetric(vertical: 8),

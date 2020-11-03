@@ -18,9 +18,6 @@ import 'package:provider/provider.dart';
 import 'package:ChatApp/modal/user.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:import_sorter/args.dart';
-import 'package:import_sorter/files.dart';
-import 'package:import_sorter/sort.dart';
 
 class ContactListScreen extends StatefulWidget {
   @override
@@ -202,7 +199,7 @@ class _ContactListScreenState extends State<ContactListScreen> {
   //                         : () {},
   //                     child: Container(
   //                         child: Icon(
-  //                       Icons.video_call,
+  //                       Icons.videocam,
   //                       color: Colors.cyan,
   //                     )),
   //                   )
@@ -470,7 +467,7 @@ class _ViewLayoutState extends State<ViewLayout> {
             ),
             icon2: IconButton(
               icon: Icon(
-                Icons.video_call,
+                Icons.videocam,
                 color: Colors.cyan,
                 size: 27,
               ),
@@ -620,7 +617,7 @@ class _ViewLayoutState extends State<ViewLayout> {
                     : () {},
             child: Container(
                 child: Icon(
-              Icons.video_call,
+              Icons.videocam,
               color: Colors.cyan,
             )),
           )

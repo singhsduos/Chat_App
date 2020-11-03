@@ -175,7 +175,7 @@ class _ViewLayoutState extends State<ViewLayout> {
               ),
               icon2: IconButton(
                 icon: Icon(
-                  Icons.video_call,
+                  Icons.videocam,
                   color: Colors.cyan,
                   size: 27,
                 ),
@@ -310,7 +310,7 @@ class _ViewLayoutState extends State<ViewLayout> {
                     receiverId: widget.contact.userId,
                   ),
                 ),
-              )
+              ),
             ],
           ),
         ),
@@ -324,6 +324,7 @@ class _ViewLayoutState extends State<ViewLayout> {
             ),
           ),
           child: Container(
+            
             child: LastMessageContainer(
               stream: _chatMethods.fetchLastMessageBetween(
                 id: userProvider.getUser.userId,

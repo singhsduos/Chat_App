@@ -33,7 +33,7 @@ class Permissions {
     PermissionStatus permission =
         await PermissionHandler().checkPermissionStatus(PermissionGroup.camera);
     if (permission != PermissionStatus.granted &&
-        permission != PermissionStatus.disabled) {
+        permission != PermissionStatus.denied) {
       Map<PermissionGroup, PermissionStatus> permissionStatus =
           await PermissionHandler()
               .requestPermissions([PermissionGroup.camera]);
@@ -48,7 +48,7 @@ class Permissions {
     PermissionStatus permission = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.microphone);
     if (permission != PermissionStatus.granted &&
-        permission != PermissionStatus.disabled) {
+        permission != PermissionStatus.denied) {
       Map<PermissionGroup, PermissionStatus> permissionStatus =
           await PermissionHandler()
               .requestPermissions([PermissionGroup.microphone]);
@@ -69,8 +69,8 @@ class Permissions {
           code: "PERMISSION_DENIED",
           message: "Access to camera and microphone denied",
           details: null);
-    } else if (cameraPermissionStatus == PermissionStatus.disabled &&
-        microphonePermissionStatus == PermissionStatus.disabled) {
+    } else if (cameraPermissionStatus == PermissionStatus.denied &&
+        microphonePermissionStatus == PermissionStatus.denied) {
       throw new PlatformException(
           code: "PERMISSION_DISABLED",
           message: "Location data is not available on device",
@@ -85,7 +85,7 @@ class Permissions {
           code: "PERMISSION_DENIED",
           message: "Access to microphone denied",
           details: null);
-    } else if (microphonePermissionStatus == PermissionStatus.disabled) {
+    } else if (microphonePermissionStatus == PermissionStatus.denied) {
       throw new PlatformException(
           code: "PERMISSION_DISABLED",
           message: "Location data is not available on device",

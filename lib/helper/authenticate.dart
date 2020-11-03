@@ -3,16 +3,18 @@ import 'package:ChatApp/Views/signUp.dart';
 import 'package:flutter/material.dart';
 
 class Authenticate extends StatefulWidget {
-  Authenticate({Key key}) : super(key: key);
+  final String token;
+  Authenticate({Key key,this.token}) : super(key: key);
 
   @override
-  _AuthenticateState createState() => _AuthenticateState();
+  _AuthenticateState createState() => _AuthenticateState(this.token);
 }
 
 class _AuthenticateState extends State<Authenticate> {
+ String token;
+  _AuthenticateState(this.token);
   bool showSignIn = true;
   bool isSwitched = false;
-
 
   void toggleView() {
     setState(() {
@@ -23,11 +25,9 @@ class _AuthenticateState extends State<Authenticate> {
   @override
   Widget build(BuildContext context) {
     if (showSignIn) {
-      return SignIn(toggleView);
+      return SignIn(token:token);
     } else {
-      return SignUp(toggleView);
+      return SignUp(token:token);
     }
-    
   }
-    
 }

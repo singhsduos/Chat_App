@@ -237,7 +237,7 @@ class _LogListContainerState extends State<LogListContainer> {
                           ),
                           icon2: IconButton(
                             icon: Icon(
-                              Icons.video_call,
+                              Icons.videocam,
                               color: Colors.cyan,
                               size: 27,
                             ),
@@ -522,7 +522,7 @@ class _LogListContainerState extends State<LogListContainer> {
                                           callis: "video")
                                       : () {},
                                   child: Icon(
-                                    Icons.video_call,
+                                    Icons.videocam,
                                     color: Colors.cyan,
                                     size: 27,
                                   ),

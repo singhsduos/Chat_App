@@ -95,11 +95,14 @@ class _SettingScreenState extends State<SettingScreen> {
     setState(() {});
   }
 
-  final picker = ImagePicker();
-//image from gallery
+  File newImagefile;
   Future getImage() async {
-    final newImagefile = await picker.getImage(source: ImageSource.gallery);
-    final ScaffoldState scaffold = _scaffoldKey.currentState;
+    ImagePicker imagePicker = ImagePicker();
+    PickedFile pickedFile;
+
+    pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
+    newImagefile = File(pickedFile.path);
+
     try {
       if (newImagefile != null) {
         cropImage(File(newImagefile.path));
@@ -126,14 +129,20 @@ class _SettingScreenState extends State<SettingScreen> {
     }
   }
 
+  
+
 //image from camera
   Future cameraImage() async {
-    final newImagefile = await picker.getImage(source: ImageSource.camera);
+    ImagePicker imagePicker = ImagePicker();
+    PickedFile pickedFile;
+    pickedFile = await imagePicker.getImage(source: ImageSource.camera);
+    newImagefile = File(pickedFile.path);
 
     if (newImagefile != null) {
       cropImage(File(newImagefile.path));
     }
   }
+
 
   Future cropImage(File imageFile) async {
     File croppedFile = await ImageCropper.cropImage(

@@ -21,7 +21,7 @@ class LastMessageContainer extends StatelessWidget {
           if (docList.isNotEmpty) {
             Message message = Message.fromMap(docList.last.data());
             return SizedBox(
-              // width: MediaQuery.of(context).size.width * 0.6,
+              width: MediaQuery.of(context).size.width * 0.65,
               child: Text(
                 message.message,
                 maxLines: 1,

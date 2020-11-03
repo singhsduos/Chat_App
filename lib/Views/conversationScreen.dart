@@ -1,8 +1,10 @@
 import 'dart:async';
+// import 'dart:convert';
 import 'dart:io';
 import 'package:ChatApp/Views/call_screen/pickup/pickup_layout.dart';
 import 'package:ChatApp/Widget/fullScreenGalleryImage.dart';
 import 'package:ChatApp/Widget/fullScreenUserImage.dart';
+// import 'package:ChatApp/configs/firebase_messaging.dart';
 import 'package:ChatApp/enum/view_state.dart';
 import 'package:ChatApp/modal/message.dart';
 import 'package:ChatApp/modal/user.dart';
@@ -25,9 +27,8 @@ import 'package:ChatApp/Views/chatRoomsScreen.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-
 // import 'package:firebase_messaging/firebase_messaging.dart';
-// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+// import 'package:http/http.dart' as http;
 
 class ConversationScreen extends StatefulWidget {
   final Users recevier;
@@ -74,7 +75,7 @@ class _ConversationScreenState extends State<ConversationScreen> {
     username = preferences.getString('username');
     email = preferences.getString('email');
     aboutMe = preferences.getString('aboutMe');
-id = preferences.getString('id');
+    id = preferences.getString('id');
     createdAt = preferences.getString('createdAt');
 
     setState(() {});
@@ -118,7 +119,7 @@ id = preferences.getString('id');
         context: context,
         builder: (BuildContext context) {
           return PickupLayout(
-                      scaffold: SimpleDialog(
+            scaffold: SimpleDialog(
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.all(Radius.circular(20.0))),
               contentPadding: EdgeInsets.all(16),
@@ -186,7 +187,7 @@ id = preferences.getString('id');
                     children: <Widget>[
                       Container(
                         child: Icon(
-                          Icons.video_call,
+                          Icons.videocam,
                           color: Colors.cyan,
                         ),
                         margin: EdgeInsets.only(right: 10.0),
@@ -450,16 +451,6 @@ class _ChatScreen extends State<ChatScreen> {
     });
   }
 
-  Future<bool> onBackPress() {
-    FirebaseFirestore.instance
-        .collection('users')
-        .doc(id)
-        .update(<String, dynamic>{'chattingWith': widget.recevier.userId});
-    Navigator.pop(context);
-
-    return Future.value(false);
-  }
-
   @override
   Widget build(BuildContext context) {
     _imageUploadProvider = Provider.of<ImageUploadProvider>(context);
@@ -712,6 +703,35 @@ class _ChatScreen extends State<ChatScreen> {
           );
   }
 
+  //   Future<http.Response> sendNotification(
+  //     String message, String sender, String receiver) {
+  //   print("Firebase Token: " + receiver);
+  //   return http.post(
+  //     'https://fcm.googleapis.com/fcm/send',
+  //     headers: <String, String>{
+  //       'Authorization': 'key=$SERVER_KEY',
+  //       'Content-Type': 'application/json; charset=UTF-8',
+  //     },
+  //     body: jsonEncode(<String, dynamic>{
+  //       // "message": {
+  //       "to": "$receiver",
+  //       "collapse_key": "type_a",
+  //       "priority": "high",
+  //       "notification": {
+  //         "title": "$sender",
+  //         "body": "$message",
+  //       },
+  //       "data": {
+  //         "title": "$sender",
+  //         "body": "$message",
+  //         "sound": "default",
+  //         "click_action": "FLUTTER_NOTIFICATION_CLICK",
+  //       }
+  //       // }
+  //     }),
+  //   );
+  // }
+
   // void registerNotification() {
   //   firebaseMessaging.requestNotificationPermissions();
 
@@ -733,7 +753,7 @@ class _ChatScreen extends State<ChatScreen> {
   //     print('token: $token');
   //     FirebaseFirestore.instance
   //         .collection('users')
-  //         .doc(uid)
+  //         .doc(_currentUserId)
   //         .update({'pushToken': token});
   //   }).catchError((dynamic err) {
   //     Fluttertoast.showToast(msg: err.message.toString());
@@ -920,6 +940,7 @@ class _ChatScreen extends State<ChatScreen> {
       messageController.text = '';
       databaseMethods.addConversationMessages(_message, sender, recevier);
       updateContactTime(_message);
+      chattingWith();
     } else {
       Fluttertoast.showToast(
           msg: 'Please type a message', gravity: ToastGravity.CENTER);
@@ -946,14 +967,24 @@ class _ChatScreen extends State<ChatScreen> {
     });
   }
 
-  final picker = ImagePicker();
+
   //gallery image
+
+  File newImagefile;
   Future getImage() async {
-    final imageFileUpload = await picker.getImage(source: ImageSource.gallery);
+    ImagePicker imagePicker = ImagePicker();
+    PickedFile pickedFile;
+
+    pickedFile = await imagePicker.getImage(source: ImageSource.gallery);
+    newImagefile = File(pickedFile.path);
 
     try {
-      if (imageFileUpload != null) {
-        cropImage(File(imageFileUpload.path));
+      if (newImagefile != null) {
+        cropImage(File(newImagefile.path));
+        // setState(() {
+        //   this.imageFileAvatar = File(newImagefile.path);
+        //   isLoading = true;
+        // });
       } else {
         throw ('File is not available');
       }
@@ -973,12 +1004,17 @@ class _ChatScreen extends State<ChatScreen> {
     }
   }
 
-  // camera Image
-  Future cameraImage() async {
-    final imageFileUpload = await picker.getImage(source: ImageSource.camera);
+  
 
-    if (imageFileUpload != null) {
-      cropImage(File(imageFileUpload.path));
+//image from camera
+  Future cameraImage() async {
+    ImagePicker imagePicker = ImagePicker();
+    PickedFile pickedFile;
+    pickedFile = await imagePicker.getImage(source: ImageSource.camera);
+    newImagefile = File(pickedFile.path);
+
+    if (newImagefile != null) {
+      cropImage(File(newImagefile.path));
     }
   }
 
@@ -1080,6 +1116,7 @@ class _ChatScreen extends State<ChatScreen> {
     databaseMethods.addToContacts(
         senderId: _message.id, receiverId: _message.recevierId);
     updateContactImageTime(_message);
+    chattingWith();
     return await FirebaseFirestore.instance
         .collection('messages')
         .doc(_message.recevierId)
@@ -1105,6 +1142,18 @@ class _ChatScreen extends State<ChatScreen> {
         .update(<String, String>{
       'added_on': message.timestamp,
     });
+  }
+
+  void chattingWith() {
+    FirebaseFirestore.instance
+        .collection('users')
+        .doc(sender.userId)
+        .update(<String, dynamic>{'chattingWith': widget.recevier.userId});
+
+    // FirebaseFirestore.instance
+    //     .collection('users')
+    //     .doc(widget.recevier.userId)
+    //     .update(<String, dynamic>{'chattingWith': sender.userId});
   }
 }
 

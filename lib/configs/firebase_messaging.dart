@@ -1,0 +1,3 @@
+const String SERVER_KEY =
+    'AAAAtsmpwas:APA91bGCJFkbVLw5WMnRBnojQx6FIGQ2w8BHqkODounQvLcQ601cdgVBflGzIo3wSVrpMneSf7tPJGZ2vLFsyRClRuw_Mf6II_uY13ur8un05UhHrrlXYCny6pAYEK8pvWyaUJlfyOaw';
+const String SENDER_ID = '785067393451';

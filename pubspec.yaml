@@ -3,7 +3,7 @@ description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: "none" # Remove this line if you wish to publish to pub.dev
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -28,9 +28,8 @@ dependencies:
   firebase_analytics:
 
   #User auth
-  firebase_auth: 
+  firebase_auth:
   google_sign_in:
-
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
@@ -50,29 +49,22 @@ dependencies:
   path_provider:
   cached_network_image:
   emoji_picker:
-  image_picker:
-  image_picker_saver:
+  image_picker: ^0.6.7+10
   image_cropper:
   firebase_storage:
   photo_view:
   modal_bottom_sheet:
   agora_rtc_engine:
-  permission_handler: ^3.0.0
+  permission_handler: ^3.3.0
   gradient_app_bar:
   esys_flutter_share:
   sqflite:
   intl:
-  flutter_svg:
   wakelock:
-  folding_cell:
-  import_sorter:
   dio:
   image_gallery_saver:
   gallery_saver:
-  random_string:
-  
-
-    
+  firebase_messaging:
 
 dev_dependencies:
   hive_generator:
@@ -80,14 +72,11 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
 
-
-
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter.
 flutter:
-
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
@@ -113,13 +102,13 @@ flutter:
     - family: UncialAntiqua
       fonts:
         - asset: fonts/UncialAntiqua.ttf
-  #       - asset: fonts/Schyler-Italic.ttf
-  #         style: italic
+    #       - asset: fonts/Schyler-Italic.ttf
+    #         style: italic
     - family: Croissan
       fonts:
         - asset: fonts/Croissan.ttf
-  #       - asset: fonts/TrajanPro_Bold.ttf
-  #         weight: 700
+    #       - asset: fonts/TrajanPro_Bold.ttf
+    #         weight: 700
     - family: EmilysCandy
       fonts:
         - asset: fonts/EmilysCandy.ttf

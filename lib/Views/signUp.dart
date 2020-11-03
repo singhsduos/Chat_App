@@ -1,4 +1,5 @@
 import 'package:ChatApp/Views/chatRoomsScreen.dart';
+import 'package:ChatApp/Views/signIn.dart';
 import 'package:ChatApp/Widget/customtheme.dart';
 import 'package:ChatApp/Widget/theme.dart';
 import 'package:ChatApp/helper/authenticate.dart';
@@ -18,13 +19,18 @@ import '../Widget/widget.dart';
 
 class SignUp extends StatefulWidget {
   final Function toggle;
-  SignUp(this.toggle);
+  final String token;
+  SignUp({Key key, this.toggle, this.token}) : super(key: key);
 
   @override
-  _SignUpState createState() => _SignUpState();
+  _SignUpState createState() => _SignUpState(this.token);
 }
 
 class _SignUpState extends State<SignUp> {
+ final String token;
+  _SignUpState(
+    this.token,
+  );
   bool isLoading = false;
   bool isLoggedIn = false;
   User currentUser;
@@ -66,6 +72,7 @@ class _SignUpState extends State<SignUp> {
             'chattingWith': null,
             'photoUrl': user.photoURL,
             'aboutMe': 'Hey there! I am using ChaTooApp',
+            'token': token,
 
             //  'state' : null,
           }).catchError((dynamic e) {
@@ -96,6 +103,7 @@ class _SignUpState extends State<SignUp> {
           await prefs.setString(
               'email', emailTextEditingController.text.trim());
           await prefs.setString('aboutMe', 'Hey there! I am using ChaTooApp');
+          await prefs.setString('token', token);
           Navigator.pushReplacement(
               context,
               MaterialPageRoute<MaterialPageRoute>(
@@ -129,7 +137,7 @@ class _SignUpState extends State<SignUp> {
         .catchError((dynamic onError) => print(onError));
     if (googleUser == null) {
       Fluttertoast.showToast(msg: 'SignUp fail');
-      
+
       this.setState(() {
         isLoading = false;
         Authenticate();
@@ -164,6 +172,7 @@ class _SignUpState extends State<SignUp> {
           'chattingWith': null,
           'email': user.email,
           'aboutMe': 'Hey there! I am using ChaTooApp',
+          'token': token,
           // 'state' : null,
         });
 
@@ -173,6 +182,8 @@ class _SignUpState extends State<SignUp> {
         await prefs.setString('username', currentUser.displayName);
         await prefs.setString('photoUrl', currentUser.photoURL);
         await prefs.setString('email', currentUser.email);
+        await prefs.setString('token', token);
+        await prefs.setString('aboutMe', 'Hey there! I am using ChaTooApp');
       } else {
         // Write data to local
         await prefs.setString('id', '${documents[0].data()['id']}');
@@ -180,6 +191,7 @@ class _SignUpState extends State<SignUp> {
         await prefs.setString('photoUrl', '${documents[0].data()['photoUrl']}');
         await prefs.setString('email', '${documents[0].data()['email']}');
         await prefs.setString('aboutMe', '${documents[0].data()['aboutMe']}');
+        await prefs.setString('token', '${documents[0].data()['token']}');
       }
       Fluttertoast.showToast(msg: 'SignUp successful');
       this.setState(() {
@@ -241,7 +253,6 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: Container(
                             child: Icon(
                               Icons.person_outlined,
-                              
                             ),
                           ),
                           focusedBorder: const OutlineInputBorder(
@@ -288,7 +299,6 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: Container(
                             child: Icon(
                               Icons.mail_outline,
-                             
                             ),
                           ),
                           focusedBorder: OutlineInputBorder(
@@ -343,7 +353,6 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: Container(
                             child: Icon(
                               Icons.vpn_key_outlined,
-                             
                             ),
                           ),
                           suffixIcon: Container(
@@ -410,7 +419,6 @@ class _SignUpState extends State<SignUp> {
                           prefixIcon: Container(
                             child: Icon(
                               Icons.vpn_key_outlined,
-                           
                             ),
                           ),
                           suffixIcon: Container(
@@ -536,7 +544,11 @@ class _SignUpState extends State<SignUp> {
                                   TextStyle(color: Colors.blue, fontSize: 16)),
                           InkWell(
                             onTap: () {
-                              widget.toggle();
+                              Navigator.push<MaterialPageRoute>(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (BuildContext context) =>
+                                          SignIn(token: token)));
                             },
                             child: Container(
                               padding: EdgeInsets.symmetric(vertical: 8),

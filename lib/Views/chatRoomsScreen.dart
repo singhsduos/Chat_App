@@ -9,6 +9,7 @@ import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:ChatApp/services/repository_log/log_repository.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -23,6 +24,7 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
   final FirebaseAuth auth = FirebaseAuth.instance;
+  final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
   UserProvider userProvider;
   PageController pageController;
   int _page = 0;
@@ -49,12 +51,48 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
       LogRepository.init(isHive: false, dbName: user.uid);
     });
     pageController = PageController();
+
+    _firebaseMessaging.configure(
+      onMessage: (Map<String, dynamic> message) async {
+        print("onMessage: $message");
+        showMessage('Notification', '$message');
+      },
+      onLaunch: (Map<String, dynamic> message) async {
+        print("onLaunch: $message");
+         showMessage('Notification', '$message');
+      },
+      onResume: (Map<String, dynamic> message) async {
+        print("onResume: $message");
+         showMessage('Notification', '$message');
+      },
+    );
   }
 
   @override
   void dispose() {
-    
     super.dispose();
+  }
+
+  dynamic showMessage(String title, String description) {
+    showDialog<Widget>(
+        context: context,
+        builder: (ctx) {
+          return AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            title: Text(title),
+            content: Text(description),
+            actions: <Widget>[
+              FlatButton(
+                onPressed: () {
+                  Navigator.pop(ctx);
+                },
+                child: Text("Dismiss"),
+              )
+            ],
+          );
+        });
   }
 
   // @override
