@@ -27,7 +27,7 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
- final String token;
+  final String token;
   _SignUpState(
     this.token,
   );
@@ -77,16 +77,35 @@ class _SignUpState extends State<SignUp> {
             //  'state' : null,
           }).catchError((dynamic e) {
             print(e);
-            setState(() {
-              isLoading = false;
-              Fluttertoast.showToast(
-                msg: 'Email already in use',
-                textColor: Color(0xFFFFFFFF),
-                backgroundColor: Colors.cyan,
-                fontSize: 16.0,
-                timeInSecForIosWeb: 4,
-              );
-            });
+            User user = FirebaseAuth.instance.currentUser;
+            if (signedInUser == null) {
+              setState(() {
+                isLoading = false;
+
+                Fluttertoast.showToast(
+                  msg: 'Email already in use',
+                  textColor: Color(0xFFFFFFFF),
+                  backgroundColor: Colors.cyan,
+                  fontSize: 16.0,
+                  timeInSecForIosWeb: 4,
+                );
+                return Authenticate();
+              });
+            } else {
+              print(user.uid);
+              setState(() {
+                isLoading = false;
+
+                Fluttertoast.showToast(
+                  msg: 'Email already in use',
+                  textColor: Color(0xFFFFFFFF),
+                  backgroundColor: Colors.cyan,
+                  fontSize: 16.0,
+                  timeInSecForIosWeb: 4,
+                );
+                return ChatRoom();
+              });
+            }
           });
 
           Fluttertoast.showToast(msg: "SignUp successful");
@@ -108,19 +127,68 @@ class _SignUpState extends State<SignUp> {
               context,
               MaterialPageRoute<MaterialPageRoute>(
                   builder: (BuildContext context) => ChatRoom()));
+        } else {
+          User user = FirebaseAuth.instance.currentUser;
+          if (signedInUser == null) {
+            setState(() {
+              isLoading = false;
+
+              Fluttertoast.showToast(
+                msg: 'Email already in use',
+                textColor: Color(0xFFFFFFFF),
+                backgroundColor: Colors.cyan,
+                fontSize: 16.0,
+                timeInSecForIosWeb: 4,
+              );
+              return Authenticate();
+            });
+          } else {
+            print(user.uid);
+            setState(() {
+              isLoading = false;
+
+              Fluttertoast.showToast(
+                msg: 'Email already in use',
+                textColor: Color(0xFFFFFFFF),
+                backgroundColor: Colors.cyan,
+                fontSize: 16.0,
+                timeInSecForIosWeb: 4,
+              );
+              return ChatRoom();
+            });
+          }
         }
       }).catchError((dynamic e) {
         print(e);
-        setState(() {
-          isLoading = false;
-          Fluttertoast.showToast(
-            msg: 'Email already in use',
-            textColor: Color(0xFFFFFFFF),
-            backgroundColor: Colors.cyan,
-            fontSize: 16.0,
-            timeInSecForIosWeb: 4,
-          );
-        });
+        User user = FirebaseAuth.instance.currentUser;
+        if (user == null) {
+          setState(() {
+            isLoading = false;
+
+            Fluttertoast.showToast(
+              msg: 'Email already in use',
+              textColor: Color(0xFFFFFFFF),
+              backgroundColor: Colors.cyan,
+              fontSize: 16.0,
+              timeInSecForIosWeb: 4,
+            );
+            return;
+          });
+        } else {
+          print(user.uid);
+          setState(() {
+            isLoading = false;
+
+            Fluttertoast.showToast(
+              msg: 'Email already in use',
+              textColor: Color(0xFFFFFFFF),
+              backgroundColor: Colors.cyan,
+              fontSize: 16.0,
+              timeInSecForIosWeb: 4,
+            );
+            return ChatRoom();
+          });
+        }
       });
     }
   }

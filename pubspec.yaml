@@ -55,7 +55,7 @@ dependencies:
   photo_view:
   modal_bottom_sheet:
   agora_rtc_engine:
-  permission_handler: ^3.3.0
+  permission_handler: 3.0.0
   gradient_app_bar:
   esys_flutter_share:
   sqflite:

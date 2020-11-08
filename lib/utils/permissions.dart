@@ -1,4 +1,5 @@
 import 'package:permission_handler/permission_handler.dart';
+
 import 'package:flutter/services.dart';
 
 class Permissions {
@@ -33,7 +34,7 @@ class Permissions {
     PermissionStatus permission =
         await PermissionHandler().checkPermissionStatus(PermissionGroup.camera);
     if (permission != PermissionStatus.granted &&
-        permission != PermissionStatus.denied) {
+        permission != PermissionStatus.disabled) {
       Map<PermissionGroup, PermissionStatus> permissionStatus =
           await PermissionHandler()
               .requestPermissions([PermissionGroup.camera]);
@@ -48,7 +49,7 @@ class Permissions {
     PermissionStatus permission = await PermissionHandler()
         .checkPermissionStatus(PermissionGroup.microphone);
     if (permission != PermissionStatus.granted &&
-        permission != PermissionStatus.denied) {
+        permission != PermissionStatus.disabled) {
       Map<PermissionGroup, PermissionStatus> permissionStatus =
           await PermissionHandler()
               .requestPermissions([PermissionGroup.microphone]);
@@ -60,17 +61,16 @@ class Permissions {
   }
 
   static void _handleInvalidPermissions(
-    PermissionStatus cameraPermissionStatus,
-    PermissionStatus microphonePermissionStatus,
-  ) {
+      PermissionStatus cameraPermissionStatus,
+      PermissionStatus microphonePermissionStatus) {
     if (cameraPermissionStatus == PermissionStatus.denied &&
         microphonePermissionStatus == PermissionStatus.denied) {
       throw new PlatformException(
           code: "PERMISSION_DENIED",
           message: "Access to camera and microphone denied",
           details: null);
-    } else if (cameraPermissionStatus == PermissionStatus.denied &&
-        microphonePermissionStatus == PermissionStatus.denied) {
+    } else if (cameraPermissionStatus == PermissionStatus.disabled &&
+        microphonePermissionStatus == PermissionStatus.disabled) {
       throw new PlatformException(
           code: "PERMISSION_DISABLED",
           message: "Location data is not available on device",
@@ -85,7 +85,7 @@ class Permissions {
           code: "PERMISSION_DENIED",
           message: "Access to microphone denied",
           details: null);
-    } else if (microphonePermissionStatus == PermissionStatus.denied) {
+    } else if (microphonePermissionStatus == PermissionStatus.disabled) {
       throw new PlatformException(
           code: "PERMISSION_DISABLED",
           message: "Location data is not available on device",

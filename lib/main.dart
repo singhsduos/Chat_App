@@ -34,7 +34,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final DatabaseMethods _authenticationMethods = DatabaseMethods();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
-  static const platform = const MethodChannel('TokenChannel');
+  // static const platform = const MethodChannel('TokenChannel');
   bool userIsLoggedIn;
   String token;
   dynamic _getdeviceToken() async {
@@ -82,7 +82,7 @@ class _MyAppState extends State<MyApp> {
     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
-      print( token);
+      // print( token);
 
     // User user = FirebaseAuth.instance.currentUser;
     return MultiProvider(

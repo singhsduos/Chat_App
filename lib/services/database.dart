@@ -22,9 +22,12 @@ class DatabaseMethods {
   }
 
   Future<Users> getUserDetails() async {
-    User currentUser = await FirebaseAuth.instance.currentUser;
+    User currentUser =  FirebaseAuth.instance.currentUser;
     DocumentSnapshot documentSnapshot = await users.doc(currentUser.uid).get();
-
+    if (currentUser == null) {
+     users.doc(currentUser.uid).get();
+    } 
+   
     return Users.fromMap(documentSnapshot.data());
   }
 

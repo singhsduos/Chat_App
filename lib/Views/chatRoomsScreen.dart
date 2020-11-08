@@ -8,6 +8,7 @@ import 'package:ChatApp/provider/provider.dart';
 import 'package:ChatApp/services/auth.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:ChatApp/services/repository_log/log_repository.dart';
+import 'package:ChatApp/utils/utilites.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
@@ -44,10 +45,20 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
   void initState() {
     super.initState();
 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
       userProvider = Provider.of<UserProvider>(context, listen: false);
 
-      userProvider.refreshUser();
+      await userProvider.refreshUser();
+      WidgetsBinding.instance.addObserver(this);
+
+      databaseMethods.getCurrentUser().then((user) {
+        setState(() {
+          isLoading = false;
+          currentUserId = user.uid;
+          // initials = Utils.getInitials(user.displayName);
+        });
+      });
+
       LogRepository.init(isHive: false, dbName: user.uid);
     });
     pageController = PageController();
@@ -59,11 +70,11 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
       },
       onLaunch: (Map<String, dynamic> message) async {
         print("onLaunch: $message");
-         showMessage('Notification', '$message');
+        showMessage('Notification', '$message');
       },
       onResume: (Map<String, dynamic> message) async {
         print("onResume: $message");
-         showMessage('Notification', '$message');
+        showMessage('Notification', '$message');
       },
     );
   }
@@ -71,6 +82,7 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
   @override
   void dispose() {
     super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
   }
 
   dynamic showMessage(String title, String description) {

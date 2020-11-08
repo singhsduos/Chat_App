@@ -9,6 +9,7 @@ class UserProvider with ChangeNotifier {
   Users get getUser => _user;
 
   void refreshUser() async {
+    
     Users user = await databaseMethods.getUserDetails();
     _user = user;
     notifyListeners();
