@@ -15,22 +15,28 @@ import 'package:ChatApp/Widget/widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import '../Widget/widget.dart';
 import 'chatRoomsScreen.dart';
 
 class SignIn extends StatefulWidget {
-  final Function toggle;
   final String token;
-  SignIn({Key key, this.toggle, this.token}) : super(key: key);
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  SignIn({@required this.token, this.analytics, this.observer});
 
   @override
-  _SignInState createState() => _SignInState(this.token, this.toggle);
+  _SignInState createState() =>
+      _SignInState(token: token, analytics: analytics, observer: observer);
 }
 
 class _SignInState extends State<SignIn> {
   String token;
-  final Function toggle;
-  _SignInState(this.token, this.toggle);
+
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  _SignInState({@required this.token, this.analytics, this.observer});
   final formKey = GlobalKey<FormState>();
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
@@ -84,7 +90,8 @@ class _SignInState extends State<SignIn> {
             Navigator.pushReplacement(
                 context,
                 MaterialPageRoute<MaterialPageRoute>(
-                    builder: (BuildContext context) => ChatRoom()));
+                    builder: (BuildContext context) =>
+                        ChatRoom(analytics: analytics, observer: observer)));
           } else {
             setState(() {
               Fluttertoast.showToast(
@@ -169,7 +176,6 @@ class _SignInState extends State<SignIn> {
         await prefs.setString('email', currentUser.email);
         await prefs.setString('token', token);
         await prefs.setString('aboutMe', 'Hey there! I am using ChaTooApp');
-
       } else {
         // Write data to local
         await prefs.setString('id', '${documents[0].data()['id']}');
@@ -187,7 +193,8 @@ class _SignInState extends State<SignIn> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute<MaterialPageRoute>(
-              builder: (BuildContext context) => ChatRoom()));
+              builder: (BuildContext context) =>
+                  ChatRoom(analytics: analytics, observer: observer)));
     }
   }
 

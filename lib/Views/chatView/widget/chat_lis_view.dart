@@ -17,13 +17,17 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ChatListView extends StatelessWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
   final Contact contact;
   final DatabaseMethods _authenticationMethods = DatabaseMethods();
 
-  ChatListView(this.contact);
+  ChatListView({@required this.contact, this.analytics, this.observer});
 
   @override
   Widget build(BuildContext context) {
@@ -34,8 +38,7 @@ class ChatListView extends StatelessWidget {
           Users user = snapshot.data;
 
           return ViewLayout(
-            contact: user,
-          );
+              contact: user, analytics: analytics, observer: observer);
         }
         return Center(
           child: Container(),
@@ -46,20 +49,21 @@ class ChatListView extends StatelessWidget {
 }
 
 class ViewLayout extends StatefulWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
   final Users contact;
-  ViewLayout({
-    @required this.contact,
-  });
+  ViewLayout({@required this.contact, this.analytics, this.observer});
 
   @override
-  _ViewLayoutState createState() => _ViewLayoutState(contact: contact);
+  _ViewLayoutState createState() => _ViewLayoutState(
+      contact: contact, analytics: analytics, observer: observer);
 }
 
 class _ViewLayoutState extends State<ViewLayout> {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
   final Users contact;
-  _ViewLayoutState({
-    @required this.contact,
-  });
+  _ViewLayoutState({@required this.contact, this.analytics, this.observer});
   final DatabaseMethods _chatMethods = DatabaseMethods();
 
   Users sender;
@@ -104,6 +108,16 @@ class _ViewLayoutState extends State<ViewLayout> {
     setState(() {});
   }
 
+  Future<Null> currentScreen() async {
+    await widget.analytics
+        .logEvent(name: 'Chat_Screens', parameters: <String, dynamic>{});
+  }
+
+  Future<Null> sendAnalytics() async {
+    await widget.analytics
+        .logEvent(name: 'tap_to_full_screen', parameters: <String, dynamic>{});
+  }
+
   @override
   void initState() {
     super.initState();
@@ -130,96 +144,102 @@ class _ViewLayoutState extends State<ViewLayout> {
     Message _message;
 
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute<MaterialPageRoute>(
-          builder: (context) => ConversationScreen(
-            recevier: widget.contact,
+      onTap: () {
+        currentScreen();
+        Navigator.push(
+          context,
+          MaterialPageRoute<MaterialPageRoute>(
+            builder: (context) => ConversationScreen(
+              recevier: widget.contact,
+            ),
           ),
-        ),
-      ),
+        );
+      },
       child: CustomTile(
         leading: GestureDetector(
-          onTap: () => showDialog<Widget>(
-            context: context,
-            builder: (BuildContext context) => CustomDialog(
-              url: contact.photoUrl != null
-                  ? contact.photoUrl
-                  : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg',
-              title: Text(
-                (widget.contact != null ? widget.contact.username : null) !=
-                        null
-                    ? widget.contact.username
-                    : '..',
-                overflow: TextOverflow.ellipsis,
-                style: TextStyle(
-                    fontFamily: "Arial",
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.0,
-                    wordSpacing: 1.0),
-              ),
-              icon1: IconButton(
-                icon: Icon(
-                  Icons.info_outline,
-                  color: Colors.cyan,
-                  size: 27,
+          onTap: () {
+            sendAnalytics();
+            showDialog<Widget>(
+              context: context,
+              builder: (BuildContext context) => CustomDialog(
+                url: contact.photoUrl != null
+                    ? contact.photoUrl
+                    : 'https://upload.wikimedia.org/wikipedia/commons/b/bc/Unknown_person.jpg',
+                title: Text(
+                  (widget.contact != null ? widget.contact.username : null) !=
+                          null
+                      ? widget.contact.username
+                      : '..',
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(
+                      fontFamily: "Arial",
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                      wordSpacing: 1.0),
                 ),
-                onPressed: () {
-                  Navigator.push<MaterialPageRoute>(
-                      context,
-                      MaterialPageRoute(
-                          builder: (BuildContext context) =>
-                              UserDetails(recevier: widget.contact)));
-                },
-              ),
-              icon2: IconButton(
-                icon: Icon(
-                  Icons.videocam,
-                  color: Colors.cyan,
-                  size: 27,
+                icon1: IconButton(
+                  icon: Icon(
+                    Icons.info_outline,
+                    color: Colors.cyan,
+                    size: 27,
+                  ),
+                  onPressed: () {
+                    Navigator.push<MaterialPageRoute>(
+                        context,
+                        MaterialPageRoute(
+                            builder: (BuildContext context) =>
+                                UserDetails(recevier: widget.contact)));
+                  },
                 ),
-                onPressed: () async =>
-                    await Permissions.cameraAndMicrophonePermissionsGranted()
-                        ? CallUtils.dial(
-                            from: sender,
-                            to: contact,
-                            context: context,
-                            callis: "video")
-                        : () {},
-              ),
-              icon3: IconButton(
-                icon: Icon(
-                  Icons.call,
-                  color: Colors.cyan,
-                  size: 27,
+                icon2: IconButton(
+                  icon: Icon(
+                    Icons.videocam,
+                    color: Colors.cyan,
+                    size: 27,
+                  ),
+                  onPressed: () async =>
+                      await Permissions.cameraAndMicrophonePermissionsGranted()
+                          ? CallUtils.dial(
+                              from: sender,
+                              to: contact,
+                              context: context,
+                              callis: "video")
+                          : () {},
                 ),
-                onPressed: () async =>
-                    await Permissions.microphonePermissionsGranted()
-                        ? CallUtils.dialVoice(
-                            from: sender,
-                            to: widget.contact,
-                            context: context,
-                            callis: "audio")
-                        : () {},
-              ),
-              icon4: IconButton(
-                icon: Icon(
-                  Icons.chat,
-                  color: Colors.cyan,
-                  size: 27,
+                icon3: IconButton(
+                  icon: Icon(
+                    Icons.call,
+                    color: Colors.cyan,
+                    size: 27,
+                  ),
+                  onPressed: () async =>
+                      await Permissions.microphonePermissionsGranted()
+                          ? CallUtils.dialVoice(
+                              from: sender,
+                              to: widget.contact,
+                              context: context,
+                              callis: "audio")
+                          : () {},
                 ),
-                onPressed: () => Navigator.push(
-                  context,
-                  MaterialPageRoute<MaterialPageRoute>(
-                    builder: (context) => ConversationScreen(
-                      recevier: widget.contact,
+                icon4: IconButton(
+                  icon: Icon(
+                    Icons.chat,
+                    color: Colors.cyan,
+                    size: 27,
+                  ),
+                  onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute<MaterialPageRoute>(
+                      builder: (context) => ConversationScreen(
+                        recevier: widget.contact,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ),
+            );
+          },
           child: Container(
             padding: EdgeInsets.all(1),
             decoration: BoxDecoration(
@@ -324,7 +344,6 @@ class _ViewLayoutState extends State<ViewLayout> {
             ),
           ),
           child: Container(
-            
             child: LastMessageContainer(
               stream: _chatMethods.fetchLastMessageBetween(
                 id: userProvider.getUser.userId,

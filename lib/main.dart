@@ -13,6 +13,8 @@ import 'package:ChatApp/Widget/theme.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 // ignore: avoid_void_async
 Future main() async {
@@ -34,6 +36,9 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   final DatabaseMethods _authenticationMethods = DatabaseMethods();
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging();
+  static FirebaseAnalytics analytics = FirebaseAnalytics();
+  static FirebaseAnalyticsObserver observer =
+      FirebaseAnalyticsObserver(analytics: analytics);
   // static const platform = const MethodChannel('TokenChannel');
   bool userIsLoggedIn;
   String token;
@@ -78,11 +83,10 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-  
     void _changeTheme(BuildContext buildContext, MyThemeKeys key) {
       CustomTheme.instanceOf(buildContext).changeTheme(key);
     }
-      // print( token);
+    // print( token);
 
     // User user = FirebaseAuth.instance.currentUser;
     return MultiProvider(
@@ -98,11 +102,13 @@ class _MyAppState extends State<MyApp> {
               title: 'ChatooApp',
               theme:
                   notifier.darkTheme ? MyThemes.darkTheme : MyThemes.lightTheme,
+              navigatorObservers: <NavigatorObserver>[observer],
               home: Constants.prefs.getBool('userIsLoggedIn') == true
-                  ? ChatRoom()
-                  : Authenticate(token: token));
+                  ? ChatRoom(analytics: analytics, observer: observer)
+                  : Authenticate(token: token,analytics: analytics,observer: observer));
         },
       ),
+      
     );
   }
 }

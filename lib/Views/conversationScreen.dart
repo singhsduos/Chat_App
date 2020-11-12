@@ -101,19 +101,6 @@ class _ConversationScreenState extends State<ConversationScreen> {
     });
   }
 
-  // @override
-  // Future<void> dispose() async {
-
-  //   databaseMethods.getCurrentUser().then((user) {
-  //     _currentUserId = user.uid;
-  //     setState(() {
-  //       sender =
-  //           Users(userId: user.uid, username: username, photoUrl: photoUrl);
-  //     });
-  //   });
-  //   super.dispose();
-  // }
-
   Future<Null> openDialog() async {
     switch (await showDialog<int>(
         context: context,
@@ -314,16 +301,12 @@ class _ConversationScreenState extends State<ConversationScreen> {
         ),
       ],
       leading: IconButton(
-        icon: const Icon(
-          Icons.arrow_back_ios,
-          color: Colors.white,
-          size: 27,
-        ),
-        onPressed: () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute<MaterialPageRoute>(
-                builder: (BuildContext context) => ChatRoom())),
-      ),
+          icon: const Icon(
+            Icons.arrow_back_ios,
+            color: Colors.white,
+            size: 27,
+          ),
+          onPressed: () => Navigator.pop(context)),
       centerTitle: false,
       title: GestureDetector(
         onTap: () {
@@ -967,7 +950,6 @@ class _ChatScreen extends State<ChatScreen> {
     });
   }
 
-
   //gallery image
 
   File newImagefile;
@@ -1003,8 +985,6 @@ class _ChatScreen extends State<ChatScreen> {
       });
     }
   }
-
-  
 
 //image from camera
   Future cameraImage() async {

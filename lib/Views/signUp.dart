@@ -14,23 +14,28 @@ import 'package:ChatApp/Widget/widget.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'chatRoomsScreen.dart';
 import '../Widget/widget.dart';
 
 class SignUp extends StatefulWidget {
-  final Function toggle;
+ 
   final String token;
-  SignUp({Key key, this.toggle, this.token}) : super(key: key);
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  SignUp({@required this.token, this.analytics, this.observer});
 
   @override
-  _SignUpState createState() => _SignUpState(this.token);
+  _SignUpState createState() =>
+      _SignUpState(token: token, analytics: analytics, observer: observer);
 }
 
 class _SignUpState extends State<SignUp> {
   final String token;
-  _SignUpState(
-    this.token,
-  );
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  _SignUpState({@required  this.token, this.analytics, this.observer});
   bool isLoading = false;
   bool isLoggedIn = false;
   User currentUser;
@@ -89,7 +94,7 @@ class _SignUpState extends State<SignUp> {
                   fontSize: 16.0,
                   timeInSecForIosWeb: 4,
                 );
-                return Authenticate();
+                return Authenticate(token: token,analytics: analytics,observer: observer);
               });
             } else {
               print(user.uid);
@@ -103,7 +108,7 @@ class _SignUpState extends State<SignUp> {
                   fontSize: 16.0,
                   timeInSecForIosWeb: 4,
                 );
-                return ChatRoom();
+                return ChatRoom(analytics: analytics, observer: observer);
               });
             }
           });
@@ -126,7 +131,7 @@ class _SignUpState extends State<SignUp> {
           Navigator.pushReplacement(
               context,
               MaterialPageRoute<MaterialPageRoute>(
-                  builder: (BuildContext context) => ChatRoom()));
+                  builder: (BuildContext context) => ChatRoom(analytics: analytics, observer: observer)));
         } else {
           User user = FirebaseAuth.instance.currentUser;
           if (signedInUser == null) {
@@ -140,7 +145,7 @@ class _SignUpState extends State<SignUp> {
                 fontSize: 16.0,
                 timeInSecForIosWeb: 4,
               );
-              return Authenticate();
+              return Authenticate(token: token,analytics: analytics,observer: observer);
             });
           } else {
             print(user.uid);
@@ -154,7 +159,7 @@ class _SignUpState extends State<SignUp> {
                 fontSize: 16.0,
                 timeInSecForIosWeb: 4,
               );
-              return ChatRoom();
+              return ChatRoom(analytics: analytics, observer: observer);
             });
           }
         }
@@ -186,7 +191,7 @@ class _SignUpState extends State<SignUp> {
               fontSize: 16.0,
               timeInSecForIosWeb: 4,
             );
-            return ChatRoom();
+            return ChatRoom(analytics: analytics, observer: observer);
           });
         }
       });
@@ -208,7 +213,7 @@ class _SignUpState extends State<SignUp> {
 
       this.setState(() {
         isLoading = false;
-        Authenticate();
+        Authenticate(token: token,analytics: analytics,observer: observer);
       });
     }
     GoogleSignInAuthentication googleAuth = await googleUser.authentication;
@@ -269,7 +274,7 @@ class _SignUpState extends State<SignUp> {
       Navigator.pushReplacement(
           context,
           MaterialPageRoute<MaterialPageRoute>(
-              builder: (BuildContext context) => ChatRoom()));
+              builder: (BuildContext context) => ChatRoom(analytics: analytics, observer: observer)));
     } else {
       Fluttertoast.showToast(msg: 'SignUp fail');
       this.setState(() {

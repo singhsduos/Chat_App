@@ -7,16 +7,23 @@ import 'package:ChatApp/provider/provider.dart';
 import 'package:ChatApp/services/database.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 import 'package:provider/provider.dart';
 
 class ChatListScreen extends StatelessWidget {
   
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+
+  ChatListScreen({@required this.analytics, this.observer});
+
   @override
   Widget build(BuildContext context) {
     return PickupLayout(
       scaffold: Scaffold(
         backgroundColor: Colors.transparent,
-        body: ChatListContainer(),
+        body: ChatListContainer(analytics: analytics, observer: observer),
         floatingActionButton: FloatingActionButton(
           backgroundColor: Colors.cyan,
           onPressed: () {
@@ -34,8 +41,10 @@ class ChatListScreen extends StatelessWidget {
 }
 
 class ChatListContainer extends StatelessWidget {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  ChatListContainer({@required this.analytics, this.observer});
   DatabaseMethods databaseMethods = DatabaseMethods();
-  
 
   @override
   Widget build(BuildContext context) {
@@ -44,7 +53,7 @@ class ChatListContainer extends StatelessWidget {
     return Container(
       child: StreamBuilder<QuerySnapshot>(
           stream: databaseMethods.fetchContacts(
-            userId: userProvider.getUser.userId,  
+            userId: userProvider.getUser.userId,
           ),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
@@ -59,7 +68,8 @@ class ChatListContainer extends StatelessWidget {
                 itemBuilder: (context, index) {
                   Contact contact = Contact.fromMap(docList[index].data());
 
-                  return ChatListView(contact);
+                  return ChatListView(contact: contact,
+                      analytics:analytics, observer: observer);
                 },
               );
             }
@@ -69,5 +79,3 @@ class ChatListContainer extends StatelessWidget {
     );
   }
 }
-
-

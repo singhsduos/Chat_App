@@ -91,7 +91,7 @@ class _SideDrawerState extends State<SideDrawer> {
                         context,
                         MaterialPageRoute<MaterialPageRoute>(
                             builder: (BuildContext context) =>
-                                Authenticate())); // Navigator.pop(context, 1);
+                                Authenticate(token: null,))); // Navigator.pop(context, 1);
                   },
                   child: Row(
                     children: <Widget>[

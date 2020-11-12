@@ -15,13 +15,22 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_analytics/firebase_analytics.dart';
+import 'package:firebase_analytics/observer.dart';
 
 class ChatRoom extends StatefulWidget {
+ 
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+  ChatRoom({@required this.analytics, this.observer});
   @override
-  _ChatRoomState createState() => _ChatRoomState();
+  _ChatRoomState createState() => _ChatRoomState(analytics:analytics, observer:observer);
 }
 
 class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
+  final FirebaseAnalytics analytics;
+  final FirebaseAnalyticsObserver observer;
+   _ChatRoomState({@required this.analytics, this.observer});
   AuthMethods authMethods = AuthMethods();
   DatabaseMethods databaseMethods = DatabaseMethods();
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -40,6 +49,8 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
 
   bool isLoading = false;
   User user = FirebaseAuth.instance.currentUser;
+
+  
 
   @override
   void initState() {
@@ -204,8 +215,8 @@ class _ChatRoomState extends State<ChatRoom> with WidgetsBindingObserver {
           drawer: SideDrawer(),
           body: TabBarView(
             children: <Widget>[
-              ChatListScreen(),
-              LogScreen(),
+              ChatListScreen(analytics: analytics, observer: observer),
+              LogScreen(analytics: analytics, observer: observer),
             ],
           ),
         ),
